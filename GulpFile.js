@@ -1,4 +1,4 @@
-const _PROJECTNAME = '';
+const _PROJECTNAME = 'base';
 
 var gulp = require('gulp'),
 	concat = require('gulp-concat-css'),
@@ -8,6 +8,7 @@ var gulp = require('gulp'),
 	uglify = require('gulp-uglify'),
 	imageResize = require('gulp-image-resize'),
 	tinypng = require('gulp-tinypng'),
+
 	browserSync = require('browser-sync').create();
 
 /*
@@ -28,9 +29,9 @@ var gulp = require('gulp'),
  * http://www.imagemagick.org/script/binary-releases.php
  * */
 
-var tinypngToken = 'hHrU0V0DGG3tNna6R1sqNNOqqU-x1S4u';
+const tinypngToken = false;
 
-// Content structure
+// Source Content structure
 
 var source = {
 	content: '*',
@@ -48,7 +49,7 @@ source.js = {
 };
 
 source.index = {
-	content: '*.html',
+	content: '**/*.html',
 	location: './'
 };
 
@@ -62,6 +63,8 @@ source.images.largePhotos = {
 	location: source.images.location + 'largePhotos/'
 };
 
+// Source Content structure
+
 var dist = {
 	content: '*',
 	location: 'dist/'
@@ -73,10 +76,16 @@ dist.css.location = dist.location + dist.css.location;
 dist.js = source.js;
 dist.js.location = dist.location + dist.js.location;
 
+dist.index = source.index;
+dist.index.location = dist.location + dist.index.location;
+
+dist.images = source.images;
+dist.images.location = dist.location + dist.images.location;
+
 // CSS
 
 gulp.task('css', function() {
-	gulp.src(css.location + css.content)
+	gulp.src(source.css.location + source.css.content)
 		.pipe(concat(_PROJECTNAME + '.css'))
 		.pipe(gulp.dest(dist.css.location))
 		.pipe(minifycss())
@@ -86,12 +95,14 @@ gulp.task('css', function() {
 		.pipe(gulp.dest(dist.css.location));
 });
 
+gulp.task('css-watch', ['css'], function () {
+	browserSync.reload();
+});
+
 // JS
 
 gulp.task('js', function() {
-	gulp.src(jsfiles)
-		.pipe(jshint())
-		.pipe(jshint.reporter('default'))
+	gulp.src(source.js.location + source.js.content)
 		.pipe(gulp.dest(dist.js.location + _PROJECTNAME + '.js'));
 	gulp.src([dist.js.location + _PROJECTNAME + '.js'])
 		.pipe(rename({
@@ -103,9 +114,13 @@ gulp.task('js', function() {
 		.pipe(gulp.dest(dist.js.location));
 });
 
-// Images
+gulp.task('js-watch', ['js'], function () {
+	browserSync.reload();
+});
 
-gulp.task('resizeLargePhotos', function () {
+// IMAGES
+
+gulp.task('resizePhotos', function () {
 	gulp.src(source.images.largePhotos.location + source.images.largePhotos.content)
 		.pipe(imageResize({
 			height : 960,
@@ -114,39 +129,32 @@ gulp.task('resizeLargePhotos', function () {
 		.pipe(gulp.dest(dist.location + source.images.largePhotos.location));
 });
 
-gulp.task('tinyImages', function () {
-	gulp.src(source.images.location + source.images.content)
-		.pipe(tinypng(tinypngToken))
-		.pipe(gulp.dest(source.images.location));
+gulp.task('tinyPhotosSource', function () {
+	if (tinypngToken)
+		gulp.src(source.images.location + source.images.content)
+			.pipe(tinypng(tinypngToken))
+			.pipe(gulp.dest(source.images.location));
+	else
+		console.log('TinyPNG Token Required');
 });
 
-gulp.task('tinyLargePhotos', function () {
-	gulp.src(source.images.largePhotos.location + source.images.largePhotos.content)
-		.pipe(tinypng(tinypngToken))
-		.pipe(gulp.dest(source.images.largePhotos.location));
-});
+// SERVER
 
-gulp.task('tiny', ['tinyImages', 'tinyLargePhotos']);
-
-gulp.task('watch', function () {
-	gulp.watch(source.css.location + source.css.content, ['css']);
-});
-
-gulp.task('watch', ['css'], function () {
-	browserSync.reload();
-});
-
-// Watch scss AND html files, doing different things with each.
-gulp.task('serve', ['oai'], function () {
+gulp.task('serve', function () {
 
 	// Serve files from the root of this project
 	browserSync.init({
 		server: {
-			baseDir: "./"
+			baseDir: "./",
+			index: "index.html",
+			routes: {
+				"/home": "./index.html"
+			}
 		}
 	});
 
-	gulp.watch(source.css.location + source.css.content, ['oai-watch']);
+	gulp.watch([source.css.location + source.css.content], ['css-watch']);
+	gulp.watch([source.js.location + source.js.content], ['js-watch']);
 	gulp.watch(source.index.content).on("change", browserSync.reload);
 
 });
