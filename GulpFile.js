@@ -39,23 +39,23 @@ var source = {
 };
 
 source.css = {
-	content: '*.css',
-	location: 'css/'
+	content: '**/*.css',
+	location: source.location + 'css/'
 };
 
 source.js = {
 	content: '*.js',
-	location: 'js/'
+	location: source.location + 'js/'
 };
 
 source.index = {
 	content: '**/*.html',
-	location: './'
+	location: source.location
 };
 
 source.images = {
 	content: '*.*',
-	location: 'img/'
+	location: source.location + 'img/'
 };
 
 source.images.largePhotos = {
