@@ -1,7 +1,8 @@
 const _PROJECTNAME = 'base';
 
 var gulp = require('gulp'),
-	concat = require('gulp-concat-css'),
+	concat = require('gulp-concat'),
+	concatCSS = require('gulp-concat-css'),
 	jshint = require('gulp-jshint'),
 	minifycss = require('gulp-minify-css'),
 	rename = require('gulp-rename'),
@@ -39,7 +40,7 @@ var source = {
 };
 
 source.css = {
-	content: '**/*.css',
+	content: '*.css',
 	location: source.location + 'css/'
 };
 
@@ -70,23 +71,21 @@ var dist = {
 	location: 'dist/'
 };
 
-dist.css = source.css;
-dist.css.location = dist.location + dist.css.location;
+dist.css = {
+	content: '*.css',
+	location: dist.location + 'css/'
+};
 
-dist.js = source.js;
-dist.js.location = dist.location + dist.js.location;
-
-dist.index = source.index;
-dist.index.location = dist.location + dist.index.location;
-
-dist.images = source.images;
-dist.images.location = dist.location + dist.images.location;
+dist.js = {
+	content: '*.js',
+	location: dist.location + 'js/'
+};
 
 // CSS
 
 gulp.task('css', function() {
 	gulp.src(source.css.location + source.css.content)
-		.pipe(concat(_PROJECTNAME + '.css'))
+		.pipe(concatCSS(_PROJECTNAME + '.css'))
 		.pipe(gulp.dest(dist.css.location))
 		.pipe(minifycss())
 		.pipe(rename({
@@ -103,13 +102,13 @@ gulp.task('css-watch', ['css'], function () {
 
 gulp.task('js', function() {
 	gulp.src(source.js.location + source.js.content)
-		.pipe(gulp.dest(dist.js.location + _PROJECTNAME + '.js'));
-	gulp.src([dist.js.location + _PROJECTNAME + '.js'])
-		.pipe(rename({
-			extname: '.min.js'
-		}))
+		.pipe(concat(_PROJECTNAME + '.js'))
+		.pipe(gulp.dest(dist.js.location))
 		.pipe(uglify({
 			preserveComments: 'some'
+		}))
+		.pipe(rename({
+			extname: '.min.js'
 		}))
 		.pipe(gulp.dest(dist.js.location));
 });
