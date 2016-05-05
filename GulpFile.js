@@ -4,7 +4,7 @@ var gulp = require('gulp'),
 	concat = require('gulp-concat'),
 	concatCSS = require('gulp-concat-css'),
 	jshint = require('gulp-jshint'),
-	minifycss = require('gulp-minify-css'),
+	cleanCSS = require('gulp-clean-css'),
 	rename = require('gulp-rename'),
 	uglify = require('gulp-uglify'),
 	imageResize = require('gulp-image-resize'),
@@ -87,7 +87,7 @@ gulp.task('css', function() {
 	gulp.src(source.css.location + source.css.content)
 		.pipe(concatCSS(_PROJECTNAME + '.css'))
 		.pipe(gulp.dest(dist.css.location))
-		.pipe(minifycss())
+		.pipe(cleanCSS())
 		.pipe(rename({
 			extname: '.min.css'
 		}))
