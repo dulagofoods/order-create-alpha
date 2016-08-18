@@ -1,9 +1,12 @@
 const _PROJECTNAME = 'base';
 
 var gulp = require('gulp'),
+	watch = require('gulp-watch'),
+	batch = require('gulp-batch'),
+	print = require('gulp-print'),
+	plumber = require('gulp-plumber'),
 	concat = require('gulp-concat'),
 	concatCSS = require('gulp-concat-css'),
-	jshint = require('gulp-jshint'),
 	cleanCSS = require('gulp-clean-css'),
 	rename = require('gulp-rename'),
 	uglify = require('gulp-uglify'),
@@ -36,11 +39,11 @@ const tinypngToken = false;
 
 var source = {
 	content: '*',
-	location: './'
+	location: 'src/'
 };
 
 source.css = {
-	content: '*.css',
+	content: '**/*.css',
 	location: source.location + 'css/'
 };
 
@@ -68,7 +71,7 @@ source.images.largePhotos = {
 
 var dist = {
 	content: '*',
-	location: 'dist/'
+	location: 'public/dist/'
 };
 
 dist.css = {
@@ -87,6 +90,7 @@ gulp.task('css', function() {
 	gulp.src(source.css.location + source.css.content)
 		.pipe(concatCSS(_PROJECTNAME + '.css'))
 		.pipe(gulp.dest(dist.css.location))
+		.pipe(plumber())
 		.pipe(cleanCSS())
 		.pipe(rename({
 			extname: '.min.css'
@@ -95,7 +99,10 @@ gulp.task('css', function() {
 });
 
 gulp.task('css-watch', ['css'], function () {
-	browserSync.reload();
+	watch(source.css.location + source.css.content, batch(function (events, done) {
+		gulp.start('css', done);
+		browserSync.reload();
+	}));
 });
 
 // JS
@@ -104,6 +111,7 @@ gulp.task('js', function() {
 	gulp.src(source.js.location + source.js.content)
 		.pipe(concat(_PROJECTNAME + '.js'))
 		.pipe(gulp.dest(dist.js.location))
+		.pipe(plumber())
 		.pipe(uglify({
 			preserveComments: 'some'
 		}))
@@ -114,7 +122,10 @@ gulp.task('js', function() {
 });
 
 gulp.task('js-watch', ['js'], function () {
-	browserSync.reload();
+	watch(source.js.location + source.js.content, batch(function (events, done) {
+		gulp.start('js', done);
+		browserSync.reload();
+	}));
 });
 
 // IMAGES
@@ -144,7 +155,7 @@ gulp.task('serve', function () {
 	// Serve files from the root of this project
 	browserSync.init({
 		server: {
-			baseDir: "./",
+			baseDir: "./public/",
 			index: "index.html",
 			routes: {
 				"/home": "./index.html"
@@ -152,10 +163,8 @@ gulp.task('serve', function () {
 		}
 	});
 
-	gulp.watch([source.css.location + source.css.content], ['css-watch']);
-	gulp.watch([source.js.location + source.js.content], ['js-watch']);
-	gulp.watch(source.index.content).on("change", browserSync.reload);
+	gulp.watch(source.index.content).on('change', browserSync.reload);
 
 });
 
-gulp.task('default', ['serve']);
+gulp.task('default', ['serve', 'css-watch', 'js-watch']);
