@@ -39,7 +39,7 @@ const tinypngToken = false;
 
 var source = {
 	content: '*',
-	location: 'src/'
+	location: './_src/'
 };
 
 source.css = {
@@ -67,11 +67,17 @@ source.images.largePhotos = {
 	location: source.images.location + 'largePhotos/'
 };
 
-// Source Content structure
+// Public Content structure
+
+var public = {
+	location: './public/'
+};
+
+// Dist Content structure
 
 var dist = {
 	content: '*',
-	location: 'public/dist/'
+	location: public.location + 'dist/'
 };
 
 dist.css = {
