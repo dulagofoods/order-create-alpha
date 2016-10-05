@@ -29,18 +29,32 @@
     "url": "https://github.com/elbitdigital/base.git"
   },
   "keywords": [
-    "letsmowe",
-    "mowe",
+    "base",
     "elbitdigital",
-    "elbit",
-    "foundation",
-    "base"
+    "elbit"
   ],
   "author": {
-    "name": "Eduardo Barros",
-    "email": "dbajrs@noibe.com",
-    "url": "dbarjs.noibe.com"
+    "name": "Elbit Digital",
+    "email": "contact@elbit.com.br",
+    "url": "elbit.com.br"
   },
+  "contributors": [
+    {
+      "name": "Cristiano Fromagio",
+      "email": "cristiano@elbit.com.br",
+      "url": "elbit.com.br"
+    },
+    {
+      "name": "Eduardo Barros",
+      "email": "eduardo@elbit.com.br",
+      "url": "dbarjs.github.io"
+    },
+    {
+      "name": "Rafael Spoladore",
+      "email": "rafael@elbit.com.br",
+      "url": "elbit.com.br"
+    }
+  ],
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/elbitdigital/base/issues"
