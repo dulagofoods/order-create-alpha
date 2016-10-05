@@ -1,12 +1,12 @@
 /*!
- * Villa Framework v2.8.9 (http://getvilla.org/)
+ * Villa Framework v2.9.0 (http://getvilla.org/)
  * Copyright 2013-2015 Noibe Developers
  * Licensed under MIT (https://github.com/noibe/villa/blob/master/LICENSE)
 *//*!
- * Villa Container v2.0.0 (http://getvilla.org/)
- * Copyright 2013-2015 Noibe Developers
+ * Villa Container v2.5.0 (http://getvilla.org/)
+ * Copyright 2013-2016 Noibe Developers
  * Licensed under MIT (https://github.com/noibe/villa/blob/master/LICENSE)
-*/.container{margin-right:auto;margin-left:auto}@media (max-width:60em){.container{width:100%}}@media (min-width:60em){.container{width:64em}}@media (min-width:72em){.blog,.full,.wide{width:100%}.wide{max-width:72em}.full{max-width:96em}}/*!
+*/.child-width-100,.container,.width-100{width:100%}.container{margin-right:auto;margin-left:auto}/*!
  * Villa Flex v3.0.0 (http://getvilla.org/)
  * Copyright 2013-2015 Noibe Developers
  * Licensed under MIT (https://github.com/noibe/villa/blob/master/LICENSE)
@@ -26,7 +26,7 @@
  * Villa UI Helper v2.5.0 (http://getvilla.org/)
  * Copyright 2013-2015 Noibe Developers
  * Licensed under MIT (https://github.com/noibe/villa/blob/master/LICENSE)
-*/.child-h-opacity-1>:hover,.child-opacity-1>*,.h-opacity-1:hover,.opacity-1{opacity:1}.child-h-opacity-10>:hover,.child-opacity-10>*,.h-opacity-10:hover,.opacity-10{opacity:.1}.child-h-opacity-20>:hover,.child-opacity-20>*,.h-opacity-20:hover,.opacity-20{opacity:.2}.child-h-opacity-30>:hover,.child-opacity-30>*,.h-opacity-30:hover,.opacity-30{opacity:.3}.child-h-opacity-40>:hover,.child-opacity-40>*,.h-opacity-40:hover,.opacity-40{opacity:.4}.child-h-opacity-50>:hover,.child-opacity-50>*,.h-opacity-50:hover,.opacity-50{opacity:.5}.child-h-opacity-60>:hover,.child-opacity-60>*,.h-opacity-60:hover,.opacity-60{opacity:.6}.child-h-opacity-70>:hover,.child-opacity-70>*,.h-opacity-70:hover,.opacity-70{opacity:.7}.child-h-opacity-80>:hover,.child-opacity-80>*,.h-opacity-80:hover,.opacity-80{opacity:.8}.child-h-opacity-90>:hover,.child-opacity-90>*,.h-opacity-90:hover,.opacity-90{opacity:.9}.bg-cover{background-repeat:no-repeat;background-size:cover;-moz-background-size:cover;-o-background-size:cover;-webkit-background-size:cover}.child-height-100,.height-100{height:100%}.child-width-100,.width-100{width:100%}/*!
+*/.child-h-opacity-1>:hover,.child-opacity-1>*,.h-opacity-1:hover,.opacity-1{opacity:1}.child-h-opacity-10>:hover,.child-opacity-10>*,.h-opacity-10:hover,.opacity-10{opacity:.1}.child-h-opacity-20>:hover,.child-opacity-20>*,.h-opacity-20:hover,.opacity-20{opacity:.2}.child-h-opacity-30>:hover,.child-opacity-30>*,.h-opacity-30:hover,.opacity-30{opacity:.3}.child-h-opacity-40>:hover,.child-opacity-40>*,.h-opacity-40:hover,.opacity-40{opacity:.4}.child-h-opacity-50>:hover,.child-opacity-50>*,.h-opacity-50:hover,.opacity-50{opacity:.5}.child-h-opacity-60>:hover,.child-opacity-60>*,.h-opacity-60:hover,.opacity-60{opacity:.6}.child-h-opacity-70>:hover,.child-opacity-70>*,.h-opacity-70:hover,.opacity-70{opacity:.7}.child-h-opacity-80>:hover,.child-opacity-80>*,.h-opacity-80:hover,.opacity-80{opacity:.8}.child-h-opacity-90>:hover,.child-opacity-90>*,.h-opacity-90:hover,.opacity-90{opacity:.9}.bg-cover{background-repeat:no-repeat;background-size:cover;-moz-background-size:cover;-o-background-size:cover;-webkit-background-size:cover}.child-height-100,.height-100{height:100%}/*!
  * Villa UX Helper v1.0.0 (http://getvilla.org/)
  * Copyright 2013-2015 Noibe Developers
  * Licensed under MIT (https://github.com/noibe/villa/blob/master/LICENSE)
