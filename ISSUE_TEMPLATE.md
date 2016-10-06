@@ -7,8 +7,9 @@
 - [ ] Arquivo de logo (SVG)
 - [ ] Lib. de ícones (Fontello)
 - [ ] Projeto no Typekit
+- [ ] Incorporação de configuração do Typekit no index
 - [ ] Projeto no Firebase
-- [x] Configurações de deploy do Firebase
+- [ ] Configurações de deploy do Firebase (.firebaserc)
 - [ ] Configuração do domínio (DNS)
 - [ ] Configuração de emails
 - [ ] Projeto no Analytics
