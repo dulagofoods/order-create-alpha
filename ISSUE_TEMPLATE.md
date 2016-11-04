@@ -9,6 +9,7 @@
 - [ ] Projeto no Typekit
 - [ ] Incorporação de configuração do Typekit no index
 - [ ] Projeto no Firebase
+- [ ] Compartilhar projeto no Firebase com time
 - [ ] Configurações de deploy do Firebase (.firebaserc)
 - [ ] Configuração do domínio (DNS)
 - [ ] Configuração de emails
