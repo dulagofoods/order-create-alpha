@@ -35,28 +35,18 @@
   ],
   "author": {
     "name": "Elbit Digital",
-    "email": "contact@elbit.com.br",
-    "url": "elbit.com.br"
+    "email": "dbarjs@gmail.com.br",
+    "url": "dbarjs.github.io"
   },
   "contributors": [
     {
-      "name": "Cristiano Fromagio",
-      "email": "cristiano@elbit.com.br",
-      "url": "elbit.com.br"
-    },
-    {
       "name": "Eduardo Barros",
-      "email": "eduardo@elbit.com.br",
+      "email": "dbarjs@gmail.com.br",
       "url": "dbarjs.github.io"
-    },
-    {
-      "name": "Rafael Spoladore",
-      "email": "rafael@elbit.com.br",
-      "url": "elbit.com.br"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/elbitdigital/base/issues"
+    "url": "https://github.com/dulagorefeicoes/base/issues"
   }
 }
