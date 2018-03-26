@@ -7,7 +7,9 @@
 <script src="dist/js/villa.min.js"></script>
 <link rel="stylesheet" href="dist/css/villa.min.css"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css"  media="screen,projection"/>
+<link rel="stylesheet" href="dist/css/order-create-alpha.css">
 <!--[if lt IE 9]>
 <link rel="stylesheet" type="text/css" href="dist/css/material-colors.css"/>
 <link rel="stylesheet" type="text/css" href="dist/css/villa-cross.min.css"/>
@@ -20,6 +22,15 @@
 
   .OrderApp {
     position: relative;
+    -webkit-align-items: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
     width: 100%;
   }
 
@@ -31,23 +42,58 @@
     display: flex;
     -webkit-flex-flow: column;
     flex-flow: column;
-    position: relative;
     height: 100%;
+    padding: 1rem;
+    position: relative;
     width: 100%;
+  }
+
+  .OrderApp-actionButtons {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+
+  @media (min-width: 768px) {
+
+    .OrderApp-inner {
+      max-width: 768px;
+    }
+
+  }
+
+  @media (min-width: 960px) {
+
+    .OrderApp-inner {
+      max-width: 960px;
+    }
+
   }
 
 </style>
 
-<body>
+<body class="grey-200">
 
-<h1>Order App</h1>
+<h1 class="header">Order App</h1>
 
-<div id="orderApp" class="OrderApp grey-100">
-
-
+<div id="orderApp" class="OrderApp">
 
 </div>
 
+<script type="text/javascript" src="dist/js/materialize.js"></script>
+<script>
+
+  M.AutoInit(document.body);
+
+</script>
 <script src="dist/js/moment-with-locales.js"></script>
 <script>
 
@@ -61,55 +107,38 @@
   const socket = io.connect('http://192.168.1.4:3000');
 
 </script>
+
+<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  const config = {
+    apiKey: "AIzaSyD-oJ2bifB4i3eq5XysEkkW34otJuuz1xE",
+    authDomain: "dulago-com-br.firebaseapp.com",
+    databaseURL: "https://dulago-com-br.firebaseio.com",
+    projectId: "dulago-com-br",
+    storageBucket: "dulago-com-br.appspot.com",
+    messagingSenderId: "265386755560"
+  };
+  firebase.initializeApp(config);
+</script>
+<script>
+
+  const databaseRef = firebase.database();
+  const ordersRef = databaseRef.ref('orders');
+
+</script>
 <script src="dist/js/order-create-alpha.js"></script>
 
 <script>
 
-class OrderApp {
 
-  constructor(element) {
-
-    this.element = element;
-    this.orders = [];
-
-    this.build();
-
-  }
-
-  build() {
-
-    this.innerElement = document.createElement('div');
-    this.innerElement.className = 'OrderApp-inner';
-    this.element.append(this.innerElement);
-
-    this.orderList = document.createElement('div');
-    this.orderList.className = 'OrderApp-orderList';
-    this.innerElement.append(this.orderList);
-
-    this.actionButtons = document.createElement('div');
-    this.actionButtons.className = 'OrderApp-actionButtons';
-    this.innerElement.append(this.actionButtons);
-
-    this.createOrderButton = document.createElement('button');
-    this.createOrderButton.className = 'btn';
-    this.createOrderButton.innerHTML = 'Criar pedido';
-    this.actionButtons.append(this.createOrderButton);
-
-  }
-
-  push() {
-
-    this.orders.push(new Order());
-
-  }
-
-}
 
 </script>
 
 <script>
 
-  const orderApp = new OrderApp(document.getElementById('orderApp'));
+  const orderApp = new OrderApp(document.getElementById('orderApp'), ordersRef);
+  // orderApp.createOrder();
 
 </script>
 

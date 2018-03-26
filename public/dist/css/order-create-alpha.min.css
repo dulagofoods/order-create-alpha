@@ -1,4 +1,4 @@
-/*!
+.Order{border-radius:3px;display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex;-webkit-flex-flow:column;flex-flow:column;margin-bottom:1em;width:100%}.Order.is-deleted{display:none}.OrderConsumer{width:100%}.OrderConsumer-consumerNameField input{font-weight:500}.OrderItem{-webkit-align-items:center;align-items:center;display:-webkit-box;display:-moz-box;display:-ms-flexbox;display:-webkit-flex;display:flex}.OrderItem.is-deleted{display:none}/*!
  * Du Lago {ProjectName} Project v0.0.0 (http://elbit.com.br/)
  * Copyright 2013-2018 Elbit Developers
  * Licensed under MIT (https://github.com/elbitdigital/base/blob/master/LICENSE)

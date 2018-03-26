@@ -152,6 +152,7 @@ gulp.task('serve', function () {
 
 	// Serve files from the root of this project
 	browserSync.init({
+    ghostMode: false,
 		server: {
 			baseDir: "./public/",
 			index: "index.html",
