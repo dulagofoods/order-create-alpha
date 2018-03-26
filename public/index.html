@@ -6,6 +6,8 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
 <script src="dist/js/villa.min.js"></script>
 <link rel="stylesheet" href="dist/css/villa.min.css"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css"  media="screen,projection"/>
 <!--[if lt IE 9]>
 <link rel="stylesheet" type="text/css" href="dist/css/material-colors.css"/>
 <link rel="stylesheet" type="text/css" href="dist/css/villa-cross.min.css"/>
@@ -14,9 +16,102 @@
 <script src="dist/js/classList.min.js"></script>
 <![endif]-->
 
+<style>
+
+  .OrderApp {
+    position: relative;
+    width: 100%;
+  }
+
+  .OrderApp-inner {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    position: relative;
+    height: 100%;
+    width: 100%;
+  }
+
+</style>
+
 <body>
 
+<h1>Order App</h1>
 
+<div id="orderApp" class="OrderApp grey-100">
+
+
+
+</div>
+
+<script src="dist/js/moment-with-locales.js"></script>
+<script>
+
+  moment.locale('pt-br');
+  console.log(moment().format());
+
+</script>
+<script src="dist/js/socket.io.js"></script>
+<script>
+
+  const socket = io.connect('http://192.168.1.4:3000');
+
+</script>
+<script src="dist/js/order-create-alpha.js"></script>
+
+<script>
+
+class OrderApp {
+
+  constructor(element) {
+
+    this.element = element;
+    this.orders = [];
+
+    this.build();
+
+  }
+
+  build() {
+
+    this.innerElement = document.createElement('div');
+    this.innerElement.className = 'OrderApp-inner';
+    this.element.append(this.innerElement);
+
+    this.orderList = document.createElement('div');
+    this.orderList.className = 'OrderApp-orderList';
+    this.innerElement.append(this.orderList);
+
+    this.actionButtons = document.createElement('div');
+    this.actionButtons.className = 'OrderApp-actionButtons';
+    this.innerElement.append(this.actionButtons);
+
+    this.createOrderButton = document.createElement('button');
+    this.createOrderButton.className = 'btn';
+    this.createOrderButton.innerHTML = 'Criar pedido';
+    this.actionButtons.append(this.createOrderButton);
+
+  }
+
+  push() {
+
+    this.orders.push(new Order());
+
+  }
+
+}
+
+</script>
+
+<script>
+
+  const orderApp = new OrderApp(document.getElementById('orderApp'));
+
+</script>
 
 </body>
 
