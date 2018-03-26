@@ -17,8 +17,8 @@ class OrderItemList {
 
     this.orderRef.child('items').once('value', snap => {
 
-      if (snap.val() == null)
-        this.addItem('Marmita P');
+      // if (snap.val() == null)
+      //   this.addItem('Marmita P');
 
     });
 
@@ -38,7 +38,7 @@ class OrderItemList {
 
   build() {
 
-    this.element.className = 'OrderItemList';
+    this.element.className = 'OrderItemList row';
 
     this.buildItemListElement();
 
@@ -72,11 +72,11 @@ class OrderItemList {
 
   }
 
-  addItem(itemName, itemPrie) {
+  addItem(itemName, itemPrice) {
 
     this.orderRef.child('items').push({
       itemName: itemName || '',
-      itemPrice: itemPrie || 0.00,
+      itemPrice: itemPrice ||  0.00,
       quantity: 1
     });
 

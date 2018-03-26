@@ -45,7 +45,7 @@ class OrderItem {
     var self = this;
 
     const element = document.createElement('div');
-    element.className = 'input-field col s6';
+    element.className = 'input-field col s5';
 
     element.inputElement = document.createElement('input');
     element.inputElement.className = 'autocomplete';
@@ -60,7 +60,7 @@ class OrderItem {
 
       try {
 
-        var instance = M.Autocomplete.init(element.inputElement, {
+        let instance = M.Autocomplete.init(element.inputElement, {
           data: {
             "Marmita P": null,
             "Marmita M": null,
@@ -79,12 +79,12 @@ class OrderItem {
             "Suco DeLVale Uva": null,
             "Suco DeLVale Laranja": null
           },
-          minLength: 2,
+          minLength: 1,
           limit: 6,
           onAutocomplete: function(event, asf) {
-            console.log(event);
-            console.log(element);
-            console.log(self);
+            // console.log(event);
+            // console.log(element);
+            // console.log(self);
           }
         });
 
@@ -161,19 +161,22 @@ class OrderItem {
     element.inputElement = document.createElement('input');
     element.inputElement.type = 'number';
     element.inputElement.min = 0;
-    element.inputElement.step = .01;
+    element.inputElement.step = 1;
     element.inputElement.value = 0.00.toFixed(2);
     element.inputElement.id = this.orderItemRef.key + 'itemPrice';
     element.inputElement.addEventListener('focus', event => {
       element.inputElement.select();
     });
     element.inputElement.addEventListener('change', event => {
+
       try {
-        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2)
+        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
       } catch (e) {
         console.log(e);
       }
+
       this.orderItemRef.child('itemPrice').set(element.inputElement.value);
+
     });
     this.orderItemRef.child('itemPrice').on('value', snap => {
 
@@ -198,7 +201,7 @@ class OrderItem {
   buildDeleteItemButtonElement() {
 
     const element = document.createElement('div');
-    element.className = 'col s1';
+    element.className = 'col s2';
 
     element.buttonElement = document.createElement('a');
     element.buttonElement.className = 'waves-effect waves-light btn-floating red';

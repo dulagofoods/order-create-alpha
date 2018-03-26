@@ -9,7 +9,7 @@ class Order {
 
     this.consumer = new OrderConsumer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
-    this.payment = new OrderPayment();
+    this.payment = new OrderPayment(this.orderRef);
     this.delivery = new OrderDelivery();
 
     this.init();
@@ -30,13 +30,6 @@ class Order {
 
       }
 
-      // is new
-      if (snap.val() === true) {
-
-        this.focus();
-
-      }
-
     });
 
   }
@@ -51,6 +44,7 @@ class Order {
 
     this.element.contentElement.appendChild(this.consumer.element);
     this.element.contentElement.appendChild(this.items.element);
+    this.element.contentElement.appendChild(this.payment.element);
 
     this.buildActionsElement();
 
@@ -96,6 +90,18 @@ class Order {
 
   }
 
+  static create(ordersRef) {
+
+    const orderRef = ordersRef.push().ref;
+    orderRef.child('items').push({
+      itemPrice: 0.00,
+      quantity: 1
+    });
+
+    return orderRef;
+
+  }
+
 }
 class OrderApp {
 
@@ -104,6 +110,8 @@ class OrderApp {
     this.element = element;
     this.ordersRef = ordersRef;
     this.orderList = [];
+
+    this.activeOrderKey = false;
 
     this.init();
 
@@ -135,14 +143,6 @@ class OrderApp {
     this.actionButtons.className = 'OrderApp-actionButtons';
     this.innerElement.append(this.actionButtons);
 
-    this.createOrderButton = document.createElement('a');
-    this.createOrderButton.className = 'waves-effect waves-light btn orange light-1';
-    this.createOrderButton.innerHTML = 'Criar pedido';
-    this.createOrderButton.addEventListener('click', () => {
-      this.createOrder();
-    });
-    this.actionButtons.append(this.createOrderButton);
-
     this.floatingActionButton = this.buildFloatingActionButton();
     this.actionButtons.appendChild(this.floatingActionButton);
 
@@ -155,32 +155,31 @@ class OrderApp {
 
     // btn element
     element.btn = document.createElement('a');
-    element.btn.className = 'btn-floating btn-large orange light-1';
+    element.btn.className = 'waves-effect waves-light btn-floating btn-large orange light-1';
     element.appendChild(element.btn);
     // icon
     element.btn.icon = document.createElement('i');
     element.btn.icon.className = 'large material-icons';
     element.btn.icon.innerHTML = 'add';
     element.btn.append(element.btn.icon);
-
-    // list element
-    element.list = document.createElement('ul');
-    element.appendChild(element.list);
-
-    // fist link option
-    element.list.first = document.createElement('li');
-    element.list.first.btn = document.createElement('a');
-    element.list.first.btn.className = 'btn-floating red ';
-    element.list.first.btn.icon = document.createElement('i');
-    element.list.first.btn.icon.innerText = 'P';
-    // element.list.first.btn.icon.className = 'material-icons';
-    // element.list.first.btn.icon.innerHTML = 'insert_chart';
-    element.list.first.btn.appendChild(element.list.first.btn.icon);
-    element.list.first.appendChild(element.list.first.btn);
-    element.list.appendChild(element.list.first);
-    element.list.first.btn.addEventListener('click', event => {
+    element.btn.addEventListener('click', event => {
       this.createOrder();
     });
+
+    // list element
+    // element.list = document.createElement('ul');
+    // element.appendChild(element.list);
+
+    // fist link option
+    // element.list.first = document.createElement('li');
+    // element.list.first.btn = document.createElement('a');
+    // element.list.first.btn.className = 'btn-floating red ';
+    // element.list.first.btn.icon = document.createElement('i');
+    // element.list.first.btn.icon.className = 'material-icons';
+    // element.list.first.btn.icon.innerHTML = 'insert_chart';
+    // element.list.first.btn.appendChild(element.list.first.btn.icon);
+    // element.list.first.appendChild(element.list.first.btn);
+    // element.list.appendChild(element.list.first);
 
     element.instance = M.FloatingActionButton.init(element);
 
@@ -190,7 +189,7 @@ class OrderApp {
 
   createOrder() {
 
-    this.ordersRef.push(true);
+    this.activeOrderKey = Order.create(this.ordersRef).key;
 
     try {
 
@@ -208,11 +207,21 @@ class OrderApp {
 
   pushOrder(orderRef) {
 
+    let self = this;
+
     if (orderRef) {
 
       let order = new Order(orderRef);
       this.orderList.push(order);
       this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
+
+      // seta o focus para o pedido
+      setTimeout(function () {
+
+        if (self.activeOrderKey === orderRef.key)
+          order.focus();
+
+      }, 1);
 
     }
 
@@ -335,7 +344,7 @@ class OrderItem {
     var self = this;
 
     const element = document.createElement('div');
-    element.className = 'input-field col s6';
+    element.className = 'input-field col s5';
 
     element.inputElement = document.createElement('input');
     element.inputElement.className = 'autocomplete';
@@ -350,7 +359,7 @@ class OrderItem {
 
       try {
 
-        var instance = M.Autocomplete.init(element.inputElement, {
+        let instance = M.Autocomplete.init(element.inputElement, {
           data: {
             "Marmita P": null,
             "Marmita M": null,
@@ -369,12 +378,12 @@ class OrderItem {
             "Suco DeLVale Uva": null,
             "Suco DeLVale Laranja": null
           },
-          minLength: 2,
+          minLength: 1,
           limit: 6,
           onAutocomplete: function(event, asf) {
-            console.log(event);
-            console.log(element);
-            console.log(self);
+            // console.log(event);
+            // console.log(element);
+            // console.log(self);
           }
         });
 
@@ -451,19 +460,22 @@ class OrderItem {
     element.inputElement = document.createElement('input');
     element.inputElement.type = 'number';
     element.inputElement.min = 0;
-    element.inputElement.step = .01;
+    element.inputElement.step = 1;
     element.inputElement.value = 0.00.toFixed(2);
     element.inputElement.id = this.orderItemRef.key + 'itemPrice';
     element.inputElement.addEventListener('focus', event => {
       element.inputElement.select();
     });
     element.inputElement.addEventListener('change', event => {
+
       try {
-        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2)
+        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
       } catch (e) {
         console.log(e);
       }
+
       this.orderItemRef.child('itemPrice').set(element.inputElement.value);
+
     });
     this.orderItemRef.child('itemPrice').on('value', snap => {
 
@@ -488,7 +500,7 @@ class OrderItem {
   buildDeleteItemButtonElement() {
 
     const element = document.createElement('div');
-    element.className = 'col s1';
+    element.className = 'col s2';
 
     element.buttonElement = document.createElement('a');
     element.buttonElement.className = 'waves-effect waves-light btn-floating red';
@@ -533,8 +545,8 @@ class OrderItemList {
 
     this.orderRef.child('items').once('value', snap => {
 
-      if (snap.val() == null)
-        this.addItem('Marmita P');
+      // if (snap.val() == null)
+      //   this.addItem('Marmita P');
 
     });
 
@@ -554,7 +566,7 @@ class OrderItemList {
 
   build() {
 
-    this.element.className = 'OrderItemList';
+    this.element.className = 'OrderItemList row';
 
     this.buildItemListElement();
 
@@ -588,11 +600,11 @@ class OrderItemList {
 
   }
 
-  addItem(itemName, itemPrie) {
+  addItem(itemName, itemPrice) {
 
     this.orderRef.child('items').push({
       itemName: itemName || '',
-      itemPrice: itemPrie || 0.00,
+      itemPrice: itemPrice ||  0.00,
       quantity: 1
     });
 
@@ -637,7 +649,116 @@ class OrderItemList {
 }
 class OrderPayment {
 
-  constructor() {
+  constructor(orderRef) {
+
+    this.orderRef = orderRef;
+
+    this.element = document.createElement('div');
+
+    this.priceList = [];
+    this.priceAmount = 0.00;
+
+    this.init();
+
+  }
+
+  init() {
+
+    this.build();
+
+    this.orderRef.child('items').on('child_added', snap => {
+
+      this.updatePriceAmount(snap.ref, snap.val());
+
+    });
+
+    this.orderRef.child('items').on('child_changed', snap => {
+
+      this.updatePriceAmount(snap.ref, snap.val());
+
+    });
+
+    this.orderRef.child('items').on('child_removed', snap => {
+
+      this.updatePriceAmount(snap.ref, null);
+
+    });
+
+  }
+
+  build() {
+
+    this.element.className = 'OrderPayment row';
+
+    this.element.priceAmountElement = this.buildPriceAmountElement();
+
+
+  }
+
+  buildPriceAmountElement() {
+
+    let element = document.createElement('span');
+    this.orderRef.child('priceAmount').on('value', snap => {
+
+      try {
+
+        element.innerHTML = 'Total: ' + parseFloat(snap.val()).toLocaleString('pt-BR', {
+          minimumFractionDigits: 2,
+          style: 'currency',
+          currency: 'BRL'
+        });
+
+      } catch (e) {
+
+        element.innerHTML = 'Total: ' + snap.val();
+
+      }
+
+    });
+
+    this.element.appendChild(element);
+
+    return element;
+
+  }
+
+  setPriceAmount(priceAmount) {
+
+    this.priceAmount = priceAmount;
+
+    // isso evita que seja criado novamente o objeto no firebase
+    this.orderRef.on('value', snap => {
+
+      if (snap.val() != null)
+        this.orderRef.child('priceAmount').set(this.priceAmount);
+
+    });
+
+  }
+
+  updatePriceAmount(orderItemRef, data) {
+
+    let priceAmount = 0;
+
+    if (data)
+      this.priceList[orderItemRef.key] = {
+        itemPrice: data.itemPrice || 0,
+        quantity: data.quantity || 0
+      };
+    else
+      this.priceList[orderItemRef.key] = null;
+
+    let priceListArray = Object.values(this.priceList);
+    priceListArray.forEach(orderItem => {
+
+      if (orderItem != null)
+        priceAmount += orderItem.itemPrice * orderItem.quantity;
+      else
+        priceAmount = 0;
+
+    });
+
+    this.setPriceAmount(priceAmount);
 
   }
 

@@ -9,7 +9,7 @@ class Order {
 
     this.consumer = new OrderConsumer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
-    this.payment = new OrderPayment();
+    this.payment = new OrderPayment(this.orderRef);
     this.delivery = new OrderDelivery();
 
     this.init();
@@ -30,13 +30,6 @@ class Order {
 
       }
 
-      // is new
-      if (snap.val() === true) {
-
-        this.focus();
-
-      }
-
     });
 
   }
@@ -51,6 +44,7 @@ class Order {
 
     this.element.contentElement.appendChild(this.consumer.element);
     this.element.contentElement.appendChild(this.items.element);
+    this.element.contentElement.appendChild(this.payment.element);
 
     this.buildActionsElement();
 
@@ -93,6 +87,18 @@ class Order {
   delete() {
 
     this.orderRef.set(null);
+
+  }
+
+  static create(ordersRef) {
+
+    const orderRef = ordersRef.push().ref;
+    orderRef.child('items').push({
+      itemPrice: 0.00,
+      quantity: 1
+    });
+
+    return orderRef;
 
   }
 

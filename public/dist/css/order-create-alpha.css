@@ -35,6 +35,21 @@
   display: none;
 }
 
+.OrderPayment {
+  -webkit-align-items: flex-end;
+  align-items: flex-end;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: flex-end;
+  justify-content: flex-end;
+}
+
+.OrderPayment span {
+  font-weight: 700;
+}
 /*!
  * Du Lago {ProjectName} Project v0.0.0 (http://elbit.com.br/)
  * Copyright 2013-2018 Elbit Developers
