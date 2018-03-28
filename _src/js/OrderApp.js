@@ -1,12 +1,15 @@
 class OrderApp {
 
-  constructor(element, ordersRef) {
+  constructor(element, ordersRef, socket) {
 
     this.element = element;
     this.ordersRef = ordersRef;
+    this.socket = socket;
+
     this.orderList = [];
 
     this.activeOrderKey = false;
+
 
     this.init();
 
@@ -106,7 +109,7 @@ class OrderApp {
 
     if (orderRef) {
 
-      let order = new Order(orderRef);
+      let order = new Order(orderRef, this.socket);
       this.orderList.push(order);
       this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
 

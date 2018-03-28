@@ -43,11 +43,24 @@
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
+  -webkit-flex-flow: column;
+  flex-flow: column;
   -webkit-justify-content: flex-end;
   justify-content: flex-end;
 }
 
-.OrderPayment span {
+.OrderPayment-priceAmount {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: flex-end;
+  justify-content: flex-end;
+  text-align: right;
+}
+
+.OrderPayment-priceAmount span {
   font-weight: 700;
 }
 /*!
@@ -55,3 +68,41 @@
  * Copyright 2013-2018 Elbit Developers
  * Licensed under MIT (https://github.com/elbitdigital/base/blob/master/LICENSE)
 */
+/* ajustes especificos para aumentar a area util em smartphones */
+
+@media (max-width: 600px) {
+  .card-panel,
+  .card .card-image .card-title,
+  .card .card-reveal {
+    padding: 20px 16px;
+  }
+
+  .card .card-content,
+  .modal .modal-content {
+    padding: 24px 16px;
+  }
+
+  .card .card-action {
+    padding: 16px;
+  }
+
+  .row {
+    margin-bottom: 16px;
+  }
+
+  .row .col {
+    padding: .5rem;
+  }
+
+  .input-field.col label {
+    left: .5rem;
+  }
+
+  button,
+  input,
+  optgroup,
+  select,
+  textarea {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  }
+}

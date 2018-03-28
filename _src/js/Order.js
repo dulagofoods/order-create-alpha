@@ -1,9 +1,11 @@
 class Order {
 
-  constructor(orderRef) {
+  constructor(orderRef, socket) {
 
     this.orderRef = orderRef;
     this.orderKey = this.orderRef.key;
+
+    this.socket = socket || false;
 
     this.element = document.createElement('div');
 
@@ -71,7 +73,7 @@ class Order {
     this.element.printOrderButtonElement.innerHTML = '<i class="material-icons left">print</i>Imprimir';
     this.element.printOrderButtonElement.addEventListener('click', () => {
 
-      this.delete();
+      Order.print(this.orderRef, this.socket);
 
     });
     this.element.actionsElement.appendChild(this.element.printOrderButtonElement);
@@ -87,6 +89,21 @@ class Order {
   delete() {
 
     this.orderRef.set(null);
+
+  }
+
+  static print(orderRef, socket) {
+
+    if (socket) {
+
+      orderRef.once('value', snap => {
+
+        console.log('enviando dados para impressao via socket...');
+        socket.emit('print order', snap.val());
+
+      });
+
+    }
 
   }
 

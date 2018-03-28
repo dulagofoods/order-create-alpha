@@ -6,10 +6,23 @@
     display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
     -webkit-justify-content: flex-end;
     justify-content: flex-end;
 }
 
-.OrderPayment span {
+.OrderPayment-priceAmount {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: flex-end;
+    justify-content: flex-end;
+    text-align: right;
+}
+
+.OrderPayment-priceAmount span {
     font-weight: 700;
 }

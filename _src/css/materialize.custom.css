@@ -1,0 +1,39 @@
+/* ajustes especificos para aumentar a area util em smartphones */
+@media (max-width: 600px) {
+
+    .card-panel,
+    .card .card-image .card-title,
+    .card .card-reveal {
+        padding: 20px 16px;
+    }
+
+    .card .card-content,
+    .modal .modal-content {
+        padding: 24px 16px;
+    }
+
+    .card .card-action {
+        padding: 16px;
+    }
+
+    .row {
+        margin-bottom: 16px;
+    }
+
+    .row .col {
+        padding: .5rem;
+    }
+
+    .input-field.col label {
+        left: .5rem;
+    }
+
+    button,
+    input,
+    optgroup,
+    select,
+    textarea {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    }
+
+}

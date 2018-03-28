@@ -1,9 +1,11 @@
 class Order {
 
-  constructor(orderRef) {
+  constructor(orderRef, socket) {
 
     this.orderRef = orderRef;
     this.orderKey = this.orderRef.key;
+
+    this.socket = socket || false;
 
     this.element = document.createElement('div');
 
@@ -71,7 +73,7 @@ class Order {
     this.element.printOrderButtonElement.innerHTML = '<i class="material-icons left">print</i>Imprimir';
     this.element.printOrderButtonElement.addEventListener('click', () => {
 
-      this.delete();
+      Order.print(this.orderRef, this.socket);
 
     });
     this.element.actionsElement.appendChild(this.element.printOrderButtonElement);
@@ -90,6 +92,21 @@ class Order {
 
   }
 
+  static print(orderRef, socket) {
+
+    if (socket) {
+
+      orderRef.once('value', snap => {
+
+        console.log('enviando dados para impressao via socket...');
+        socket.emit('print order', snap.val());
+
+      });
+
+    }
+
+  }
+
   static create(ordersRef) {
 
     const orderRef = ordersRef.push().ref;
@@ -105,13 +122,16 @@ class Order {
 }
 class OrderApp {
 
-  constructor(element, ordersRef) {
+  constructor(element, ordersRef, socket) {
 
     this.element = element;
     this.ordersRef = ordersRef;
+    this.socket = socket;
+
     this.orderList = [];
 
     this.activeOrderKey = false;
+
 
     this.init();
 
@@ -211,7 +231,7 @@ class OrderApp {
 
     if (orderRef) {
 
-      let order = new Order(orderRef);
+      let order = new Order(orderRef, this.socket);
       this.orderList.push(order);
       this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
 
@@ -341,7 +361,7 @@ class OrderItem {
 
   buildItemNameFieldElement() {
 
-    var self = this;
+    let self = this;
 
     const element = document.createElement('div');
     element.className = 'input-field col s5';
@@ -378,12 +398,30 @@ class OrderItem {
             "Suco DeLVale Uva": null,
             "Suco DeLVale Laranja": null
           },
-          minLength: 1,
+          minLength: 0,
           limit: 6,
-          onAutocomplete: function(event, asf) {
-            // console.log(event);
-            // console.log(element);
-            // console.log(self);
+          onAutocomplete: function(select) {
+            switch (select) {
+              case 'Marmita P': {
+                self.element.itemPriceFieldElement.inputElement.value = 8.00
+              }
+                break;
+              case 'Marmita M': {
+                self.element.itemPriceFieldElement.inputElement.value = 9.00
+              }
+                break;
+              case 'Marmita G': {
+                self.element.itemPriceFieldElement.inputElement.value = 11.00
+              }
+                break;
+              case 'Marmita F': {
+                self.element.itemPriceFieldElement.inputElement.value = 14.00
+              }
+                break;
+              default: {
+                console.log('hehe');
+              }
+            }
           }
         });
 
@@ -406,11 +444,11 @@ class OrderItem {
     });
     element.appendChild(element.inputElement);
 
-    element.label = document.createElement('label');
-    element.label.htmlFor = element.inputElement.id;
-    element.label.className = 'active';
-    element.label.innerHTML = 'Produto';
-    element.appendChild(element.label);
+    element.labelElement = document.createElement('label');
+    element.labelElement.htmlFor = element.inputElement.id;
+    element.labelElement.className = 'active';
+    element.labelElement.innerHTML = 'Produto';
+    element.appendChild(element.labelElement);
 
     this.element.appendChild(element);
 
@@ -428,6 +466,9 @@ class OrderItem {
     element.inputElement.min = 1;
     element.inputElement.value = 1;
     element.inputElement.id = this.orderItemRef.key + 'itemQuantity';
+    element.inputElement.addEventListener('focus', event => {
+      element.inputElement.select();
+    });
     element.inputElement.addEventListener('change', () => {
 
       this.orderItemRef.child('quantity').set(element.inputElement.value);
@@ -440,11 +481,11 @@ class OrderItem {
     });
     element.appendChild(element.inputElement);
 
-    element.label = document.createElement('label');
-    element.label.htmlFor = element.inputElement.id;
-    element.label.className = 'active';
-    element.label.innerHTML = 'Qtde';
-    element.appendChild(element.label);
+    element.labelElement = document.createElement('label');
+    element.labelElement.htmlFor = element.inputElement.id;
+    element.labelElement.className = 'active';
+    element.labelElement.innerHTML = 'Qtde';
+    element.appendChild(element.labelElement);
 
     this.element.appendChild(element);
 
@@ -466,6 +507,17 @@ class OrderItem {
     element.inputElement.addEventListener('focus', event => {
       element.inputElement.select();
     });
+    element.inputElement.addEventListener('blur', event => {
+
+      try {
+        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
+      } catch (e) {
+        console.log(e);
+      }
+
+      this.orderItemRef.child('itemPrice').set(element.inputElement.value);
+
+    });
     element.inputElement.addEventListener('change', event => {
 
       try {
@@ -485,11 +537,11 @@ class OrderItem {
     });
     element.appendChild(element.inputElement);
 
-    element.label = document.createElement('label');
-    element.label.htmlFor = element.inputElement.id;
-    element.label.className = 'active';
-    element.label.innerHTML = 'Preço';
-    element.appendChild(element.label);
+    element.labelElement = document.createElement('label');
+    element.labelElement.htmlFor = element.inputElement.id;
+    element.labelElement.className = 'active';
+    element.labelElement.innerHTML = 'Preço';
+    element.appendChild(element.labelElement);
 
     this.element.appendChild(element);
 
@@ -503,7 +555,7 @@ class OrderItem {
     element.className = 'col s2';
 
     element.buttonElement = document.createElement('a');
-    element.buttonElement.className = 'waves-effect waves-light btn-floating red';
+    element.buttonElement.className = 'waves-effect waves-light btn-floating btn-small red';
     element.buttonElement.innerHTML = '<i class="material-icons">delete</i>';
     // element.buttonElement.innerHTML = '<span class="new badge red">drop</span>';
     element.buttonElement.addEventListener('click', () => {
@@ -692,29 +744,72 @@ class OrderPayment {
 
     this.element.priceAmountElement = this.buildPriceAmountElement();
 
+    this.element.chargeOptionField = this.buildChargeOptionField();
+
 
   }
 
   buildPriceAmountElement() {
 
-    let element = document.createElement('span');
+    let element = document.createElement('div');
+    element.className = 'OrderPayment-priceAmount col s6';
     this.orderRef.child('priceAmount').on('value', snap => {
 
       try {
 
-        element.innerHTML = 'Total: ' + parseFloat(snap.val()).toLocaleString('pt-BR', {
+        element.innerHTML = '<span>Total: ' + parseFloat(snap.val()).toLocaleString('pt-BR', {
           minimumFractionDigits: 2,
           style: 'currency',
           currency: 'BRL'
-        });
+        }) + '</span>';
 
       } catch (e) {
 
-        element.innerHTML = 'Total: ' + snap.val();
+        element.innerHTML = '<span>Total: ' + snap.val() + '</span>';
 
       }
 
     });
+
+    this.element.appendChild(element);
+
+    return element;
+
+  }
+
+  buildChargeOptionField() {
+
+    let element = document.createElement('div');
+    element.className = 'OrderPayment-chargeOption input-field col s6';
+
+    element.inputElement = document.createElement('input');
+    element.inputElement.type = 'number';
+    element.inputElement.min = 0;
+    element.inputElement.step = 1;
+    element.inputElement.value = 0.00.toFixed(2);
+    element.inputElement.id = this.orderRef.key + '-chargeOption';
+    element.inputElement.addEventListener('focus', event => {
+      element.inputElement.select();
+    });
+    element.inputElement.addEventListener('change', event => {
+
+      try {
+        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
+      } catch (e) {
+        console.log(e);
+      }
+
+      this.orderRef.child('changeOption').set(element.inputElement.value);
+
+    });
+    element.appendChild(element.inputElement);
+
+    element.labelElement = document.createElement('label');
+    element.labelElement.htmlFor = element.inputElement.id;
+    element.labelElement.className = 'active';
+    element.labelElement.innerHTML = 'Troco para';
+    element.appendChild(element.labelElement);
+
 
     this.element.appendChild(element);
 
@@ -753,8 +848,6 @@ class OrderPayment {
 
       if (orderItem != null)
         priceAmount += orderItem.itemPrice * orderItem.quantity;
-      else
-        priceAmount = 0;
 
     });
 
