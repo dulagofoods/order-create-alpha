@@ -233,11 +233,11 @@ class OrderItem {
   buildDeleteItemButtonElement() {
 
     const element = document.createElement('div');
-    element.className = 'col s2';
+    element.className = 'OrderItem-actions col s2';
 
     element.buttonElement = document.createElement('a');
     element.buttonElement.className = 'waves-effect waves-light btn-floating btn-small red';
-    element.buttonElement.innerHTML = '<i class="material-icons">delete</i>';
+    element.buttonElement.innerHTML = '<i class="material-icons">remove</i>';
     // element.buttonElement.innerHTML = '<span class="new badge red">drop</span>';
     element.buttonElement.addEventListener('click', () => {
 

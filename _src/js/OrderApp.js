@@ -19,7 +19,7 @@ class OrderApp {
 
     this.build();
 
-    this.ordersRef.on('child_added', snap => {
+    this.ordersRef.orderByChild('createdTime').on('child_added', snap => {
 
       this.pushOrder(snap.ref);
 
@@ -111,7 +111,8 @@ class OrderApp {
 
       let order = new Order(orderRef, this.socket);
       this.orderList.push(order);
-      this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
+      // this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
+      this.element.orderListElement.appendChild(order.element);
 
       // seta o focus para o pedido
       setTimeout(function () {

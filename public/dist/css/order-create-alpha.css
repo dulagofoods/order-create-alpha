@@ -19,9 +19,28 @@
 }
 
 .OrderConsumer-consumerNameField input {
-  font-weight: 500;
+  font-weight: 700;
 }
 .OrderItem {
+  -webkit-align-items: stretch;
+  align-items: stretch;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+
+.OrderItem.row {
+  margin-bottom: 0;
+  margin-top: 0;
+}
+
+.OrderItem.is-deleted {
+  display: none;
+}
+
+.OrderPriceAmount {
   -webkit-align-items: center;
   align-items: center;
   display: -webkit-box;
@@ -31,36 +50,7 @@
   display: flex;
 }
 
-.OrderItem.is-deleted {
-  display: none;
-}
-
-.OrderPayment {
-  -webkit-align-items: flex-end;
-  align-items: flex-end;
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-flex-flow: column;
-  flex-flow: column;
-  -webkit-justify-content: flex-end;
-  justify-content: flex-end;
-}
-
-.OrderPayment-priceAmount {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-justify-content: flex-end;
-  justify-content: flex-end;
-  text-align: right;
-}
-
-.OrderPayment-priceAmount span {
+.OrderPriceAmount input {
   font-weight: 700;
 }
 /*!

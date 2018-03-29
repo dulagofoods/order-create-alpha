@@ -11,7 +11,7 @@ class Order {
 
     this.consumer = new OrderConsumer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
-    this.payment = new OrderPayment(this.orderRef);
+    this.priceAmount = new OrderPriceAmount(this.orderRef);
     this.delivery = new OrderDelivery();
 
     this.init();
@@ -46,7 +46,7 @@ class Order {
 
     this.element.contentElement.appendChild(this.consumer.element);
     this.element.contentElement.appendChild(this.items.element);
-    this.element.contentElement.appendChild(this.payment.element);
+    this.element.contentElement.appendChild(this.priceAmount.element);
 
     this.buildActionsElement();
 
@@ -109,7 +109,11 @@ class Order {
 
   static create(ordersRef) {
 
-    const orderRef = ordersRef.push().ref;
+    let createdTime = moment().toISOString();
+
+    const orderRef = ordersRef.push({
+      createdTime: createdTime
+    }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,
       quantity: 1

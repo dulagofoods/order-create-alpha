@@ -11,7 +11,7 @@ class Order {
 
     this.consumer = new OrderConsumer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
-    this.payment = new OrderPayment(this.orderRef);
+    this.priceAmount = new OrderPriceAmount(this.orderRef);
     this.delivery = new OrderDelivery();
 
     this.init();
@@ -46,7 +46,7 @@ class Order {
 
     this.element.contentElement.appendChild(this.consumer.element);
     this.element.contentElement.appendChild(this.items.element);
-    this.element.contentElement.appendChild(this.payment.element);
+    this.element.contentElement.appendChild(this.priceAmount.element);
 
     this.buildActionsElement();
 
@@ -109,7 +109,11 @@ class Order {
 
   static create(ordersRef) {
 
-    const orderRef = ordersRef.push().ref;
+    let createdTime = moment().toISOString();
+
+    const orderRef = ordersRef.push({
+      createdTime: createdTime
+    }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,
       quantity: 1
@@ -141,7 +145,7 @@ class OrderApp {
 
     this.build();
 
-    this.ordersRef.on('child_added', snap => {
+    this.ordersRef.orderByChild('createdTime').on('child_added', snap => {
 
       this.pushOrder(snap.ref);
 
@@ -233,7 +237,8 @@ class OrderApp {
 
       let order = new Order(orderRef, this.socket);
       this.orderList.push(order);
-      this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
+      // this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
+      this.element.orderListElement.appendChild(order.element);
 
       // seta o focus para o pedido
       setTimeout(function () {
@@ -246,6 +251,36 @@ class OrderApp {
     }
 
   }
+
+}
+class OrderBilling {
+
+  constructor(orderRef) {
+
+    this.orderRef = orderRef;
+
+    this.element = document.createElement('div');
+
+    this.paymentMethodList = [];
+
+    this.init();
+
+  }
+
+  init() {
+
+    this.build();
+
+  }
+
+  build() {
+
+    this.element.className = 'OrderBilling';
+    // this.element.innerHTML = this.orderRef.consum;
+
+  }
+
+
 
 }
 class OrderConsumer {
@@ -552,11 +587,11 @@ class OrderItem {
   buildDeleteItemButtonElement() {
 
     const element = document.createElement('div');
-    element.className = 'col s2';
+    element.className = 'OrderItem-actions col s2';
 
     element.buttonElement = document.createElement('a');
     element.buttonElement.className = 'waves-effect waves-light btn-floating btn-small red';
-    element.buttonElement.innerHTML = '<i class="material-icons">delete</i>';
+    element.buttonElement.innerHTML = '<i class="material-icons">remove</i>';
     // element.buttonElement.innerHTML = '<span class="new badge red">drop</span>';
     element.buttonElement.addEventListener('click', () => {
 
@@ -699,7 +734,7 @@ class OrderItemList {
   }
 
 }
-class OrderPayment {
+class OrderPriceAmount {
 
   constructor(orderRef) {
 
@@ -709,6 +744,7 @@ class OrderPayment {
 
     this.priceList = [];
     this.priceAmount = 0.00;
+    this.priceAmountUnlocked = false;
 
     this.init();
 
@@ -736,40 +772,62 @@ class OrderPayment {
 
     });
 
+    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
+
+      this.priceAmountUnlocked = !!snap.val();
+
+    });
+
   }
 
   build() {
 
-    this.element.className = 'OrderPayment row';
+    this.element.className = 'OrderPriceAmount row';
 
-    this.element.priceAmountElement = this.buildPriceAmountElement();
-
-    this.element.chargeOptionField = this.buildChargeOptionField();
-
+    this.inputFieldElement = this.buildInputFieldElement();
+    this.switcherElement = this.buildSwitcherElement();
 
   }
 
-  buildPriceAmountElement() {
+  buildInputFieldElement() {
 
-    let element = document.createElement('div');
-    element.className = 'OrderPayment-priceAmount col s6';
-    this.orderRef.child('priceAmount').on('value', snap => {
+    const element = document.createElement('div');
+    element.className = 'input-field col s6';
 
-      try {
+    element.input = document.createElement('input');
+    element.input.id = this.orderRef.key + '-priceAmountInput';
+    element.input.type = 'number';
+    element.input.min = '0.00';
+    element.input.step = '1';
+    element.input.disabled = true;
+    element.input.addEventListener('blur', event => {
 
-        element.innerHTML = '<span>Total: ' + parseFloat(snap.val()).toLocaleString('pt-BR', {
-          minimumFractionDigits: 2,
-          style: 'currency',
-          currency: 'BRL'
-        }) + '</span>';
-
-      } catch (e) {
-
-        element.innerHTML = '<span>Total: ' + snap.val() + '</span>';
-
-      }
+      element.input.value = parseFloat(element.input.value).toFixed(2);
 
     });
+    element.input.addEventListener('change', event => {
+
+      element.input.value = parseFloat(element.input.value).toFixed(2);
+      this.orderRef.child('priceAmount').set(parseFloat(element.input.value).toFixed(2));
+
+    });
+    this.orderRef.child('priceAmount').on('value', snap => {
+
+      element.input.value = parseFloat(snap.val()).toFixed(2);
+
+    });
+    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
+
+      element.input.disabled = !snap.val();
+
+    });
+    element.appendChild(element.input);
+
+    element.label = document.createElement('label');
+    element.label.className = 'active';
+    element.label.innerHTML = 'Total';
+    element.label.htmlFor = element.input.id;
+    element.appendChild(element.label);
 
     this.element.appendChild(element);
 
@@ -777,39 +835,34 @@ class OrderPayment {
 
   }
 
-  buildChargeOptionField() {
+  buildSwitcherElement() {
 
-    let element = document.createElement('div');
-    element.className = 'OrderPayment-chargeOption input-field col s6';
+    const element = document.createElement('div');
+    element.className = 'switch col s6';
 
-    element.inputElement = document.createElement('input');
-    element.inputElement.type = 'number';
-    element.inputElement.min = 0;
-    element.inputElement.step = 1;
-    element.inputElement.value = 0.00.toFixed(2);
-    element.inputElement.id = this.orderRef.key + '-chargeOption';
-    element.inputElement.addEventListener('focus', event => {
-      element.inputElement.select();
-    });
-    element.inputElement.addEventListener('change', event => {
+    element.label = document.createElement('label');
+    element.appendChild(element.label);
 
-      try {
-        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
-      } catch (e) {
-        console.log(e);
-      }
+    element.input = document.createElement('input');
+    element.input.type = 'checkbox';
+    element.input.addEventListener('change', event => {
 
-      this.orderRef.child('changeOption').set(element.inputElement.value);
+      this.orderRef.child('priceAmountUnlocked').set(element.input.checked);
 
     });
-    element.appendChild(element.inputElement);
+    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
 
-    element.labelElement = document.createElement('label');
-    element.labelElement.htmlFor = element.inputElement.id;
-    element.labelElement.className = 'active';
-    element.labelElement.innerHTML = 'Troco para';
-    element.appendChild(element.labelElement);
+      element.input.checked = !!snap.val();
 
+    });
+    element.label.appendChild(element.input);
+
+    element.label.span = document.createElement('span');
+    element.label.span.className = 'lever';
+    element.label.appendChild(element.label.span);
+
+    element.label.text = document.createTextNode('alterar');
+    element.label.appendChild(element.label.text);
 
     this.element.appendChild(element);
 
@@ -824,7 +877,7 @@ class OrderPayment {
     // isso evita que seja criado novamente o objeto no firebase
     this.orderRef.on('value', snap => {
 
-      if (snap.val() != null)
+      if (snap.val() != null && !this.priceAmountUnlocked)
         this.orderRef.child('priceAmount').set(this.priceAmount);
 
     });
