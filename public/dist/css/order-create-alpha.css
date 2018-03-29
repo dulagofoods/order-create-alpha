@@ -22,8 +22,8 @@
   font-weight: 700;
 }
 .OrderItem {
-  -webkit-align-items: stretch;
-  align-items: stretch;
+  -webkit-align-items: center;
+  align-items: center;
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;

@@ -6,10 +6,7 @@ class OrderApp {
     this.ordersRef = ordersRef;
     this.socket = socket;
 
-    this.orderList = [];
-
     this.activeOrderKey = false;
-
 
     this.init();
 
@@ -64,6 +61,7 @@ class OrderApp {
       this.createOrder();
     });
 
+    // TODO criar items no botao flutuante principal para produtos
     // list element
     // element.list = document.createElement('ul');
     // element.appendChild(element.list);
@@ -110,9 +108,8 @@ class OrderApp {
     if (orderRef) {
 
       let order = new Order(orderRef, this.socket);
-      this.orderList.push(order);
-      // this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
-      this.element.orderListElement.appendChild(order.element);
+      this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
+      order.init();
 
       // seta o focus para o pedido
       setTimeout(function () {

@@ -1,6 +1,6 @@
 class Order {
 
-  constructor(orderRef, socket) {
+  constructor(orderRef, socket, autoInit) {
 
     this.orderRef = orderRef;
     this.orderKey = this.orderRef.key;
@@ -9,16 +9,17 @@ class Order {
 
     this.element = document.createElement('div');
 
-    this.consumer = new OrderConsumer(this.orderRef);
-    this.items = new OrderItemList(this.orderRef);
-    this.priceAmount = new OrderPriceAmount(this.orderRef);
-    this.delivery = new OrderDelivery();
-
-    this.init();
+    if (autoInit)
+      this.init();
 
   }
 
   init() {
+
+    this.consumer = new OrderConsumer(this.orderRef);
+    this.items = new OrderItemList(this.orderRef);
+    this.priceAmount = new OrderPriceAmount(this.orderRef);
+    this.delivery = new OrderDelivery();
 
     this.build();
 
@@ -58,16 +59,6 @@ class Order {
     this.element.actionsElement.className = 'Order-inner card-action';
     this.element.appendChild(this.element.actionsElement);
 
-    this.element.deleteOrderButtonElement = document.createElement('button');
-    this.element.deleteOrderButtonElement.className = 'waves-effect waves-red btn-flat';
-    this.element.deleteOrderButtonElement.innerHTML = '<i class="material-icons left">delete</i>Excluir';
-    this.element.deleteOrderButtonElement.addEventListener('click', () => {
-
-      this.delete();
-
-    });
-    this.element.actionsElement.appendChild(this.element.deleteOrderButtonElement);
-
     this.element.printOrderButtonElement = document.createElement('button');
     this.element.printOrderButtonElement.className = 'waves-effect waves-light-blue btn light-blue';
     this.element.printOrderButtonElement.innerHTML = '<i class="material-icons left">print</i>Imprimir';
@@ -77,6 +68,32 @@ class Order {
 
     });
     this.element.actionsElement.appendChild(this.element.printOrderButtonElement);
+
+    this.element.deleteOrderButtonElement = document.createElement('button');
+    this.element.deleteOrderButtonElement.className = 'waves-effect waves-red btn-flat';
+    this.element.deleteOrderButtonElement.innerHTML = '<i class="material-icons left">delete</i>Excluir';
+    this.element.deleteOrderButtonElement.addEventListener('click', () => {
+
+      if (window.confirm('Tem certeza?')) {
+
+        this.delete();
+
+        try {
+
+          M.toast({
+            html: 'Pedido Excluido!'
+          });
+
+        } catch (e) {
+
+          console.log('materialize error');
+
+        }
+
+      }
+
+    });
+    this.element.actionsElement.appendChild(this.element.deleteOrderButtonElement);
 
   }
 

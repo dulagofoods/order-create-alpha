@@ -21,7 +21,6 @@ class OrderBilling {
   build() {
 
     this.element.className = 'OrderBilling';
-    // this.element.innerHTML = this.orderRef.consum;
 
   }
 

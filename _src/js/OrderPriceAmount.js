@@ -136,13 +136,15 @@ class OrderPriceAmount {
 
   setPriceAmount(priceAmount) {
 
+    const self = this;
+
     this.priceAmount = priceAmount;
 
     // isso evita que seja criado novamente o objeto no firebase
-    this.orderRef.on('value', snap => {
+    this.orderRef.once('value', snap => {
 
       if (snap.val() != null && !this.priceAmountUnlocked)
-        this.orderRef.child('priceAmount').set(this.priceAmount);
+          self.orderRef.child('priceAmount').set(self.priceAmount);
 
     });
 
