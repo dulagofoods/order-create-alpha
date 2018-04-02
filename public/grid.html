@@ -7,7 +7,7 @@
 <script src="dist/js/villa.min.js"></script>
 <link rel="stylesheet" href="dist/css/villa.min.css"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-<link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css"  media="screen,projection"/>
+<link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css" media="screen,projection"/>
 <!--[if lt IE 9]>
 <link rel="stylesheet" type="text/css" href="dist/css/material-colors.css"/>
 <link rel="stylesheet" type="text/css" href="dist/css/villa-cross.min.css"/>
@@ -29,23 +29,31 @@
 <style>
 
   .Item {
+    border-radius: 2px;
+    -webkit-box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
     height: 100px;
     left: 0;
     margin: 16px;
     position: absolute;
     top: 0;
-    width: 0;
+    -webkit-transition: all .3s;
+    -moz-transition: all .3s;
+    -ms-transition: all .3s;
+    -o-transition: all .3s;
+    transition: all .3s;
   }
 
   .Item-inner {
     background-color: #ffffff;
     height: 100%;
     width: 100%;
+    padding: 16px;
   }
 
 </style>
 
-<body>
+<body class="grey-100">
 
 <div class="fixed-action-btn user-unselect">
   <a class="btn-floating btn-large red" onclick="grid.addItem();">
@@ -53,19 +61,20 @@
   </a>
 </div>
 
+<main id="appGrid" class="Grid grey-100"></main>
+
 <script type="text/javascript" src="dist/js/materialize.js"></script>
 <script>
 
   M.AutoInit(document.body);
 
 </script>
-<main id="appGrid" class="Grid red"></main>
 
 <script>
 
   class Grid {
 
-    constructor (element) {
+    constructor(element) {
 
       this.element = element;
 
@@ -74,8 +83,11 @@
       // id manager
       this.itemCount = 0;
 
-      this.defaultItemWidth = 240;
-      this.defaultRowLength = 3;
+      this.defaultColumnsNumber = 4;
+      this.defaultItemWidth = 200;
+      this.defaultMarginSize = 16;
+
+      this.currentMatrixView = [];
 
       this.resize();
 
@@ -88,61 +100,165 @@
       this.element.appendChild(item.element);
       this.itemList.push(item);
 
-      this.reOder();
+      this.reOderView();
+
+      console.clear();
+      console.log('Items criados: ' + this.itemList.length);
+      console.log(Grid.getItemPosition(this.itemList.length - 1, this.defaultColumnsNumber));
 
     }
 
     resize() {
 
-      const gridElementWidth = ( this.defaultItemWidth * this.defaultRowLength ) + ( ( this.defaultRowLength + 1 ) * 16 );
+      const gridElementWidth = (this.defaultItemWidth * this.defaultColumnsNumber) + ((this.defaultColumnsNumber + 1) * 16);
       this.element.style.width = gridElementWidth + 'px';
 
     }
 
-    reOder() {
+    reOderView() {
 
-      // const reverseItemList = this.itemList.slice().reverse();
+      this.updateCurrentMatrixView();
 
-      this.resize();
+      for (let column = 0; column < this.currentMatrixView.length; column++) {
 
-      let width = 0;
+        for (let row = 0; row < this.currentMatrixView[column].length; row++) {
 
-      for (let i = 0; i < this.itemList.length; i++) {
+          const item = this.currentMatrixView[column][row];
 
-        const item = this.itemList[i];
+          if (item) {
 
-        item.resize(this.defaultItemWidth, 0);
-        item.translate(width, 0);
+            let translateX = this.getTranslateX(column);
+            let translateY = this.getTranslateY(column, row);
 
-        width += item.element.offsetWidth + 16;
+            item.resize(this.defaultItemWidth, 0);
+            item.translate(translateX, translateY);
 
-        const position = Grid.getItemPosition(i, this.defaultRowLength);
-        console.log(position);
+          }
+
+        }
 
       }
 
     }
 
-    static getItemPosition(i, rowLength) {
+    getTranslateY(column, row) {
+
+      let translate = 0;
+
+      let count = 0;
+
+      this.currentMatrixView[column].forEach(item => {
+
+        if (count < row)
+          if (item)
+            translate += item.element.offsetHeight;
+
+        count++;
+
+      });
+
+      if (row > 0)
+        translate += row * this.defaultMarginSize;
+
+      return translate;
+
+    }
+
+    getTranslateX(column) {
+
+      let translate = this.defaultItemWidth * column;
+
+      if (column > 0)
+        translate += column * this.defaultMarginSize;
+
+      return translate;
+
+    }
+
+    updateCurrentMatrixView() {
+
+      this.currentMatrixView = Grid.getMatrixView(this.itemList, this.defaultColumnsNumber);
+      console.log(this.currentMatrixView);
+
+    }
+
+    static getMatrixView(itemList, columnsNumber) {
+
+      let matrixView = [];
+
+      // controi matriz
+      for (let i = 0; i < columnsNumber; i++) {
+        matrixView.push([]);
+        for (let j = 0; j < itemList.length / columnsNumber; j++)
+          matrixView[i].push(false);
+      }
+
+      // passa por todos items e os coloca na melhor posiçao
+      for (let i = 0; i < itemList.length; i++) {
+
+        const row = Grid.getRowPosition(i, columnsNumber);
+        matrixView[Grid.getSmallestColumn(matrixView, row)][row] = itemList[i];
+
+      }
+
+      return matrixView;
+
+    }
+
+    static getSmallestColumn(matrixView, row) {
+
+      let smallestColumnIndex = 0;
+      let smallestColumnHeight = 0;
+
+      for (let col = 0; col < matrixView.length; col++) {
+
+        if (row > 0) {
+
+          let columnHeight = 0;
+
+          matrixView[col].forEach(item => {
+            if (item)
+              columnHeight += item.element.offsetHeight;
+          });
+
+          if (columnHeight < smallestColumnHeight || smallestColumnHeight === 0) {
+            smallestColumnHeight = columnHeight;
+            smallestColumnIndex = col;
+          }
+
+        } else if (!matrixView[col][row]) {
+
+          smallestColumnIndex = col;
+          break;
+
+        }
+
+      }
+
+      return smallestColumnIndex;
+
+    }
+
+    static getItemPosition(i, columnsNumber) {
 
       return {
-        x: Grid.getXPosition(i, rowLength),
-        y: Grid.getYPosition(i, rowLength)
+        column: Grid.getColumnPosition(i, columnsNumber),
+        row: Grid.getRowPosition(i, columnsNumber)
       }
 
     }
 
-    // item position on row
-    static getXPosition(i, rowLength) {
+    // item column
+    static getColumnPosition(i, columnsNumber) {
 
-      return parseInt(Math.abs( i - ( ( i / rowLength ) * rowLength ) ).toString(), 10);
+      return parseInt((i - (Grid.getRowPosition(i, columnsNumber) * columnsNumber)).toString(), 10);
 
     }
 
-    // item position on column
-    static getYPosition(i, rowLength) {
+    // item row
+    static getRowPosition(i, columnsNumber) {
 
-      return parseInt(Math.abs( i / rowLength ).toString(), 10);
+      return parseInt(Math.abs(i / columnsNumber).toString(), 10);
 
     }
 
@@ -154,7 +270,7 @@
 
   class Item {
 
-    constructor (gridParent, id) {
+    constructor(gridParent, id) {
 
       this.gridParent = gridParent;
       this.id = '-item' + id;
@@ -198,6 +314,12 @@
 <script>
 
   const grid = new Grid(document.getElementById('appGrid'));
+  grid.addItem();
+  grid.addItem();
+  grid.addItem();
+  grid.addItem();
+  grid.addItem();
+  grid.addItem();
 
 </script>
 
