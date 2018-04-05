@@ -19,7 +19,7 @@ class Order {
     this.consumer = new OrderConsumer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
     this.priceAmount = new OrderPriceAmount(this.orderRef);
-    this.delivery = new OrderDelivery();
+    this.delivery = new OrderDelivery(this.orderRef);
 
     this.build();
 
@@ -40,6 +40,7 @@ class Order {
   build() {
 
     this.element.className = 'Order card grey lighten-5';
+    this.element.dataset.orderRefKey = this.orderKey;
 
     this.element.contentElement = document.createElement('div');
     this.element.contentElement.className = 'Order-inner card-content';
@@ -48,6 +49,7 @@ class Order {
     this.element.contentElement.appendChild(this.consumer.element);
     this.element.contentElement.appendChild(this.items.element);
     this.element.contentElement.appendChild(this.priceAmount.element);
+    this.element.contentElement.appendChild(this.delivery.element);
 
     this.buildActionsElement();
 
@@ -129,7 +131,8 @@ class Order {
     let createdTime = moment().toISOString();
 
     const orderRef = ordersRef.push({
-      createdTime: createdTime
+      createdTime: createdTime,
+      delivery: false
     }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,

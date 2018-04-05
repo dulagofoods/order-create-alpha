@@ -6,6 +6,7 @@ class OrderApp {
     this.ordersRef = ordersRef;
     this.socket = socket;
 
+    this.activeOrderElement = false;
     this.activeOrderKey = false;
 
     this.init();
@@ -110,6 +111,9 @@ class OrderApp {
       let order = new Order(orderRef, this.socket);
       this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
       order.init();
+
+      if (this.activeOrderKey === orderRef.key)
+        self.activeOrderElement = order.element;
 
       // seta o focus para o pedido
       setTimeout(function () {

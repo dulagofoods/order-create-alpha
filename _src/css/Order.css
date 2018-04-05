@@ -14,3 +14,7 @@
 .Order.is-deleted {
     display: none;
 }
+
+.Order-inner > .row {
+    margin-bottom: 0;
+}

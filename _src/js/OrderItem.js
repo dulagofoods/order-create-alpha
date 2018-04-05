@@ -33,10 +33,23 @@ class OrderItem {
     this.element.className = 'OrderItem row';
     this.element.dataset.orderItemKey = this.orderItemRef.key;
 
-    this.element.itemNameFieldElement = this.buildItemNameFieldElement();
-    this.element.itemQuantityFieldElement = this.buildItemQuantityFieldElement();
-    this.element.itemPriceFieldElement = this.buildItemPriceFieldElement();
-    this.element.deleteItemButtonElement = this.buildDeleteItemButtonElement();
+    this.element.main = this.buildMainElement();
+    this.element.itemNameField = this.buildItemNameFieldElement();
+    this.element.itemQuantityField = this.buildItemQuantityFieldElement();
+    this.element.itemPriceField = this.buildItemPriceFieldElement();
+    this.element.deleteItemButton = this.buildDeleteItemButtonElement();
+
+    this.element.note = this.buildNoteElement();
+
+  }
+
+  buildMainElement() {
+
+    const element = document.createElement('div');
+    element.className = 'OrderItem-main';
+    this.element.appendChild(element);
+
+    return element;
 
   }
 
@@ -81,22 +94,22 @@ class OrderItem {
           },
           minLength: 0,
           limit: 6,
-          onAutocomplete: function(select) {
+          onAutocomplete: function (select) {
             switch (select) {
               case 'Marmita P': {
-                self.element.itemPriceFieldElement.inputElement.value = 8.00
+                self.updatePrice(8.00);
               }
                 break;
               case 'Marmita M': {
-                self.element.itemPriceFieldElement.inputElement.value = 9.00
+                self.updatePrice(9.00);
               }
                 break;
               case 'Marmita G': {
-                self.element.itemPriceFieldElement.inputElement.value = 11.00
+                self.updatePrice(11.00);
               }
                 break;
               case 'Marmita F': {
-                self.element.itemPriceFieldElement.inputElement.value = 14.00
+                self.updatePrice(14.00);
               }
                 break;
               default: {
@@ -118,20 +131,22 @@ class OrderItem {
       this.orderItemRef.child('itemName').set(element.inputElement.value);
 
     });
-    this.orderItemRef.child('itemName').on('value', snap => {
-
-      element.inputElement.value = snap.val();
-
-    });
     element.appendChild(element.inputElement);
 
     element.labelElement = document.createElement('label');
     element.labelElement.htmlFor = element.inputElement.id;
-    element.labelElement.className = 'active';
     element.labelElement.innerHTML = 'Produto';
+    this.orderItemRef.child('itemName').on('value', snap => {
+
+      element.inputElement.value = snap.val();
+
+      if (!!snap.val())
+        element.labelElement.className = 'active';
+
+    });
     element.appendChild(element.labelElement);
 
-    this.element.appendChild(element);
+    this.element.main.appendChild(element);
 
     return element;
 
@@ -168,7 +183,7 @@ class OrderItem {
     element.labelElement.innerHTML = 'Qtde';
     element.appendChild(element.labelElement);
 
-    this.element.appendChild(element);
+    this.element.main.appendChild(element);
 
     return element;
 
@@ -183,39 +198,14 @@ class OrderItem {
     element.inputElement.type = 'number';
     element.inputElement.min = 0;
     element.inputElement.step = 1;
-    element.inputElement.value = 0.00.toFixed(2);
+    element.inputElement.value = 0.00;
     element.inputElement.id = this.orderItemRef.key + 'itemPrice';
-    element.inputElement.addEventListener('focus', event => {
+    element.inputElement.addEventListener('focus', () => {
       element.inputElement.select();
     });
-    element.inputElement.addEventListener('blur', event => {
-
-      try {
-        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
-      } catch (e) {
-        console.log(e);
-      }
-
-      this.orderItemRef.child('itemPrice').set(element.inputElement.value);
-
-    });
-    element.inputElement.addEventListener('change', event => {
-
-      try {
-        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
-      } catch (e) {
-        console.log(e);
-      }
-
-      this.orderItemRef.child('itemPrice').set(element.inputElement.value);
-
-    });
-    this.orderItemRef.child('itemPrice').on('value', snap => {
-
-      element.inputElement.value = snap.val();
-
-
-    });
+    element.inputElement.addEventListener('blur', () => this.updatePrice(element.inputElement.value));
+    element.inputElement.addEventListener('change', () => this.updatePrice(element.inputElement.value));
+    this.orderItemRef.child('itemPrice').on('value', snap => element.inputElement.value = snap.val());
     element.appendChild(element.inputElement);
 
     element.labelElement = document.createElement('label');
@@ -224,7 +214,7 @@ class OrderItem {
     element.labelElement.innerHTML = 'Preço';
     element.appendChild(element.labelElement);
 
-    this.element.appendChild(element);
+    this.element.main.appendChild(element);
 
     return element;
 
@@ -238,7 +228,6 @@ class OrderItem {
     element.buttonElement = document.createElement('a');
     element.buttonElement.className = 'waves-effect waves-light btn-floating btn-small red';
     element.buttonElement.innerHTML = '<i class="material-icons">remove</i>';
-    // element.buttonElement.innerHTML = '<span class="new badge red">drop</span>';
     element.buttonElement.addEventListener('click', () => {
 
       this.delete();
@@ -246,9 +235,102 @@ class OrderItem {
     });
     element.appendChild(element.buttonElement);
 
+    this.element.main.appendChild(element);
+
+    return element;
+
+  }
+
+  buildNoteElement() {
+
+    const self = this;
+
+    let autodestroy = false;
+
+    const element = document.createElement('div');
+    element.className = 'OrderItem-note';
+
+    element.field = document.createElement('div');
+    element.field.className = 'input-field col s10';
+    element.appendChild(element.field);
+
+    element.field.textarea = document.createElement('textarea');
+    element.field.textarea.className = 'materialize-textarea';
+    element.field.textarea.placeholder = 'observação';
+    element.field.textarea.addEventListener('input', () => {
+
+      this.orderItemRef.child('note').set(element.field.textarea.value.toLowerCase());
+
+    });
+    this.orderItemRef.child('note').on('value', snap => element.field.textarea.value = snap.val());
+    element.field.appendChild(element.field.textarea);
+
+    element.actionButton = document.createElement('a');
+    element.actionButton.innerHTML = 'adicionar observação';
+    element.actionButton.href = '#';
+    element.actionButton.addEventListener('click', event => {
+
+      event.preventDefault();
+
+      if (element.classList.contains('is-active')) {
+
+        element.classList.remove('is-active');
+        element.actionButton.innerHTML = 'adicionar observação';
+
+        autodestroy = true;
+
+        // previne que a nota seja excluida acidentalmente
+        setTimeout(function () {
+
+          if (autodestroy)
+            self.orderItemRef.child('note').set(null);
+
+        }, 3000);
+
+      } else {
+
+        element.classList.add('is-active');
+        element.actionButton.innerHTML = 'remover observação';
+        element.field.textarea.focus();
+
+        autodestroy = false;
+
+      }
+
+    });
+    this.orderItemRef.child('note').on('value', snap => {
+
+      if (snap.val()) {
+
+        element.classList.add('is-active');
+        element.actionButton.innerHTML = 'remover observação';
+
+      } else {
+
+        element.classList.remove('is-active');
+        element.actionButton.innerHTML = 'adicionar observação';
+
+      }
+
+    });
+    element.appendChild(element.actionButton);
+
     this.element.appendChild(element);
 
     return element;
+
+  }
+
+  updatePrice(value) {
+
+    try {
+      value = parseFloat(value).toFixed(2);
+    } catch (e) {
+      value = 0;
+      console.log(e);
+    }
+
+    this.orderItemRef.child('itemPrice').set(value);
 
   }
 

@@ -57,7 +57,7 @@ class OrderItemList {
   buildActionsElement() {
 
     this.element.actionsElement = document.createElement('div');
-    this.element.actionsElement.className = 'OrderItems-actions';
+    this.element.actionsElement.className = 'OrderItems-actions row';
     this.element.appendChild(this.element.actionsElement);
 
     this.element.addItemButton = document.createElement('button');

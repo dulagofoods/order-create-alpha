@@ -1,4 +1,24 @@
 .OrderItem {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+}
+
+.OrderItem.row {
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    padding-bottom: 0;
+}
+
+.OrderItem.is-deleted {
+    display: none;
+}
+
+.OrderItem-main {
     -webkit-align-items: center;
     align-items: center;
     display: -webkit-box;
@@ -8,11 +28,35 @@
     display: flex;
 }
 
-.OrderItem.row {
+.OrderItem .input-field.col {
     margin-bottom: 0;
-    margin-top: 0;
+    padding: 0 .5rem;
 }
 
-.OrderItem.is-deleted {
+.OrderItem-note {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+}
+
+.OrderItem-note a {
+    padding: 0 .5rem;
+}
+
+.OrderItem-note .input-field.col {
     display: none;
+    margin: 0 !important;
+}
+
+.OrderItem-note.is-active .input-field.col {
+    display: block;
+}
+
+.OrderItem-note .input-field textarea {
+    text-transform: lowercase;
+    margin-bottom: 4px;
 }

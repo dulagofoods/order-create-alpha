@@ -48,8 +48,8 @@ class OrderPriceAmount {
 
     this.element.className = 'OrderPriceAmount row';
 
-    this.inputFieldElement = this.buildInputFieldElement();
-    this.switcherElement = this.buildSwitcherElement();
+    this.inputField = this.buildInputFieldElement();
+    this.switcher = this.buildSwitcherElement();
 
   }
 
@@ -113,6 +113,9 @@ class OrderPriceAmount {
 
       this.orderRef.child('priceAmountUnlocked').set(element.input.checked);
 
+      if (!element.input.checked)
+        this.refreshPriceAmount();
+
     });
     this.orderRef.child('priceAmountUnlocked').on('value', snap => {
 
@@ -134,25 +137,7 @@ class OrderPriceAmount {
 
   }
 
-  setPriceAmount(priceAmount) {
-
-    const self = this;
-
-    this.priceAmount = priceAmount;
-
-    // isso evita que seja criado novamente o objeto no firebase
-    this.orderRef.once('value', snap => {
-
-      if (snap.val() != null && !this.priceAmountUnlocked)
-          self.orderRef.child('priceAmount').set(self.priceAmount);
-
-    });
-
-  }
-
   updatePriceAmount(orderItemRef, data) {
-
-    let priceAmount = 0;
 
     if (data)
       this.priceList[orderItemRef.key] = {
@@ -161,6 +146,14 @@ class OrderPriceAmount {
       };
     else
       this.priceList[orderItemRef.key] = null;
+
+    this.refreshPriceAmount();
+
+  }
+
+  refreshPriceAmount() {
+
+    let priceAmount = 0;
 
     let priceListArray = Object.values(this.priceList);
     priceListArray.forEach(orderItem => {
@@ -171,6 +164,22 @@ class OrderPriceAmount {
     });
 
     this.setPriceAmount(priceAmount);
+
+  }
+
+  setPriceAmount(priceAmount) {
+
+    const self = this;
+
+    this.priceAmount = priceAmount;
+
+    // isso evita que seja criado novamente o objeto no firebase
+    this.orderRef.once('value', snap => {
+
+      if (snap.val() != null && !this.priceAmountUnlocked)
+        self.orderRef.child('priceAmount').set(self.priceAmount);
+
+    });
 
   }
 

@@ -19,7 +19,7 @@ class Order {
     this.consumer = new OrderConsumer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
     this.priceAmount = new OrderPriceAmount(this.orderRef);
-    this.delivery = new OrderDelivery();
+    this.delivery = new OrderDelivery(this.orderRef);
 
     this.build();
 
@@ -40,6 +40,7 @@ class Order {
   build() {
 
     this.element.className = 'Order card grey lighten-5';
+    this.element.dataset.orderRefKey = this.orderKey;
 
     this.element.contentElement = document.createElement('div');
     this.element.contentElement.className = 'Order-inner card-content';
@@ -48,6 +49,7 @@ class Order {
     this.element.contentElement.appendChild(this.consumer.element);
     this.element.contentElement.appendChild(this.items.element);
     this.element.contentElement.appendChild(this.priceAmount.element);
+    this.element.contentElement.appendChild(this.delivery.element);
 
     this.buildActionsElement();
 
@@ -129,7 +131,8 @@ class Order {
     let createdTime = moment().toISOString();
 
     const orderRef = ordersRef.push({
-      createdTime: createdTime
+      createdTime: createdTime,
+      delivery: false
     }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,
@@ -149,6 +152,7 @@ class OrderApp {
     this.ordersRef = ordersRef;
     this.socket = socket;
 
+    this.activeOrderElement = false;
     this.activeOrderKey = false;
 
     this.init();
@@ -253,6 +257,9 @@ class OrderApp {
       let order = new Order(orderRef, this.socket);
       this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
       order.init();
+
+      if (this.activeOrderKey === orderRef.key)
+        self.activeOrderElement = order.element;
 
       // seta o focus para o pedido
       setTimeout(function () {
@@ -360,7 +367,203 @@ class OrderConsumer {
 }
 class OrderDelivery {
 
-  constructor() {
+  constructor(orderRef) {
+
+    this.orderRef = orderRef;
+
+    this.element = document.createElement('div');
+
+    this.init();
+
+  }
+
+  init() {
+
+    this.build();
+
+  }
+
+  build() {
+
+    this.element.className = 'OrderDelivery row';
+
+    this.element.action = this.buildActionElement();
+
+    this.element.address = this.buildAddressFormElement();
+    this.element.address.street = this.streetElement();
+    this.element.address.houseNumber = this.buildHouseNumberElement();
+    this.element.address.neighborhood = this.buildNeighborhoodElement();
+    this.element.address.addressReference = this.buildAddressReferenceElement();
+
+  }
+
+  buildActionElement() {
+
+    let element = document.createElement('div');
+    element.className = 'OrderDelivery-action switch col s12';
+
+    element.label = document.createElement('label');
+    element.appendChild(element.label);
+
+    element.label.textOff = document.createTextNode('retirada');
+    element.label.appendChild(element.label.textOff);
+
+    element.input = document.createElement('input');
+    element.input.type = 'checkbox';
+    element.input.addEventListener('change', event => {
+
+      this.orderRef.child('delivery').set(element.input.checked);
+
+    });
+    this.orderRef.child('delivery').on('value', snap => {
+
+      element.input.checked = !!snap.val();
+
+      if (!!snap.val())
+        this.element.classList.add('is-active');
+      else
+        this.element.classList.remove('is-active');
+
+    });
+    element.label.appendChild(element.input);
+
+    element.label.lever = document.createElement('span');
+    element.label.lever.className = 'lever';
+    element.label.appendChild(element.label.lever);
+
+    element.label.textOn = document.createTextNode('entrega');
+    element.label.appendChild(element.label.textOn);
+
+    this.element.appendChild(element);
+
+    return element;
+
+  }
+
+  buildAddressFormElement() {
+
+    let element = document.createElement('div');
+    element.className = 'OrderDelivery-addressForm row';
+
+    this.element.appendChild(element);
+
+    return element;
+
+  }
+
+  streetElement() {
+
+    let element = document.createElement('div');
+    element.className = 'input-field col s9';
+
+    element.input = document.createElement('input');
+    element.input.type = 'text';
+    element.input.id = this.orderRef.key + '-street';
+    element.input.addEventListener('input', () => this.orderRef.child('street').set(element.input.value));
+    this.orderRef.child('street').on('value', snap => element.input.value = snap.val());
+    element.appendChild(element.input);
+
+    element.label = document.createElement('label');
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Rua';
+    this.orderRef.child('street').once('value', snap => {
+
+      if (!!snap.val())
+        element.label.className = 'active';
+
+    });
+    element.appendChild(element.label);
+
+    this.element.address.appendChild(element);
+
+    return element;
+
+  }
+
+  buildHouseNumberElement() {
+
+    let element = document.createElement('div');
+    element.className = 'input-field col s3';
+
+    element.input = document.createElement('input');
+    element.input.type = 'number';
+    element.input.id = this.orderRef.key + '-addressHouseNumber';
+    element.input.addEventListener('input', () => this.orderRef.child('addressHouseNumber').set(element.input.value));
+    this.orderRef.child('addressHouseNumber').on('value', snap => element.input.value = snap.val());
+    element.appendChild(element.input);
+
+    element.label = document.createElement('label');
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Número';
+    this.orderRef.child('addressHouseNumber').once('value', snap => {
+
+      if (!!snap.val())
+        element.label.className = 'active';
+
+    });
+    element.appendChild(element.label);
+
+    this.element.address.appendChild(element);
+
+    return element;
+
+  }
+
+  buildNeighborhoodElement() {
+
+    let element = document.createElement('div');
+    element.className = 'input-field col s12';
+
+    element.input = document.createElement('input');
+    element.input.type = 'text';
+    element.input.id = this.orderRef.key + '-addressNeighborhood';
+    element.input.addEventListener('input', () => this.orderRef.child('addressNeighborhood').set(element.input.value));
+    this.orderRef.child('addressNeighborhood').on('value', snap => element.input.value = snap.val());
+    element.appendChild(element.input);
+
+    element.label = document.createElement('label');
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Bairro';
+    this.orderRef.child('addressNeighborhood').once('value', snap => {
+
+      if (!!snap.val())
+        element.label.className = 'active';
+
+    });
+    element.appendChild(element.label);
+
+    this.element.address.appendChild(element);
+
+    return element;
+
+  }
+
+  buildAddressReferenceElement() {
+
+    let element = document.createElement('div');
+    element.className = 'input-field col s12';
+
+    element.input = document.createElement('input');
+    element.input.type = 'text';
+    element.input.id = this.orderRef.key + '-addressReference';
+    element.input.addEventListener('input', () => this.orderRef.child('addressReference').set(element.input.value));
+    this.orderRef.child('addressReference').on('value', snap => element.input.value = snap.val());
+    element.appendChild(element.input);
+
+    element.label = document.createElement('label');
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Referência';
+    this.orderRef.child('addressReference').once('value', snap => {
+
+      if (!!snap.val())
+        element.label.className = 'active';
+
+    });
+    element.appendChild(element.label);
+
+    this.element.address.appendChild(element);
+
+    return element;
 
   }
 
@@ -400,10 +603,23 @@ class OrderItem {
     this.element.className = 'OrderItem row';
     this.element.dataset.orderItemKey = this.orderItemRef.key;
 
-    this.element.itemNameFieldElement = this.buildItemNameFieldElement();
-    this.element.itemQuantityFieldElement = this.buildItemQuantityFieldElement();
-    this.element.itemPriceFieldElement = this.buildItemPriceFieldElement();
-    this.element.deleteItemButtonElement = this.buildDeleteItemButtonElement();
+    this.element.main = this.buildMainElement();
+    this.element.itemNameField = this.buildItemNameFieldElement();
+    this.element.itemQuantityField = this.buildItemQuantityFieldElement();
+    this.element.itemPriceField = this.buildItemPriceFieldElement();
+    this.element.deleteItemButton = this.buildDeleteItemButtonElement();
+
+    this.element.note = this.buildNoteElement();
+
+  }
+
+  buildMainElement() {
+
+    const element = document.createElement('div');
+    element.className = 'OrderItem-main';
+    this.element.appendChild(element);
+
+    return element;
 
   }
 
@@ -448,22 +664,22 @@ class OrderItem {
           },
           minLength: 0,
           limit: 6,
-          onAutocomplete: function(select) {
+          onAutocomplete: function (select) {
             switch (select) {
               case 'Marmita P': {
-                self.element.itemPriceFieldElement.inputElement.value = 8.00
+                self.updatePrice(8.00);
               }
                 break;
               case 'Marmita M': {
-                self.element.itemPriceFieldElement.inputElement.value = 9.00
+                self.updatePrice(9.00);
               }
                 break;
               case 'Marmita G': {
-                self.element.itemPriceFieldElement.inputElement.value = 11.00
+                self.updatePrice(11.00);
               }
                 break;
               case 'Marmita F': {
-                self.element.itemPriceFieldElement.inputElement.value = 14.00
+                self.updatePrice(14.00);
               }
                 break;
               default: {
@@ -485,20 +701,22 @@ class OrderItem {
       this.orderItemRef.child('itemName').set(element.inputElement.value);
 
     });
-    this.orderItemRef.child('itemName').on('value', snap => {
-
-      element.inputElement.value = snap.val();
-
-    });
     element.appendChild(element.inputElement);
 
     element.labelElement = document.createElement('label');
     element.labelElement.htmlFor = element.inputElement.id;
-    element.labelElement.className = 'active';
     element.labelElement.innerHTML = 'Produto';
+    this.orderItemRef.child('itemName').on('value', snap => {
+
+      element.inputElement.value = snap.val();
+
+      if (!!snap.val())
+        element.labelElement.className = 'active';
+
+    });
     element.appendChild(element.labelElement);
 
-    this.element.appendChild(element);
+    this.element.main.appendChild(element);
 
     return element;
 
@@ -535,7 +753,7 @@ class OrderItem {
     element.labelElement.innerHTML = 'Qtde';
     element.appendChild(element.labelElement);
 
-    this.element.appendChild(element);
+    this.element.main.appendChild(element);
 
     return element;
 
@@ -550,39 +768,14 @@ class OrderItem {
     element.inputElement.type = 'number';
     element.inputElement.min = 0;
     element.inputElement.step = 1;
-    element.inputElement.value = 0.00.toFixed(2);
+    element.inputElement.value = 0.00;
     element.inputElement.id = this.orderItemRef.key + 'itemPrice';
-    element.inputElement.addEventListener('focus', event => {
+    element.inputElement.addEventListener('focus', () => {
       element.inputElement.select();
     });
-    element.inputElement.addEventListener('blur', event => {
-
-      try {
-        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
-      } catch (e) {
-        console.log(e);
-      }
-
-      this.orderItemRef.child('itemPrice').set(element.inputElement.value);
-
-    });
-    element.inputElement.addEventListener('change', event => {
-
-      try {
-        element.inputElement.value = parseFloat(element.inputElement.value).toFixed(2);
-      } catch (e) {
-        console.log(e);
-      }
-
-      this.orderItemRef.child('itemPrice').set(element.inputElement.value);
-
-    });
-    this.orderItemRef.child('itemPrice').on('value', snap => {
-
-      element.inputElement.value = snap.val();
-
-
-    });
+    element.inputElement.addEventListener('blur', () => this.updatePrice(element.inputElement.value));
+    element.inputElement.addEventListener('change', () => this.updatePrice(element.inputElement.value));
+    this.orderItemRef.child('itemPrice').on('value', snap => element.inputElement.value = snap.val());
     element.appendChild(element.inputElement);
 
     element.labelElement = document.createElement('label');
@@ -591,7 +784,7 @@ class OrderItem {
     element.labelElement.innerHTML = 'Preço';
     element.appendChild(element.labelElement);
 
-    this.element.appendChild(element);
+    this.element.main.appendChild(element);
 
     return element;
 
@@ -605,7 +798,6 @@ class OrderItem {
     element.buttonElement = document.createElement('a');
     element.buttonElement.className = 'waves-effect waves-light btn-floating btn-small red';
     element.buttonElement.innerHTML = '<i class="material-icons">remove</i>';
-    // element.buttonElement.innerHTML = '<span class="new badge red">drop</span>';
     element.buttonElement.addEventListener('click', () => {
 
       this.delete();
@@ -613,9 +805,102 @@ class OrderItem {
     });
     element.appendChild(element.buttonElement);
 
+    this.element.main.appendChild(element);
+
+    return element;
+
+  }
+
+  buildNoteElement() {
+
+    const self = this;
+
+    let autodestroy = false;
+
+    const element = document.createElement('div');
+    element.className = 'OrderItem-note';
+
+    element.field = document.createElement('div');
+    element.field.className = 'input-field col s10';
+    element.appendChild(element.field);
+
+    element.field.textarea = document.createElement('textarea');
+    element.field.textarea.className = 'materialize-textarea';
+    element.field.textarea.placeholder = 'observação';
+    element.field.textarea.addEventListener('input', () => {
+
+      this.orderItemRef.child('note').set(element.field.textarea.value.toLowerCase());
+
+    });
+    this.orderItemRef.child('note').on('value', snap => element.field.textarea.value = snap.val());
+    element.field.appendChild(element.field.textarea);
+
+    element.actionButton = document.createElement('a');
+    element.actionButton.innerHTML = 'adicionar observação';
+    element.actionButton.href = '#';
+    element.actionButton.addEventListener('click', event => {
+
+      event.preventDefault();
+
+      if (element.classList.contains('is-active')) {
+
+        element.classList.remove('is-active');
+        element.actionButton.innerHTML = 'adicionar observação';
+
+        autodestroy = true;
+
+        // previne que a nota seja excluida acidentalmente
+        setTimeout(function () {
+
+          if (autodestroy)
+            self.orderItemRef.child('note').set(null);
+
+        }, 3000);
+
+      } else {
+
+        element.classList.add('is-active');
+        element.actionButton.innerHTML = 'remover observação';
+        element.field.textarea.focus();
+
+        autodestroy = false;
+
+      }
+
+    });
+    this.orderItemRef.child('note').on('value', snap => {
+
+      if (snap.val()) {
+
+        element.classList.add('is-active');
+        element.actionButton.innerHTML = 'remover observação';
+
+      } else {
+
+        element.classList.remove('is-active');
+        element.actionButton.innerHTML = 'adicionar observação';
+
+      }
+
+    });
+    element.appendChild(element.actionButton);
+
     this.element.appendChild(element);
 
     return element;
+
+  }
+
+  updatePrice(value) {
+
+    try {
+      value = parseFloat(value).toFixed(2);
+    } catch (e) {
+      value = 0;
+      console.log(e);
+    }
+
+    this.orderItemRef.child('itemPrice').set(value);
 
   }
 
@@ -685,7 +970,7 @@ class OrderItemList {
   buildActionsElement() {
 
     this.element.actionsElement = document.createElement('div');
-    this.element.actionsElement.className = 'OrderItems-actions';
+    this.element.actionsElement.className = 'OrderItems-actions row';
     this.element.appendChild(this.element.actionsElement);
 
     this.element.addItemButton = document.createElement('button');
@@ -797,8 +1082,8 @@ class OrderPriceAmount {
 
     this.element.className = 'OrderPriceAmount row';
 
-    this.inputFieldElement = this.buildInputFieldElement();
-    this.switcherElement = this.buildSwitcherElement();
+    this.inputField = this.buildInputFieldElement();
+    this.switcher = this.buildSwitcherElement();
 
   }
 
@@ -862,6 +1147,9 @@ class OrderPriceAmount {
 
       this.orderRef.child('priceAmountUnlocked').set(element.input.checked);
 
+      if (!element.input.checked)
+        this.refreshPriceAmount();
+
     });
     this.orderRef.child('priceAmountUnlocked').on('value', snap => {
 
@@ -883,25 +1171,7 @@ class OrderPriceAmount {
 
   }
 
-  setPriceAmount(priceAmount) {
-
-    const self = this;
-
-    this.priceAmount = priceAmount;
-
-    // isso evita que seja criado novamente o objeto no firebase
-    this.orderRef.once('value', snap => {
-
-      if (snap.val() != null && !this.priceAmountUnlocked)
-          self.orderRef.child('priceAmount').set(self.priceAmount);
-
-    });
-
-  }
-
   updatePriceAmount(orderItemRef, data) {
-
-    let priceAmount = 0;
 
     if (data)
       this.priceList[orderItemRef.key] = {
@@ -910,6 +1180,14 @@ class OrderPriceAmount {
       };
     else
       this.priceList[orderItemRef.key] = null;
+
+    this.refreshPriceAmount();
+
+  }
+
+  refreshPriceAmount() {
+
+    let priceAmount = 0;
 
     let priceListArray = Object.values(this.priceList);
     priceListArray.forEach(orderItem => {
@@ -920,6 +1198,22 @@ class OrderPriceAmount {
     });
 
     this.setPriceAmount(priceAmount);
+
+  }
+
+  setPriceAmount(priceAmount) {
+
+    const self = this;
+
+    this.priceAmount = priceAmount;
+
+    // isso evita que seja criado novamente o objeto no firebase
+    this.orderRef.once('value', snap => {
+
+      if (snap.val() != null && !this.priceAmountUnlocked)
+        self.orderRef.child('priceAmount').set(self.priceAmount);
+
+    });
 
   }
 
