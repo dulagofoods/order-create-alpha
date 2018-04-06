@@ -17,6 +17,8 @@ class OrderApp {
 
     this.build();
 
+    // this.ordersGrid = new Grid(this.element.ordersGrid);
+
     this.ordersRef.orderByChild('createdTime').on('child_added', snap => {
 
       this.pushOrder(snap.ref);
@@ -31,9 +33,9 @@ class OrderApp {
     this.innerElement.className = 'OrderApp-inner';
     this.element.append(this.innerElement);
 
-    this.element.orderListElement = document.createElement('div');
-    this.element.orderListElement.className = 'OrderApp-orderList';
-    this.innerElement.append(this.element.orderListElement);
+    this.element.ordersGrid = document.createElement('div');
+    this.element.ordersGrid.className = 'OrderApp-ordersGrid';
+    this.innerElement.append(this.element.ordersGrid);
 
     this.actionButtons = document.createElement('div');
     this.actionButtons.className = 'OrderApp-actionButtons';
@@ -109,7 +111,7 @@ class OrderApp {
     if (orderRef) {
 
       let order = new Order(orderRef, this.socket);
-      this.element.orderListElement.insertBefore(order.element, this.element.orderListElement.firstChild);
+      this.element.ordersGrid.insertBefore(order.element, this.element.ordersGrid.firstChild);
       order.init();
 
       if (this.activeOrderKey === orderRef.key)
