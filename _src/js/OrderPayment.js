@@ -1,4 +1,4 @@
-class OrderBilling {
+class OrderPayment {
 
   constructor(orderRef) {
 
