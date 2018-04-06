@@ -57,11 +57,11 @@ class OrderItemList {
   buildActionsElement() {
 
     this.element.actionsElement = document.createElement('div');
-    this.element.actionsElement.className = 'OrderItems-actions row';
+    this.element.actionsElement.className = 'OrderItems-actions';
     this.element.appendChild(this.element.actionsElement);
 
     this.element.addItemButton = document.createElement('button');
-    this.element.addItemButton.className = 'waves-effect waves-light btn orange light-1';
+    this.element.addItemButton.className = 'waves-effect waves-light btn-small orange light-1';
     this.element.addItemButton.innerHTML = 'Adicionar Produto';
     this.element.addItemButton.addEventListener('click', () => {
 

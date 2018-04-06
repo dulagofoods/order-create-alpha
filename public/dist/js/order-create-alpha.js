@@ -36,11 +36,11 @@ class Grid {
     const item = new GridItem(this, this.itemCount++, true);
 
     this.element.appendChild(item.element);
-    this.itemList.push(item);
+    this.paymentList.push(item);
 
     console.clear();
-    console.log('Items criados: ' + this.itemList.length);
-    console.log(Grid.getItemPosition(this.itemList.length - 1, this.defaultColumnsNumber));
+    console.log('Items criados: ' + this.paymentList.length);
+    console.log(Grid.getItemPosition(this.paymentList.length - 1, this.defaultColumnsNumber));
 
     this.reOderView();
 
@@ -76,9 +76,9 @@ class Grid {
 
   updateCurrentMatrixView() {
 
-    console.log(this.itemList);
-    let itemList = this.itemList.slice().reverse();
-    this.currentMatrixView = Grid.getMatrixView(itemList, this.defaultColumnsNumber);
+    console.log(this.paymentList);
+    let itemList = this.paymentList.slice().reverse();
+    this.currentMatrixView = Grid.getMatrixView(paymentList, this.defaultColumnsNumber);
     console.log(this.currentMatrixView);
 
   }
@@ -163,15 +163,15 @@ class Grid {
     // contrói a matriz
     for (let i = 0; i < columnsNumber; i++) {
       matrixView.push([]);
-      for (let j = 0; j < itemList.length / columnsNumber; j++)
+      for (let j = 0; j < paymentList.length / columnsNumber; j++)
         matrixView[i].push(false);
     }
 
     // passa por todos items e os coloca na melhor posiçao
-    for (let i = 0; i < itemList.length; i++) {
+    for (let i = 0; i < paymentList.length; i++) {
 
       const row = Grid.getRowPosition(i, columnsNumber);
-      matrixView[Grid.getSmallestColumn(matrixView, row)][row] = itemList[i];
+      matrixView[Grid.getSmallestColumn(matrixView, row)][row] = paymentList[i];
 
     }
 
@@ -297,7 +297,7 @@ class Order {
 
     this.consumer = new OrderConsumer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
-    this.priceAmount = new OrderPriceAmount(this.orderRef);
+    this.billing = new OrderBilling(this.orderRef);
     this.delivery = new OrderDelivery(this.orderRef);
 
     this.build();
@@ -327,7 +327,7 @@ class Order {
 
     this.element.contentElement.appendChild(this.consumer.element);
     this.element.contentElement.appendChild(this.items.element);
-    this.element.contentElement.appendChild(this.priceAmount.element);
+    this.element.contentElement.appendChild(this.billing.element);
     this.element.contentElement.appendChild(this.delivery.element);
 
     this.buildActionsElement();
@@ -551,6 +551,37 @@ class OrderApp {
       }, 1);
 
     }
+
+  }
+
+}
+class OrderBilling {
+
+  constructor(orderRef) {
+
+    this.orderRef = orderRef;
+
+    this.element = document.createElement('div');
+
+    this.init();
+
+  }
+
+  init() {
+
+    this.priceAmount = new OrderPriceAmount(this.orderRef);
+    this.paymentList = new OrderPaymentList(this.orderRef);
+
+    this.build();
+
+  }
+
+  build() {
+
+    this.element.className = 'OrderBilling row';
+
+    this.element.appendChild(this.priceAmount.element);
+    this.element.appendChild(this.paymentList.element);
 
   }
 
@@ -1222,11 +1253,11 @@ class OrderItemList {
   buildActionsElement() {
 
     this.element.actionsElement = document.createElement('div');
-    this.element.actionsElement.className = 'OrderItems-actions row';
+    this.element.actionsElement.className = 'OrderItems-actions';
     this.element.appendChild(this.element.actionsElement);
 
     this.element.addItemButton = document.createElement('button');
-    this.element.addItemButton.className = 'waves-effect waves-light btn orange light-1';
+    this.element.addItemButton.className = 'waves-effect waves-light btn-small orange light-1';
     this.element.addItemButton.innerHTML = 'Adicionar Produto';
     this.element.addItemButton.addEventListener('click', () => {
 
@@ -1284,11 +1315,11 @@ class OrderItemList {
   }
 
 }
-class OrderPayment {
+class OrderPaymentItem {
 
-  constructor(orderRef) {
+  constructor(orderPaymentItemRef) {
 
-    this.orderRef = orderRef;
+    this.orderPaymentItemRef = orderPaymentItemRef;
 
     this.element = document.createElement('div');
 
@@ -1331,11 +1362,24 @@ class OrderPayment {
 
     this.build();
 
+    // action listener
+    this.orderPaymentItemRef.on('value', snap => {
+
+      // is deleted
+      if (snap.val() == null) {
+
+        this.element.classList.add('is-deleted');
+
+      }
+
+    });
+
   }
 
   build() {
 
-    this.element.className = 'OrderBilling row';
+    this.element.className = 'OrderPaymentItem row';
+    this.element.dataset.orderPaymentItemRefKey = this.orderPaymentItemRef.key;
 
     this.element.method = this.buildMethodSelectElement();
     this.element.paidValue = this.buildPaidValueFieldElement();
@@ -1347,16 +1391,40 @@ class OrderPayment {
   buildMethodSelectElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderBilling-method input-field col s4';
+    element.className = 'OrderPaymentItem-method input-field col s4';
     this.element.appendChild(element);
 
     element.select = document.createElement('select');
+    // element.select.className = 'browser-default';
     element.appendChild(element.select);
 
     element.select.defaultOption = document.createElement('option');
     element.select.defaultOption.value = '';
     element.select.defaultOption.disabled = true;
     element.select.defaultOption.innerHTML = 'Métodos';
+    element.select.addEventListener('change', event => {
+
+      this.orderPaymentItemRef.child('method').set(element.select[event.target.selectedIndex].value);
+
+    });
+    this.orderPaymentItemRef.child('method').on('value', snap => {
+
+      setTimeout(() => {
+
+        for (let i = element.select.options.length; i--;)
+
+          if (element.select.options[i].value == snap.val()) {
+            element.select.options[i].setAttribute('selected', true);
+            element.select.options.selectedIndex = i;
+          } else {
+            element.select.options[i].removeAttribute('selected');
+          }
+
+        element.instance = M.FormSelect.init(element.select);
+
+      }, 1);
+
+    });
     element.select.appendChild(element.select.defaultOption);
 
     let hasSelected = false;
@@ -1384,10 +1452,7 @@ class OrderPayment {
     element.label.innerHTML = 'Pagamento';
     element.appendChild(element.label);
 
-    console.log(element.select);
-    setTimeout(() => {
-      element.instance = M.FormSelect.init(element.select);
-    },1);
+    setTimeout(() => element.instance = M.FormSelect.init(element.select), 1);
 
     return element;
 
@@ -1396,12 +1461,12 @@ class OrderPayment {
   buildPaidValueFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderBilling-paidValue input-field col s3';
+    element.className = 'OrderPaymentItem-paidValue input-field col s3';
     this.element.appendChild(element);
 
     element.input = document.createElement('input');
     element.input.type = 'number';
-    element.input.id = this.orderRef.key + '-paidValueField';
+    element.input.id = this.orderPaymentItemRef.key + '-paidValueField';
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
@@ -1416,12 +1481,12 @@ class OrderPayment {
   buildReferenceValueFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderBilling-referenceValue input-field col s3';
+    element.className = 'OrderPaymentItem-referenceValue input-field col s3';
     this.element.appendChild(element);
 
     element.input = document.createElement('input');
     element.input.type = 'number';
-    element.input.id = this.orderRef.key + '-referenceValueField';
+    element.input.id = this.orderPaymentItemRef.key + '-referenceValueField';
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
@@ -1443,7 +1508,7 @@ class OrderPayment {
     element.buttonElement.innerHTML = '<i class="material-icons red-text">remove</i>';
     element.buttonElement.addEventListener('click', () => {
 
-      // this.delete();
+      this.delete();
 
     });
     element.appendChild(element.buttonElement);
@@ -1454,12 +1519,124 @@ class OrderPayment {
 
   }
 
+  delete() {
+
+    this.orderPaymentItemRef.set(null);
+
+  }
+
+}
+class OrderPaymentList {
+
+  constructor(orderRef) {
+
+    this.orderRef = orderRef;
+    this.orderBillingRef = this.orderRef.child('billing');
+
+    this.element = document.createElement('div');
+    this.paymentList = [];
+
+    this.init();
+
+  }
+
+  init() {
+
+    this.build();
+
+    this.orderBillingRef.child('payments').on('child_added', snap => {
+
+      this.pushPaymentItem(snap.ref);
+
+    });
+
+    this.orderBillingRef.child('payments').on('child_removed', snap => {
+
+      this.delete(snap.ref);
+
+    });
+
+  }
+
+  build() {
+
+    this.element.className = 'OrderPaymentList row';
+
+    this.element.paymentList = this.buildPaymentListElement();
+    this.element.actions = this.buildActionsElement();
+
+  }
+
+  buildPaymentListElement() {
+
+    const element = document.createElement('div');
+    element.className = 'OrderItemList-list';
+    this.element.appendChild(element);
+
+    return element;
+
+  }
+
+  buildActionsElement() {
+
+    const element = document.createElement('div');
+    element.className = 'OrderPaymentList-actions';
+    this.element.appendChild(element);
+
+    element.addItemButton = document.createElement('button');
+    element.addItemButton.className = 'waves-effect waves-light btn-small green light-1';
+    element.addItemButton.innerHTML = 'Adicionar Pagamento';
+    element.addItemButton.addEventListener('click', () => {
+
+      this.addItem('money');
+
+    });
+    element.appendChild(element.addItemButton);
+
+    return element;
+
+  }
+
+  addItem(method) {
+
+    this.orderBillingRef.child('payments').push({
+      method: method || '',
+      paidValue: 0.00,
+      referenceValue: 0.00
+    });
+
+  }
+
+  pushPaymentItem(orderPaymentItemRef) {
+
+    if (orderPaymentItemRef) {
+
+      let paymentItem = new OrderPaymentItem(orderPaymentItemRef);
+      this.paymentList.push(paymentItem);
+      this.element.paymentList.appendChild(paymentItem.element);
+
+    }
+
+  }
+
+  delete(orderPaymentItemRef) {
+
+    for (let i = this.paymentList.length; i--; ) {
+
+      if (this.paymentList[i].orderPaymentItemRef.key === orderPaymentItemRef.key)
+        this.paymentList.splice(i, 1);
+
+    }
+
+  }
+
 }
 class OrderPriceAmount {
 
   constructor(orderRef) {
 
     this.orderRef = orderRef;
+    this.orderBillingRef = orderRef.child('billing');
 
     this.element = document.createElement('div');
 
@@ -1493,7 +1670,7 @@ class OrderPriceAmount {
 
     });
 
-    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
+    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
 
       this.priceAmountUnlocked = !!snap.val();
 
@@ -1529,15 +1706,15 @@ class OrderPriceAmount {
     element.input.addEventListener('change', event => {
 
       element.input.value = parseFloat(element.input.value).toFixed(2);
-      this.orderRef.child('priceAmount').set(parseFloat(element.input.value).toFixed(2));
+      this.orderBillingRef.child('priceAmount').set(parseFloat(element.input.value).toFixed(2));
 
     });
-    this.orderRef.child('priceAmount').on('value', snap => {
+    this.orderBillingRef.child('priceAmount').on('value', snap => {
 
       element.input.value = parseFloat(snap.val()).toFixed(2);
 
     });
-    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
+    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
 
       element.input.disabled = !snap.val();
 
@@ -1568,13 +1745,13 @@ class OrderPriceAmount {
     element.input.type = 'checkbox';
     element.input.addEventListener('change', event => {
 
-      this.orderRef.child('priceAmountUnlocked').set(element.input.checked);
+      this.orderBillingRef.child('priceAmountUnlocked').set(element.input.checked);
 
       if (!element.input.checked)
         this.refreshPriceAmount();
 
     });
-    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
+    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
 
       element.input.checked = !!snap.val();
 
@@ -1634,7 +1811,7 @@ class OrderPriceAmount {
     this.orderRef.once('value', snap => {
 
       if (snap.val() != null && !this.priceAmountUnlocked)
-        self.orderRef.child('priceAmount').set(self.priceAmount);
+        setTimeout(() => self.orderBillingRef.child('priceAmount').set(self.priceAmount), 1);
 
     });
 
@@ -1663,7 +1840,7 @@ class OrdersGrid extends Grid {
 
     const ordersGridItem = new OrdersGridItem(order, this);
     this.element.appendChild(ordersGridItem.element);
-    this.itemList.push(ordersGridItem);
+    this.paymentList.push(ordersGridItem);
 
     if (this.timer)
       clearTimeout(this.timer);

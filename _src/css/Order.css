@@ -31,5 +31,9 @@
 }
 
 .Order-inner > .row {
+    margin-bottom: 16px;
+}
+
+.Order-inner > .row:last-of-type {
     margin-bottom: 0;
 }

@@ -1,8 +1,8 @@
-class OrderPayment {
+class OrderPaymentItem {
 
-  constructor(orderRef) {
+  constructor(orderPaymentItemRef) {
 
-    this.orderRef = orderRef;
+    this.orderPaymentItemRef = orderPaymentItemRef;
 
     this.element = document.createElement('div');
 
@@ -45,11 +45,24 @@ class OrderPayment {
 
     this.build();
 
+    // action listener
+    this.orderPaymentItemRef.on('value', snap => {
+
+      // is deleted
+      if (snap.val() == null) {
+
+        this.element.classList.add('is-deleted');
+
+      }
+
+    });
+
   }
 
   build() {
 
-    this.element.className = 'OrderBilling row';
+    this.element.className = 'OrderPaymentItem row';
+    this.element.dataset.orderPaymentItemRefKey = this.orderPaymentItemRef.key;
 
     this.element.method = this.buildMethodSelectElement();
     this.element.paidValue = this.buildPaidValueFieldElement();
@@ -61,16 +74,40 @@ class OrderPayment {
   buildMethodSelectElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderBilling-method input-field col s4';
+    element.className = 'OrderPaymentItem-method input-field col s4';
     this.element.appendChild(element);
 
     element.select = document.createElement('select');
+    // element.select.className = 'browser-default';
     element.appendChild(element.select);
 
     element.select.defaultOption = document.createElement('option');
     element.select.defaultOption.value = '';
     element.select.defaultOption.disabled = true;
     element.select.defaultOption.innerHTML = 'Métodos';
+    element.select.addEventListener('change', event => {
+
+      this.orderPaymentItemRef.child('method').set(element.select[event.target.selectedIndex].value);
+
+    });
+    this.orderPaymentItemRef.child('method').on('value', snap => {
+
+      setTimeout(() => {
+
+        for (let i = element.select.options.length; i--;)
+
+          if (element.select.options[i].value == snap.val()) {
+            element.select.options[i].setAttribute('selected', true);
+            element.select.options.selectedIndex = i;
+          } else {
+            element.select.options[i].removeAttribute('selected');
+          }
+
+        element.instance = M.FormSelect.init(element.select);
+
+      }, 1);
+
+    });
     element.select.appendChild(element.select.defaultOption);
 
     let hasSelected = false;
@@ -98,10 +135,7 @@ class OrderPayment {
     element.label.innerHTML = 'Pagamento';
     element.appendChild(element.label);
 
-    console.log(element.select);
-    setTimeout(() => {
-      element.instance = M.FormSelect.init(element.select);
-    },1);
+    setTimeout(() => element.instance = M.FormSelect.init(element.select), 1);
 
     return element;
 
@@ -110,12 +144,12 @@ class OrderPayment {
   buildPaidValueFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderBilling-paidValue input-field col s3';
+    element.className = 'OrderPaymentItem-paidValue input-field col s3';
     this.element.appendChild(element);
 
     element.input = document.createElement('input');
     element.input.type = 'number';
-    element.input.id = this.orderRef.key + '-paidValueField';
+    element.input.id = this.orderPaymentItemRef.key + '-paidValueField';
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
@@ -130,12 +164,12 @@ class OrderPayment {
   buildReferenceValueFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderBilling-referenceValue input-field col s3';
+    element.className = 'OrderPaymentItem-referenceValue input-field col s3';
     this.element.appendChild(element);
 
     element.input = document.createElement('input');
     element.input.type = 'number';
-    element.input.id = this.orderRef.key + '-referenceValueField';
+    element.input.id = this.orderPaymentItemRef.key + '-referenceValueField';
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
@@ -157,7 +191,7 @@ class OrderPayment {
     element.buttonElement.innerHTML = '<i class="material-icons red-text">remove</i>';
     element.buttonElement.addEventListener('click', () => {
 
-      // this.delete();
+      this.delete();
 
     });
     element.appendChild(element.buttonElement);
@@ -165,6 +199,12 @@ class OrderPayment {
     this.element.appendChild(element);
 
     return element;
+
+  }
+
+  delete() {
+
+    this.orderPaymentItemRef.set(null);
 
   }
 

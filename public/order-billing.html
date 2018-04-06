@@ -68,13 +68,13 @@
 
 <script>
 
-  const orderPaymentsList = [];
+  const orderBillingList = [];
 
   ordersRef.orderByChild('createdTime').on('child_added', snap => {
 
-    let orderPayment = new OrderPayment(snap.ref);
-    orderPaymentsList.push(orderPayment);
-    document.getElementById('orderApp').insertBefore(orderPayment.element, document.getElementById('orderApp').firstChild);
+    let orderBilling = new OrderBilling(snap.ref);
+    orderBillingList.push(orderBilling);
+    document.getElementById('orderApp').insertBefore(orderBilling.element, document.getElementById('orderApp').firstChild);
 
   });
 

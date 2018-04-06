@@ -36,11 +36,11 @@ class Grid {
     const item = new GridItem(this, this.itemCount++, true);
 
     this.element.appendChild(item.element);
-    this.itemList.push(item);
+    this.paymentList.push(item);
 
     console.clear();
-    console.log('Items criados: ' + this.itemList.length);
-    console.log(Grid.getItemPosition(this.itemList.length - 1, this.defaultColumnsNumber));
+    console.log('Items criados: ' + this.paymentList.length);
+    console.log(Grid.getItemPosition(this.paymentList.length - 1, this.defaultColumnsNumber));
 
     this.reOderView();
 
@@ -76,9 +76,9 @@ class Grid {
 
   updateCurrentMatrixView() {
 
-    console.log(this.itemList);
-    let itemList = this.itemList.slice().reverse();
-    this.currentMatrixView = Grid.getMatrixView(itemList, this.defaultColumnsNumber);
+    console.log(this.paymentList);
+    let itemList = this.paymentList.slice().reverse();
+    this.currentMatrixView = Grid.getMatrixView(paymentList, this.defaultColumnsNumber);
     console.log(this.currentMatrixView);
 
   }
@@ -163,15 +163,15 @@ class Grid {
     // contrói a matriz
     for (let i = 0; i < columnsNumber; i++) {
       matrixView.push([]);
-      for (let j = 0; j < itemList.length / columnsNumber; j++)
+      for (let j = 0; j < paymentList.length / columnsNumber; j++)
         matrixView[i].push(false);
     }
 
     // passa por todos items e os coloca na melhor posiçao
-    for (let i = 0; i < itemList.length; i++) {
+    for (let i = 0; i < paymentList.length; i++) {
 
       const row = Grid.getRowPosition(i, columnsNumber);
-      matrixView[Grid.getSmallestColumn(matrixView, row)][row] = itemList[i];
+      matrixView[Grid.getSmallestColumn(matrixView, row)][row] = paymentList[i];
 
     }
 

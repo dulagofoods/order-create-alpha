@@ -3,6 +3,7 @@ class OrderPriceAmount {
   constructor(orderRef) {
 
     this.orderRef = orderRef;
+    this.orderBillingRef = orderRef.child('billing');
 
     this.element = document.createElement('div');
 
@@ -36,7 +37,7 @@ class OrderPriceAmount {
 
     });
 
-    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
+    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
 
       this.priceAmountUnlocked = !!snap.val();
 
@@ -72,15 +73,15 @@ class OrderPriceAmount {
     element.input.addEventListener('change', event => {
 
       element.input.value = parseFloat(element.input.value).toFixed(2);
-      this.orderRef.child('priceAmount').set(parseFloat(element.input.value).toFixed(2));
+      this.orderBillingRef.child('priceAmount').set(parseFloat(element.input.value).toFixed(2));
 
     });
-    this.orderRef.child('priceAmount').on('value', snap => {
+    this.orderBillingRef.child('priceAmount').on('value', snap => {
 
       element.input.value = parseFloat(snap.val()).toFixed(2);
 
     });
-    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
+    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
 
       element.input.disabled = !snap.val();
 
@@ -111,13 +112,13 @@ class OrderPriceAmount {
     element.input.type = 'checkbox';
     element.input.addEventListener('change', event => {
 
-      this.orderRef.child('priceAmountUnlocked').set(element.input.checked);
+      this.orderBillingRef.child('priceAmountUnlocked').set(element.input.checked);
 
       if (!element.input.checked)
         this.refreshPriceAmount();
 
     });
-    this.orderRef.child('priceAmountUnlocked').on('value', snap => {
+    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
 
       element.input.checked = !!snap.val();
 
@@ -177,7 +178,7 @@ class OrderPriceAmount {
     this.orderRef.once('value', snap => {
 
       if (snap.val() != null && !this.priceAmountUnlocked)
-        self.orderRef.child('priceAmount').set(self.priceAmount);
+        setTimeout(() => self.orderBillingRef.child('priceAmount').set(self.priceAmount), 1);
 
     });
 

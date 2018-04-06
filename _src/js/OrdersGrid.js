@@ -20,7 +20,7 @@ class OrdersGrid extends Grid {
 
     const ordersGridItem = new OrdersGridItem(order, this);
     this.element.appendChild(ordersGridItem.element);
-    this.itemList.push(ordersGridItem);
+    this.paymentList.push(ordersGridItem);
 
     if (this.timer)
       clearTimeout(this.timer);

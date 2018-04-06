@@ -8,6 +8,11 @@
     display: flex;
 }
 
+.OrderPriceAmount .input-field.col {
+    margin-bottom: 0;
+    padding: 0 .5rem;
+}
+
 .OrderPriceAmount input {
     font-weight: 700;
 }

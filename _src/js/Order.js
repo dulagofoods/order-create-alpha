@@ -18,7 +18,7 @@ class Order {
 
     this.consumer = new OrderConsumer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
-    this.priceAmount = new OrderPriceAmount(this.orderRef);
+    this.billing = new OrderBilling(this.orderRef);
     this.delivery = new OrderDelivery(this.orderRef);
 
     this.build();
@@ -48,7 +48,7 @@ class Order {
 
     this.element.contentElement.appendChild(this.consumer.element);
     this.element.contentElement.appendChild(this.items.element);
-    this.element.contentElement.appendChild(this.priceAmount.element);
+    this.element.contentElement.appendChild(this.billing.element);
     this.element.contentElement.appendChild(this.delivery.element);
 
     this.buildActionsElement();
