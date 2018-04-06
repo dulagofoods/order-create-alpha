@@ -73,7 +73,6 @@
   ordersRef.orderByChild('createdTime').on('child_added', snap => {
 
     let orderBilling = new OrderBilling(snap.ref);
-    orderBilling.element.innerHTML = snap.val().consumerName;
     orderBillingList.push(orderBilling);
     document.getElementById('orderApp').insertBefore(orderBilling.element, document.getElementById('orderApp').firstChild);
 
