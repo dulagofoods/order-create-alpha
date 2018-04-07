@@ -116,7 +116,7 @@ class OrderItem {
                 self.updatePrice(20.00);
                 break;
               case 'Feijoada Família':
-                self.updatePrice(25.00);
+                self.updatePrice(24.00);
                 break;
               case 'Porção Feijoada':
                 self.updatePrice(13.00);
