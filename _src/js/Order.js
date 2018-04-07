@@ -117,6 +117,8 @@ class Order {
 
       orderRef.once('value', snap => {
 
+        console.log(snap.val());
+
         console.log('enviando dados para impressao via socket...');
         socket.emit('print order', snap.val());
 

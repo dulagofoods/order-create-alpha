@@ -396,6 +396,8 @@ class Order {
 
       orderRef.once('value', snap => {
 
+        console.log(snap.val());
+
         console.log('enviando dados para impressao via socket...');
         socket.emit('print order', snap.val());
 
@@ -454,17 +456,17 @@ class OrderApp {
 
   build() {
 
-    this.innerElement = document.createElement('div');
-    this.innerElement.className = 'OrderApp-inner';
-    this.element.append(this.innerElement);
+    this.element.inner = document.createElement('div');
+    this.element.inner.className = 'OrderApp-inner';
+    this.element.append(this.element.inner);
 
     this.element.ordersGrid = document.createElement('div');
     this.element.ordersGrid.className = 'OrderApp-ordersGrid';
-    this.innerElement.append(this.element.ordersGrid);
+    this.element.inner.append(this.element.ordersGrid);
 
     this.actionButtons = document.createElement('div');
     this.actionButtons.className = 'OrderApp-actionButtons';
-    this.innerElement.append(this.actionButtons);
+    this.element.inner.append(this.actionButtons);
 
     this.floatingActionButton = this.buildFloatingActionButton();
     this.actionButtons.appendChild(this.floatingActionButton);
@@ -742,14 +744,14 @@ class OrderDelivery {
     element.input = document.createElement('input');
     element.input.type = 'text';
     element.input.id = this.orderRef.key + '-street';
-    element.input.addEventListener('input', () => this.orderRef.child('street').set(element.input.value));
-    this.orderRef.child('street').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('input', () => this.orderRef.child('address/street').set(element.input.value));
+    this.orderRef.child('address/street').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Rua';
-    this.orderRef.child('street').once('value', snap => {
+    this.orderRef.child('address/street').once('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -771,14 +773,14 @@ class OrderDelivery {
     element.input = document.createElement('input');
     element.input.type = 'number';
     element.input.id = this.orderRef.key + '-addressHouseNumber';
-    element.input.addEventListener('input', () => this.orderRef.child('addressHouseNumber').set(element.input.value));
-    this.orderRef.child('addressHouseNumber').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('input', () => this.orderRef.child('address/houseNumber').set(element.input.value));
+    this.orderRef.child('address/houseNumber').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Número';
-    this.orderRef.child('addressHouseNumber').once('value', snap => {
+    this.orderRef.child('address/houseNumber').once('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -800,14 +802,14 @@ class OrderDelivery {
     element.input = document.createElement('input');
     element.input.type = 'text';
     element.input.id = this.orderRef.key + '-addressNeighborhood';
-    element.input.addEventListener('input', () => this.orderRef.child('addressNeighborhood').set(element.input.value));
-    this.orderRef.child('addressNeighborhood').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('input', () => this.orderRef.child('address/neighborhood').set(element.input.value));
+    this.orderRef.child('address/neighborhood').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Bairro';
-    this.orderRef.child('addressNeighborhood').once('value', snap => {
+    this.orderRef.child('address/neighborhood').once('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -829,14 +831,14 @@ class OrderDelivery {
     element.input = document.createElement('input');
     element.input.type = 'text';
     element.input.id = this.orderRef.key + '-addressReference';
-    element.input.addEventListener('input', () => this.orderRef.child('addressReference').set(element.input.value));
-    this.orderRef.child('addressReference').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('input', () => this.orderRef.child('address/addressReference').set(element.input.value));
+    this.orderRef.child('address/addressReference').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Referência';
-    this.orderRef.child('addressReference').once('value', snap => {
+    this.orderRef.child('address/addressReference').once('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -1317,10 +1319,11 @@ class OrderItemList {
 }
 class OrderPaymentItem {
 
-  constructor(orderPaymentItemRef, orderBillingRef) {
+  constructor(orderPaymentItemRef, orderBillingRef, isDefault) {
 
     this.orderPaymentItemRef = orderPaymentItemRef;
     this.orderBillingRef = orderBillingRef;
+    this.isDefault = !!isDefault;
 
     this.element = document.createElement('div');
 
@@ -1365,6 +1368,9 @@ class OrderPaymentItem {
 
     this.priceAmount = false;
 
+    // update is default
+    this.updateIsDefault(this.isDefault);
+
     // main listener
     this.orderPaymentItemRef.on('value', snap => {
 
@@ -1396,7 +1402,9 @@ class OrderPaymentItem {
 
     });
 
-    this.methodDataChangeController();
+    // adapts the UI for each payment method
+    this.orderPaymentItemRef.child('method').on('value', () => this.methodDataChangeController());
+    this.orderPaymentItemRef.child('isDefault').on('value', () => this.methodDataChangeController());
 
   }
 
@@ -1406,8 +1414,8 @@ class OrderPaymentItem {
     this.element.dataset.orderPaymentItemRefKey = this.orderPaymentItemRef.key;
 
     this.element.method = this.buildMethodSelectElement();
-    this.element.paidValue = this.buildPaidValueFieldElement();
     this.element.referenceValue = this.buildReferenceValueFieldElement();
+    this.element.paidValue = this.buildPaidValueFieldElement();
     this.element.deletePayment = this.buildDeletePaymentButtonElement();
 
   }
@@ -1529,7 +1537,7 @@ class OrderPaymentItem {
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
-    element.label.innerHTML = 'Referente';
+    element.label.innerHTML = 'Valor';
     element.label.classList = 'active';
     element.appendChild(element.label);
 
@@ -1558,20 +1566,22 @@ class OrderPaymentItem {
 
   }
 
+  // adapts the UI for each payment method
   methodDataChangeController() {
 
-    this.orderPaymentItemRef.child('method').on('value', snap => {
+    this.orderPaymentItemRef.child('method').once('value', snap => {
 
-      // adapts the UI for each payment method
       switch (snap.val()) {
         case 'money': {
-          this.element.referenceValue.input.disabled = false;
-          this.element.paidValue.input.step = 5.00;
+          this.element.referenceValue.input.disabled = this.isDefault;
+          this.element.paidValue.input.disabled = false;
+          this.element.paidValue.input.step = 10.00;
           this.element.paidValue.label.innerHTML = 'Troco p';
         }
           break;
         default: {
-          this.element.referenceValue.input.disabled = true;
+          this.element.referenceValue.input.disabled = this.isDefault;
+          this.element.paidValue.input.disabled = true;
           this.element.paidValue.input.step = 1.00;
           this.element.paidValue.label.innerHTML = 'Pago';
         }
@@ -1583,22 +1593,22 @@ class OrderPaymentItem {
 
   paidValueDataChangeController(data) {
 
-    if (data.method !== 'money') {
+    if (parseFloat(data.referenceValue) > parseFloat(data.paidValue))
+      this.updatePaidValue(data.referenceValue);
 
-      if (data.paidValue > (this.priceAmount || 0))
-        this.updatePaidValue(this.priceAmount);
-      else if (data.paidValue !== data.referenceValue)
-        this.updateReferenceValue(this.element.paidValue.input.value);
-
-    }
+    if (data.method !== 'money')
+      this.updatePaidValue(data.referenceValue);
 
   }
 
   referenceValueDataChangeController(data) {
 
-    if (this.priceAmount)
-      if (data.referenceValue > this.priceAmount)
+    if (this.priceAmount) {
+      if (this.isDefault)
         this.updateReferenceValue(this.priceAmount);
+      else if (parseFloat(data.referenceValue) > parseFloat(this.priceAmount))
+        this.updateReferenceValue(this.priceAmount);
+    }
 
   }
 
@@ -1627,6 +1637,14 @@ class OrderPaymentItem {
     }
 
     this.orderPaymentItemRef.child('referenceValue').set(value);
+
+  }
+
+  updateIsDefault(state) {
+
+    this.isDefault = !!state;
+
+    this.orderPaymentItemRef.child('isDefault').set(this.isDefault);
 
   }
 
@@ -1727,9 +1745,13 @@ class OrderPaymentList {
 
     if (orderPaymentItemRef) {
 
-      let paymentItem = new OrderPaymentItem(orderPaymentItemRef, this.orderBillingRef);
+      let paymentItem = new OrderPaymentItem(orderPaymentItemRef, this.orderBillingRef, !this.paymentList.length);
       this.paymentList.push(paymentItem);
       this.element.paymentList.appendChild(paymentItem.element);
+
+      // isDefault significa que o método de pagamento é unico e deve ter o valor fixo baseado do priceAmount
+      if (this.paymentList.length > 1)
+        this.paymentList.forEach(orderPaymentItem => orderPaymentItem.updateIsDefault(false));
 
     }
 
@@ -1743,6 +1765,9 @@ class OrderPaymentList {
         this.paymentList.splice(i, 1);
 
     }
+
+    if (this.paymentList.length === 1)
+      this.paymentList[0].updateIsDefault(true);
 
   }
 

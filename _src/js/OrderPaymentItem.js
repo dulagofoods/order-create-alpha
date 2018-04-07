@@ -1,9 +1,10 @@
 class OrderPaymentItem {
 
-  constructor(orderPaymentItemRef, orderBillingRef) {
+  constructor(orderPaymentItemRef, orderBillingRef, isDefault) {
 
     this.orderPaymentItemRef = orderPaymentItemRef;
     this.orderBillingRef = orderBillingRef;
+    this.isDefault = !!isDefault;
 
     this.element = document.createElement('div');
 
@@ -48,6 +49,9 @@ class OrderPaymentItem {
 
     this.priceAmount = false;
 
+    // update is default
+    this.updateIsDefault(this.isDefault);
+
     // main listener
     this.orderPaymentItemRef.on('value', snap => {
 
@@ -79,7 +83,9 @@ class OrderPaymentItem {
 
     });
 
-    this.methodDataChangeController();
+    // adapts the UI for each payment method
+    this.orderPaymentItemRef.child('method').on('value', () => this.methodDataChangeController());
+    this.orderPaymentItemRef.child('isDefault').on('value', () => this.methodDataChangeController());
 
   }
 
@@ -89,8 +95,8 @@ class OrderPaymentItem {
     this.element.dataset.orderPaymentItemRefKey = this.orderPaymentItemRef.key;
 
     this.element.method = this.buildMethodSelectElement();
-    this.element.paidValue = this.buildPaidValueFieldElement();
     this.element.referenceValue = this.buildReferenceValueFieldElement();
+    this.element.paidValue = this.buildPaidValueFieldElement();
     this.element.deletePayment = this.buildDeletePaymentButtonElement();
 
   }
@@ -212,7 +218,7 @@ class OrderPaymentItem {
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
-    element.label.innerHTML = 'Referente';
+    element.label.innerHTML = 'Valor';
     element.label.classList = 'active';
     element.appendChild(element.label);
 
@@ -241,20 +247,22 @@ class OrderPaymentItem {
 
   }
 
+  // adapts the UI for each payment method
   methodDataChangeController() {
 
-    this.orderPaymentItemRef.child('method').on('value', snap => {
+    this.orderPaymentItemRef.child('method').once('value', snap => {
 
-      // adapts the UI for each payment method
       switch (snap.val()) {
         case 'money': {
-          this.element.referenceValue.input.disabled = false;
-          this.element.paidValue.input.step = 5.00;
+          this.element.referenceValue.input.disabled = this.isDefault;
+          this.element.paidValue.input.disabled = false;
+          this.element.paidValue.input.step = 10.00;
           this.element.paidValue.label.innerHTML = 'Troco p';
         }
           break;
         default: {
-          this.element.referenceValue.input.disabled = true;
+          this.element.referenceValue.input.disabled = this.isDefault;
+          this.element.paidValue.input.disabled = true;
           this.element.paidValue.input.step = 1.00;
           this.element.paidValue.label.innerHTML = 'Pago';
         }
@@ -266,22 +274,22 @@ class OrderPaymentItem {
 
   paidValueDataChangeController(data) {
 
-    if (data.method !== 'money') {
+    if (parseFloat(data.referenceValue) > parseFloat(data.paidValue))
+      this.updatePaidValue(data.referenceValue);
 
-      if (data.paidValue > (this.priceAmount || 0))
-        this.updatePaidValue(this.priceAmount);
-      else if (data.paidValue !== data.referenceValue)
-        this.updateReferenceValue(this.element.paidValue.input.value);
-
-    }
+    if (data.method !== 'money')
+      this.updatePaidValue(data.referenceValue);
 
   }
 
   referenceValueDataChangeController(data) {
 
-    if (this.priceAmount)
-      if (data.referenceValue > this.priceAmount)
+    if (this.priceAmount) {
+      if (this.isDefault)
         this.updateReferenceValue(this.priceAmount);
+      else if (parseFloat(data.referenceValue) > parseFloat(this.priceAmount))
+        this.updateReferenceValue(this.priceAmount);
+    }
 
   }
 
@@ -310,6 +318,14 @@ class OrderPaymentItem {
     }
 
     this.orderPaymentItemRef.child('referenceValue').set(value);
+
+  }
+
+  updateIsDefault(state) {
+
+    this.isDefault = !!state;
+
+    this.orderPaymentItemRef.child('isDefault').set(this.isDefault);
 
   }
 

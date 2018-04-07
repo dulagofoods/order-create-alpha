@@ -92,14 +92,14 @@ class OrderDelivery {
     element.input = document.createElement('input');
     element.input.type = 'text';
     element.input.id = this.orderRef.key + '-street';
-    element.input.addEventListener('input', () => this.orderRef.child('street').set(element.input.value));
-    this.orderRef.child('street').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('input', () => this.orderRef.child('address/street').set(element.input.value));
+    this.orderRef.child('address/street').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Rua';
-    this.orderRef.child('street').once('value', snap => {
+    this.orderRef.child('address/street').once('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -121,14 +121,14 @@ class OrderDelivery {
     element.input = document.createElement('input');
     element.input.type = 'number';
     element.input.id = this.orderRef.key + '-addressHouseNumber';
-    element.input.addEventListener('input', () => this.orderRef.child('addressHouseNumber').set(element.input.value));
-    this.orderRef.child('addressHouseNumber').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('input', () => this.orderRef.child('address/houseNumber').set(element.input.value));
+    this.orderRef.child('address/houseNumber').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Número';
-    this.orderRef.child('addressHouseNumber').once('value', snap => {
+    this.orderRef.child('address/houseNumber').once('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -150,14 +150,14 @@ class OrderDelivery {
     element.input = document.createElement('input');
     element.input.type = 'text';
     element.input.id = this.orderRef.key + '-addressNeighborhood';
-    element.input.addEventListener('input', () => this.orderRef.child('addressNeighborhood').set(element.input.value));
-    this.orderRef.child('addressNeighborhood').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('input', () => this.orderRef.child('address/neighborhood').set(element.input.value));
+    this.orderRef.child('address/neighborhood').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Bairro';
-    this.orderRef.child('addressNeighborhood').once('value', snap => {
+    this.orderRef.child('address/neighborhood').once('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -179,14 +179,14 @@ class OrderDelivery {
     element.input = document.createElement('input');
     element.input.type = 'text';
     element.input.id = this.orderRef.key + '-addressReference';
-    element.input.addEventListener('input', () => this.orderRef.child('addressReference').set(element.input.value));
-    this.orderRef.child('addressReference').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('input', () => this.orderRef.child('address/addressReference').set(element.input.value));
+    this.orderRef.child('address/addressReference').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Referência';
-    this.orderRef.child('addressReference').once('value', snap => {
+    this.orderRef.child('address/addressReference').once('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';

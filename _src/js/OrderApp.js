@@ -29,17 +29,17 @@ class OrderApp {
 
   build() {
 
-    this.innerElement = document.createElement('div');
-    this.innerElement.className = 'OrderApp-inner';
-    this.element.append(this.innerElement);
+    this.element.inner = document.createElement('div');
+    this.element.inner.className = 'OrderApp-inner';
+    this.element.append(this.element.inner);
 
     this.element.ordersGrid = document.createElement('div');
     this.element.ordersGrid.className = 'OrderApp-ordersGrid';
-    this.innerElement.append(this.element.ordersGrid);
+    this.element.inner.append(this.element.ordersGrid);
 
     this.actionButtons = document.createElement('div');
     this.actionButtons.className = 'OrderApp-actionButtons';
-    this.innerElement.append(this.actionButtons);
+    this.element.inner.append(this.actionButtons);
 
     this.floatingActionButton = this.buildFloatingActionButton();
     this.actionButtons.appendChild(this.floatingActionButton);

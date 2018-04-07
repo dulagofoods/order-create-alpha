@@ -88,9 +88,13 @@ class OrderPaymentList {
 
     if (orderPaymentItemRef) {
 
-      let paymentItem = new OrderPaymentItem(orderPaymentItemRef, this.orderBillingRef);
+      let paymentItem = new OrderPaymentItem(orderPaymentItemRef, this.orderBillingRef, !this.paymentList.length);
       this.paymentList.push(paymentItem);
       this.element.paymentList.appendChild(paymentItem.element);
+
+      // isDefault significa que o método de pagamento é unico e deve ter o valor fixo baseado do priceAmount
+      if (this.paymentList.length > 1)
+        this.paymentList.forEach(orderPaymentItem => orderPaymentItem.updateIsDefault(false));
 
     }
 
@@ -104,6 +108,9 @@ class OrderPaymentList {
         this.paymentList.splice(i, 1);
 
     }
+
+    if (this.paymentList.length === 1)
+      this.paymentList[0].updateIsDefault(true);
 
   }
 

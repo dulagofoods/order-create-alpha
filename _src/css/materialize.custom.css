@@ -1,5 +1,5 @@
 /* ajustes especificos para aumentar a area util em smartphones */
-@media (max-width: 600px) {
+@media (max-width: 800px) {
 
     .card-panel,
     .card .card-image .card-title,
