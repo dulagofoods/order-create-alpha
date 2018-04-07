@@ -60,20 +60,20 @@ class OrderItem {
     const element = document.createElement('div');
     element.className = 'input-field col s5';
 
-    element.inputElement = document.createElement('input');
-    element.inputElement.className = 'autocomplete';
-    element.inputElement.type = 'text';
-    element.inputElement.id = this.orderItemRef.key + '-itemName';
-    element.inputElement.addEventListener('focus', event => {
+    element.input = document.createElement('input');
+    element.input.className = 'autocomplete';
+    element.input.type = 'text';
+    element.input.id = this.orderItemRef.key + '-itemName';
+    element.input.addEventListener('focus', event => {
 
-      element.inputElement.select();
+      element.input.select();
 
     });
     setTimeout(function () {
 
       try {
 
-        let instance = M.Autocomplete.init(element.inputElement, {
+        let instance = M.Autocomplete.init(element.input, {
           data: {
             "Marmita P": null,
             "Marmita M": null,
@@ -126,25 +126,25 @@ class OrderItem {
       }
 
     }, 500);
-    element.inputElement.addEventListener('change', () => {
+    element.input.addEventListener('change', () => {
 
-      this.orderItemRef.child('itemName').set(element.inputElement.value);
+      this.orderItemRef.child('itemName').set(element.input.value);
 
     });
-    element.appendChild(element.inputElement);
+    element.appendChild(element.input);
 
-    element.labelElement = document.createElement('label');
-    element.labelElement.htmlFor = element.inputElement.id;
-    element.labelElement.innerHTML = 'Produto';
+    element.label = document.createElement('label');
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Produto';
     this.orderItemRef.child('itemName').on('value', snap => {
 
-      element.inputElement.value = snap.val();
+      element.input.value = snap.val();
 
       if (!!snap.val())
-        element.labelElement.className = 'active';
+        element.label.className = 'active';
 
     });
-    element.appendChild(element.labelElement);
+    element.appendChild(element.label);
 
     this.element.main.appendChild(element);
 
@@ -157,31 +157,31 @@ class OrderItem {
     const element = document.createElement('div');
     element.className = 'input-field col s2';
 
-    element.inputElement = document.createElement('input');
-    element.inputElement.type = 'number';
-    element.inputElement.min = 1;
-    element.inputElement.value = 1;
-    element.inputElement.id = this.orderItemRef.key + 'itemQuantity';
-    element.inputElement.addEventListener('focus', event => {
-      element.inputElement.select();
+    element.input = document.createElement('input');
+    element.input.type = 'number';
+    element.input.min = 1;
+    element.input.value = 1;
+    element.input.id = this.orderItemRef.key + 'itemQuantity';
+    element.input.addEventListener('focus', event => {
+      element.input.select();
     });
-    element.inputElement.addEventListener('change', () => {
+    element.input.addEventListener('change', () => {
 
-      this.orderItemRef.child('quantity').set(element.inputElement.value);
+      this.orderItemRef.child('quantity').set(element.input.value);
 
     });
     this.orderItemRef.child('quantity').on('value', snap => {
 
-      element.inputElement.value = snap.val();
+      element.input.value = snap.val();
 
     });
-    element.appendChild(element.inputElement);
+    element.appendChild(element.input);
 
-    element.labelElement = document.createElement('label');
-    element.labelElement.htmlFor = element.inputElement.id;
-    element.labelElement.className = 'active';
-    element.labelElement.innerHTML = 'Qtde';
-    element.appendChild(element.labelElement);
+    element.label = document.createElement('label');
+    element.label.htmlFor = element.input.id;
+    element.label.className = 'active';
+    element.label.innerHTML = 'Qtde';
+    element.appendChild(element.label);
 
     this.element.main.appendChild(element);
 
@@ -194,25 +194,25 @@ class OrderItem {
     const element = document.createElement('div');
     element.className = 'input-field col s3';
 
-    element.inputElement = document.createElement('input');
-    element.inputElement.type = 'number';
-    element.inputElement.min = 0;
-    element.inputElement.step = 1;
-    element.inputElement.value = 0.00;
-    element.inputElement.id = this.orderItemRef.key + 'itemPrice';
-    element.inputElement.addEventListener('focus', () => {
-      element.inputElement.select();
+    element.input = document.createElement('input');
+    element.input.type = 'number';
+    element.input.min = 0;
+    element.input.step = 1;
+    element.input.value = 0.00;
+    element.input.id = this.orderItemRef.key + 'itemPrice';
+    element.input.addEventListener('focus', () => {
+      element.input.select();
     });
-    element.inputElement.addEventListener('blur', () => this.updatePrice(element.inputElement.value));
-    element.inputElement.addEventListener('change', () => this.updatePrice(element.inputElement.value));
-    this.orderItemRef.child('itemPrice').on('value', snap => element.inputElement.value = snap.val());
-    element.appendChild(element.inputElement);
+    element.input.addEventListener('blur', () => this.updatePrice(element.input.value));
+    element.input.addEventListener('change', () => this.updatePrice(element.input.value));
+    this.orderItemRef.child('itemPrice').on('value', snap => element.input.value = snap.val());
+    element.appendChild(element.input);
 
-    element.labelElement = document.createElement('label');
-    element.labelElement.htmlFor = element.inputElement.id;
-    element.labelElement.className = 'active';
-    element.labelElement.innerHTML = 'Preço';
-    element.appendChild(element.labelElement);
+    element.label = document.createElement('label');
+    element.label.htmlFor = element.input.id;
+    element.label.className = 'active';
+    element.label.innerHTML = 'Preço';
+    element.appendChild(element.label);
 
     this.element.main.appendChild(element);
 

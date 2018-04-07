@@ -24,26 +24,26 @@ class OrderConsumer {
     this.nameFieldElement.className = 'OrderConsumer-consumerNameField input-field col s12';
 
     // input
-    this.nameFieldElement.inputElement = document.createElement('input');
-    this.nameFieldElement.inputElement.className = 'validate';
-    this.nameFieldElement.inputElement.id = this.orderRef.key + '-consumerName';
-    this.nameFieldElement.inputElement.type = 'text';
-    this.nameFieldElement.inputElement.addEventListener('input', () => {
+    this.nameFieldElement.input = document.createElement('input');
+    this.nameFieldElement.input.className = 'validate';
+    this.nameFieldElement.input.id = this.orderRef.key + '-consumerName';
+    this.nameFieldElement.input.type = 'text';
+    this.nameFieldElement.input.addEventListener('input', () => {
 
-      this.orderRef.child('consumerName').set(this.nameFieldElement.inputElement.value);
+      this.orderRef.child('consumerName').set(this.nameFieldElement.input.value);
 
     });
     this.orderRef.child('consumerName').on('value', snap => {
 
-      this.nameFieldElement.inputElement.value = snap.val();
+      this.nameFieldElement.input.value = snap.val();
 
     });
-    this.nameFieldElement.appendChild(this.nameFieldElement.inputElement);
+    this.nameFieldElement.appendChild(this.nameFieldElement.input);
 
     // label
     this.nameFieldElement.labelElement = document.createElement('label');
     this.nameFieldElement.labelElement.className = 'active';
-    this.nameFieldElement.labelElement.htmlFor = this.nameFieldElement.inputElement.id;
+    this.nameFieldElement.labelElement.htmlFor = this.nameFieldElement.input.id;
     this.nameFieldElement.labelElement.innerHTML = 'Nome';
     this.nameFieldElement.appendChild(this.nameFieldElement.labelElement);
 
@@ -55,7 +55,7 @@ class OrderConsumer {
 
   focus() {
 
-    this.nameFieldElement.inputElement.focus();
+    this.nameFieldElement.input.focus();
 
   }
 

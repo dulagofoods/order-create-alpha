@@ -8,6 +8,8 @@ class OrderPaymentList {
     this.element = document.createElement('div');
     this.paymentList = [];
 
+    this.priceAmount = false;
+
     this.init();
 
   }
@@ -27,6 +29,9 @@ class OrderPaymentList {
       this.delete(snap.ref);
 
     });
+
+    // atualiza o priceAmount
+    this.orderBillingRef.child('priceAmount').on('value', snap => this.priceAmount = snap.val());
 
   }
 
@@ -73,8 +78,8 @@ class OrderPaymentList {
 
     this.orderBillingRef.child('payments').push({
       method: method || '',
-      paidValue: 0.00,
-      referenceValue: 0.00
+      paidValue: this.priceAmount ? this.priceAmount.toFixed(2) : 0.00,
+      referenceValue: this.priceAmount ? this.priceAmount.toFixed(2) : 0.00
     });
 
   }
@@ -83,7 +88,7 @@ class OrderPaymentList {
 
     if (orderPaymentItemRef) {
 
-      let paymentItem = new OrderPaymentItem(orderPaymentItemRef);
+      let paymentItem = new OrderPaymentItem(orderPaymentItemRef, this.orderBillingRef);
       this.paymentList.push(paymentItem);
       this.element.paymentList.appendChild(paymentItem.element);
 

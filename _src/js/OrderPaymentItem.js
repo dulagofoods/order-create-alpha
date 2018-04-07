@@ -1,8 +1,9 @@
 class OrderPaymentItem {
 
-  constructor(orderPaymentItemRef) {
+  constructor(orderPaymentItemRef, orderBillingRef) {
 
     this.orderPaymentItemRef = orderPaymentItemRef;
+    this.orderBillingRef = orderBillingRef;
 
     this.element = document.createElement('div');
 
@@ -45,7 +46,9 @@ class OrderPaymentItem {
 
     this.build();
 
-    // action listener
+    this.priceAmount = false;
+
+    // main listener
     this.orderPaymentItemRef.on('value', snap => {
 
       // is deleted
@@ -53,9 +56,30 @@ class OrderPaymentItem {
 
         this.element.classList.add('is-deleted');
 
+      } else {
+
+        // controladores de dados (usado quando envolve mais de um campo (ex: method + referenceValue))
+        this.paidValueDataChangeController(snap.val());
+        this.referenceValueDataChangeController(snap.val());
+
       }
 
     });
+
+    // priceAmount listener (monitorar o valor total)
+    this.orderBillingRef.child('priceAmount').on('value', snap => {
+
+      this.priceAmount = snap.val();
+
+      this.orderPaymentItemRef.once('value', snap => {
+
+        this.referenceValueDataChangeController(snap.val());
+
+      });
+
+    });
+
+    this.methodDataChangeController();
 
   }
 
@@ -95,8 +119,7 @@ class OrderPaymentItem {
       setTimeout(() => {
 
         for (let i = element.select.options.length; i--;)
-
-          if (element.select.options[i].value == snap.val()) {
+          if (element.select.options[i].value === snap.val()) {
             element.select.options[i].setAttribute('selected', true);
             element.select.options.selectedIndex = i;
           } else {
@@ -150,10 +173,16 @@ class OrderPaymentItem {
     element.input = document.createElement('input');
     element.input.type = 'number';
     element.input.id = this.orderPaymentItemRef.key + '-paidValueField';
+    element.input.addEventListener('focus', () => {
+      element.input.select();
+    });
+    element.input.addEventListener('change', () => this.updatePaidValue(element.input.value));
+    this.orderPaymentItemRef.child('paidValue').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
+    element.label.className = 'active';
     element.label.innerHTML = 'Pago';
     element.appendChild(element.label);
 
@@ -170,11 +199,21 @@ class OrderPaymentItem {
     element.input = document.createElement('input');
     element.input.type = 'number';
     element.input.id = this.orderPaymentItemRef.key + '-referenceValueField';
+    element.input.addEventListener('focus', () => {
+      element.input.select();
+    });
+    element.input.addEventListener('change', () => this.updateReferenceValue(element.input.value));
+    this.orderPaymentItemRef.child('referenceValue').on('value', snap => {
+
+      element.input.value = snap.val();
+
+    });
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Referente';
+    element.label.classList = 'active';
     element.appendChild(element.label);
 
     return element;
@@ -199,6 +238,78 @@ class OrderPaymentItem {
     this.element.appendChild(element);
 
     return element;
+
+  }
+
+  methodDataChangeController() {
+
+    this.orderPaymentItemRef.child('method').on('value', snap => {
+
+      // adapts the UI for each payment method
+      switch (snap.val()) {
+        case 'money': {
+          this.element.referenceValue.input.disabled = false;
+          this.element.paidValue.input.step = 5.00;
+          this.element.paidValue.label.innerHTML = 'Troco p';
+        }
+          break;
+        default: {
+          this.element.referenceValue.input.disabled = true;
+          this.element.paidValue.input.step = 1.00;
+          this.element.paidValue.label.innerHTML = 'Pago';
+        }
+      }
+
+    });
+
+  }
+
+  paidValueDataChangeController(data) {
+
+    if (data.method !== 'money') {
+
+      if (data.paidValue > (this.priceAmount || 0))
+        this.updatePaidValue(this.priceAmount);
+      else if (data.paidValue !== data.referenceValue)
+        this.updateReferenceValue(this.element.paidValue.input.value);
+
+    }
+
+  }
+
+  referenceValueDataChangeController(data) {
+
+    if (this.priceAmount)
+      if (data.referenceValue > this.priceAmount)
+        this.updateReferenceValue(this.priceAmount);
+
+  }
+
+  updatePaidValue(value) {
+
+    try {
+      value = parseFloat(value).toFixed(2);
+    } catch (e) {
+      value = parseFloat(0).toFixed(2);
+    } finally {
+      value = isNaN(value) ? parseFloat(0).toFixed(2) : value;
+    }
+
+    this.orderPaymentItemRef.child('paidValue').set(value);
+
+  }
+
+  updateReferenceValue(value) {
+
+    try {
+      value = parseFloat(value).toFixed(2);
+    } catch (e) {
+      value = parseFloat(0).toFixed(2);
+    } finally {
+      value = isNaN(value) ? parseFloat(0).toFixed(2) : value;
+    }
+
+    this.orderPaymentItemRef.child('referenceValue').set(value);
 
   }
 
