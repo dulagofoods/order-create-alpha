@@ -51,7 +51,7 @@ class OrderConsumer {
 
     M.updateTextFields();
 
-    return this.nameFieldElement;
+    return element;
 
   }
 
@@ -88,10 +88,13 @@ class OrderConsumer {
       this.orderRef.child('deliveryTime').set(element.input.value);
 
     });
-    this.orderRef.child('deliveryTime').on('value', snap => {
+    this.orderRef.child('deliveryTime').once('value', snap => {
 
       if (!snap.val())
         this.orderRef.child('deliveryTime').set(newTime);
+
+    });
+    this.orderRef.child('deliveryTime').on('value', snap => {
 
       element.input.value = snap.val();
 
@@ -107,13 +110,17 @@ class OrderConsumer {
 
     M.updateTextFields();
 
-    return this.nameFieldElement;
+    return element;
 
   }
 
   focus() {
 
-    this.nameFieldElement.input.focus();
+    try {
+      this.element.consumerName.input.focus();
+    } catch (e) {
+      console.log(e);
+    }
 
   }
 

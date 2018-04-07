@@ -81,7 +81,11 @@ class OrderPriceAmount {
     });
     this.orderBillingRef.child('priceAmount').on('value', snap => {
 
-      element.input.value = parseFloat(snap.val()).toFixed(2);
+      try {
+        element.input.value = parseFloat(snap.val()).toFixed(2);
+      } catch (e) {
+        element.input.value = snap.val();
+      }
 
     });
     this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {

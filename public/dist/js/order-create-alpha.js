@@ -452,6 +452,11 @@ class OrderApp {
 
     });
 
+    window.addEventListener('keydown', event => {
+      if (event.keyCode === 113)
+        this.createOrder();
+    })
+
   }
 
   build() {
@@ -641,7 +646,7 @@ class OrderConsumer {
 
     M.updateTextFields();
 
-    return this.nameFieldElement;
+    return element;
 
   }
 
@@ -678,10 +683,13 @@ class OrderConsumer {
       this.orderRef.child('deliveryTime').set(element.input.value);
 
     });
-    this.orderRef.child('deliveryTime').on('value', snap => {
+    this.orderRef.child('deliveryTime').once('value', snap => {
 
       if (!snap.val())
         this.orderRef.child('deliveryTime').set(newTime);
+
+    });
+    this.orderRef.child('deliveryTime').on('value', snap => {
 
       element.input.value = snap.val();
 
@@ -697,13 +705,17 @@ class OrderConsumer {
 
     M.updateTextFields();
 
-    return this.nameFieldElement;
+    return element;
 
   }
 
   focus() {
 
-    this.nameFieldElement.input.focus();
+    try {
+      this.element.consumerName.input.focus();
+    } catch (e) {
+      console.log(e);
+    }
 
   }
 
@@ -1173,7 +1185,7 @@ class OrderItem {
                 self.updatePrice(20.00);
                 break;
               case 'Feijoada Família':
-                self.updatePrice(25.00);
+                self.updatePrice(24.00);
                 break;
               case 'Porção Feijoada':
                 self.updatePrice(13.00);
@@ -2106,7 +2118,11 @@ class OrderPriceAmount {
     });
     this.orderBillingRef.child('priceAmount').on('value', snap => {
 
-      element.input.value = parseFloat(snap.val()).toFixed(2);
+      try {
+        element.input.value = parseFloat(snap.val()).toFixed(2);
+      } catch (e) {
+        element.input.value = snap.val();
+      }
 
     });
     this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {

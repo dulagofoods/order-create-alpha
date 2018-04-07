@@ -25,6 +25,11 @@ class OrderApp {
 
     });
 
+    window.addEventListener('keydown', event => {
+      if (event.keyCode === 113)
+        this.createOrder();
+    })
+
   }
 
   build() {
