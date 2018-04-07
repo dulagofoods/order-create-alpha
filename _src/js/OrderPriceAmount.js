@@ -21,19 +21,22 @@ class OrderPriceAmount {
 
     this.orderRef.child('items').on('child_added', snap => {
 
-      this.updatePriceAmount(snap.ref, snap.val());
+      if (!this.priceAmountUnlocked)
+        this.updatePriceAmount(snap.ref, snap.val());
 
     });
 
     this.orderRef.child('items').on('child_changed', snap => {
 
-      this.updatePriceAmount(snap.ref, snap.val());
+      if (!this.priceAmountUnlocked)
+        this.updatePriceAmount(snap.ref, snap.val());
 
     });
 
     this.orderRef.child('items').on('child_removed', snap => {
 
-      this.updatePriceAmount(snap.ref, null);
+      if (!this.priceAmountUnlocked)
+        this.updatePriceAmount(snap.ref, null);
 
     });
 
@@ -148,6 +151,7 @@ class OrderPriceAmount {
     else
       this.priceList[orderItemRef.key] = null;
 
+
     this.refreshPriceAmount();
 
   }
@@ -177,8 +181,11 @@ class OrderPriceAmount {
     // isso evita que seja criado novamente o objeto no firebase
     this.orderRef.once('value', snap => {
 
-      if (snap.val() != null && !this.priceAmountUnlocked)
-        setTimeout(() => self.orderBillingRef.child('priceAmount').set(self.priceAmount), 1);
+      if (snap.val() != null)
+        this.orderBillingRef.child('priceAmountUnlocked').once('value', snap => {
+          if (!snap.val())
+            setTimeout(() => self.orderBillingRef.child('priceAmount').set(self.priceAmount), 1);
+        });
 
     });
 

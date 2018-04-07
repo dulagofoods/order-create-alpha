@@ -604,38 +604,96 @@ class OrderConsumer {
 
     this.element.className = 'OrderConsumer row';
 
-    this.element.appendChild(this.buildConsumerNameField());
+    this.element.consumerName = this.buildConsumerNameFieldElement();
+    this.element.deliveryTime = this.buildDeliveryTimeFieldElement();
 
   }
 
-  buildConsumerNameField() {
+  buildConsumerNameFieldElement() {
 
-    this.nameFieldElement = document.createElement('div');
-    this.nameFieldElement.className = 'OrderConsumer-consumerNameField input-field col s12';
+    const element = document.createElement('div');
+    element.className = 'OrderConsumer-consumerNameField input-field col s8';
+    this.element.appendChild(element);
 
     // input
-    this.nameFieldElement.input = document.createElement('input');
-    this.nameFieldElement.input.className = 'validate';
-    this.nameFieldElement.input.id = this.orderRef.key + '-consumerName';
-    this.nameFieldElement.input.type = 'text';
-    this.nameFieldElement.input.addEventListener('input', () => {
+    element.input = document.createElement('input');
+    element.input.className = 'validate';
+    element.input.id = this.orderRef.key + '-consumerName';
+    element.input.type = 'text';
+    element.input.addEventListener('input', () => {
 
-      this.orderRef.child('consumerName').set(this.nameFieldElement.input.value);
+      this.orderRef.child('consumerName').set(element.input.value);
 
     });
     this.orderRef.child('consumerName').on('value', snap => {
 
-      this.nameFieldElement.input.value = snap.val();
+      element.input.value = snap.val();
 
     });
-    this.nameFieldElement.appendChild(this.nameFieldElement.input);
+    element.appendChild(element.input);
 
     // label
-    this.nameFieldElement.labelElement = document.createElement('label');
-    this.nameFieldElement.labelElement.className = 'active';
-    this.nameFieldElement.labelElement.htmlFor = this.nameFieldElement.input.id;
-    this.nameFieldElement.labelElement.innerHTML = 'Nome';
-    this.nameFieldElement.appendChild(this.nameFieldElement.labelElement);
+    element.label = document.createElement('label');
+    element.label.className = 'active';
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Nome';
+    element.appendChild(element.label);
+
+    M.updateTextFields();
+
+    return this.nameFieldElement;
+
+  }
+
+  buildDeliveryTimeFieldElement() {
+
+    let newTime = '00:00';
+
+    if (moment())
+      newTime = moment().add(20, 'minutes').format('hh:mm');
+
+    const element = document.createElement('div');
+    element.className = 'OrderConsumer-deliveryTime input-field col s4';
+    this.element.appendChild(element);
+
+    // input
+    element.input = document.createElement('input');
+    element.input.id = this.orderRef.key + '-consumerName';
+    element.input.type = 'time';
+    element.input.step = '300';
+    element.input.addEventListener('focus', () => {
+
+      let newTime = '00:00';
+
+      if (moment())
+        newTime = moment().add(20, 'minutes').format('hh:mm');
+
+      this.orderRef.child('deliveryTime').set(newTime);
+
+      element.input.select();
+
+    });
+    element.input.addEventListener('input', () => {
+
+      this.orderRef.child('deliveryTime').set(element.input.value);
+
+    });
+    this.orderRef.child('deliveryTime').on('value', snap => {
+
+      if (!snap.val())
+        this.orderRef.child('deliveryTime').set(newTime);
+
+      element.input.value = snap.val();
+
+    });
+    element.appendChild(element.input);
+
+    // label
+    element.label = document.createElement('label');
+    element.label.className = 'active';
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Entrega';
+    element.appendChild(element.label);
 
     M.updateTextFields();
 
@@ -740,17 +798,82 @@ class OrderDelivery {
 
     let element = document.createElement('div');
     element.className = 'input-field col s9';
+    this.element.address.appendChild(element);
 
     element.input = document.createElement('input');
+    element.input.className = 'autocomplete';
     element.input.type = 'text';
-    element.input.id = this.orderRef.key + '-street';
-    element.input.addEventListener('input', () => this.orderRef.child('address/street').set(element.input.value));
+    element.input.id = this.orderRef.key + '-addressStreet';
+    element.input.addEventListener('focus', event => {
+
+      element.input.select();
+
+    });
+    setTimeout(function () {
+
+      try {
+
+        let instance = M.Autocomplete.init(element.input, {
+          data: {
+            "R Benjamin Caetano Zambon": null,
+            "R Pref Mário Junqueira": null,
+            "Av Comendador L Meneghel": null,
+            "Av Azarias Vieira de Rezende": null,
+            "R José Francisco Ferreira": null,
+            "R Vereador Dino Veiga": null,
+            "R Manoel Nascimento Trindade": null,
+            "R Cyriaco Russo": null,
+            "R Francisco Presbítero Nogueira": null,
+            "Av Tiradentes": null,
+            "R Fibolito": null,
+            "R José de Oliveira": null,
+            "R Dr Yves Ribeiro": null,
+            "R Maria Ligia Ribeiro Conter (R Rubi)": null,
+            "R Gilberto Freire": null,
+            "R Shiniti Sassatani": null,
+            "R Benedito José de Andrade": null,
+            "R Yuzo Ochiai": null,
+            "R Piracicaba": null,
+            "R José Mendes Vilela": null,
+            "R Joversino de Assis Teixeira": null,
+            "R Vicente Inácio Filho": null,
+            "Av Edelina M Rand": null,
+            "R São Paul": null,
+            "R Prof Moacyr Castanho": null,
+            "R Frei Rafael Prone": null,
+            "R Juvenal Mesquit": null,
+            "R Eurípides Rodrigue": null,
+            "R Estevam Leite de Negreiros": null,
+            "Av Francisco Alves Pereira": null,
+            "R Carmelo Comegno": null,
+            "Av Edelina de Rezende": null,
+            "R Benedito Bernardes de Oliveira": null,
+            "Av Bandeirantes": null,
+            "Av Benedito Leite de Negreiros": null,
+            "Av das Torres": null
+          },
+          minLength: 1,
+          limit: 6
+        });
+
+      } catch (e) {
+
+        console.log(e);
+
+      }
+
+    }, 500);
     this.orderRef.child('address/street').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('change', () => {
+
+      this.orderRef.child('address/street').set(element.input.value);
+
+    });
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
-    element.label.innerHTML = 'Rua';
+    element.label.innerHTML = 'Bairro';
     this.orderRef.child('address/street').once('value', snap => {
 
       if (!!snap.val())
@@ -758,10 +881,6 @@ class OrderDelivery {
 
     });
     element.appendChild(element.label);
-
-    this.element.address.appendChild(element);
-
-    return element;
 
   }
 
@@ -798,12 +917,97 @@ class OrderDelivery {
 
     let element = document.createElement('div');
     element.className = 'input-field col s12';
+    this.element.address.appendChild(element);
 
     element.input = document.createElement('input');
+    element.input.className = 'autocomplete';
     element.input.type = 'text';
     element.input.id = this.orderRef.key + '-addressNeighborhood';
-    element.input.addEventListener('input', () => this.orderRef.child('address/neighborhood').set(element.input.value));
+    element.input.addEventListener('focus', event => {
+
+      element.input.select();
+
+    });
+    setTimeout(function () {
+
+      try {
+
+        let instance = M.Autocomplete.init(element.input, {
+          data: {
+            "Centro": null,
+            "Vila Maria Alice (LESTE)": null,
+            "Vila Maria (LESTE)": null,
+            "Vila Itapeva (LESTE)": null,
+            "UENP (LESTE)": null,
+            "USINA (LESTE)": null,
+            "Vila Rubi (LESTE)": null,
+            "Condomínio MonteRey (LESTE)": null,
+            "IBC (NORTE)": null,
+            "Vila Paraiso (NORTE)": null,
+            "Vila Macedo (IBC) (NORTE)": null,
+            "Vila Santa Terezinha (IBC) (NORTE)": null,
+            "Vila Paraiso (IBC) (NORTE)": null,
+            "Jardim HP (NORTE)": null,
+            "Conj São Rafael (NORTE)": null,
+            "Conj Mario Sérgio (NORTE)": null,
+            "Conj Morar Melhor (NORTE)": null,
+            "Conj Habitar Brasil (NORTE)": null,
+            "Novo Paraiso (NORTE)": null,
+            "Jardim Paraiso (NORTE)": null,
+            "Jardim Ana Rosa (NORTE)": null,
+            "Recanto dos Bandeirantes (NORTE)": null,
+            "Loteamento Euri (NORTE)": null,
+            "Recanto Petrópolis (NORTE)": null,
+            "Vila São Pedro (CENTRO)": null,
+            "Vila Lordani (SUL)": null,
+            "Vila Moretti (SUL)": null,
+            "Loteamento Godinho (SUL)": null,
+            "Loteamento Moreti (SUL)": null,
+            "Conj Ouro Verde (SUL)": null,
+            "Loteamento Gamarano (SUL)": null,
+            "Loteamento Barboza (SUL)": null,
+            "Vila São Vicente (SUL)": null,
+            "Conj Nossa S Aparecida (SUL)": null,
+            "Conj Jardim Yara (SUL)": null,
+            "Jardim Morumbi (SUL)": null,
+            "Conj Berto Meneghel (SUL)": null,
+            "Conj Pombal I (SUL)": null,
+            "Conj Pombal II (SUL)": null,
+            "Vila São Geraldo (SUL)": null,
+            "Vila Carola (SUL)": null,
+            "Conj das Torres (SUL)": null,
+            "Lot Macedo (SUL)": null,
+            "Vila União (OESTE)": null,
+            "Jardim São Paulo (OESTE)": null,
+            "Sassatani Ueno (OESTE)": null,
+            "Vila Pompéia (OESTE)": null,
+            "Jardim União (OESTE)": null,
+            "Jardim Primavera (OESTE)": null,
+            "Conj Matida (OESTE)": null,
+            "Conj José Carvalho Henriques (OESTE)": null,
+            "Conj Julieta Lordani (OESTE)": null,
+            "Conj Celso Fontes (OESTE)": null,
+            "Vila Bela Vista (OESTE)": null,
+            "Jardim Belle Ville (OESTE)": null,
+            "RURAL": null
+          },
+          minLength: 1,
+          limit: 6
+        });
+
+      } catch (e) {
+
+        console.log(e);
+
+      }
+
+    }, 500);
     this.orderRef.child('address/neighborhood').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('change', () => {
+
+      this.orderRef.child('address/neighborhood').set(element.input.value);
+
+    });
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
@@ -816,8 +1020,6 @@ class OrderDelivery {
 
     });
     element.appendChild(element.label);
-
-    this.element.address.appendChild(element);
 
     return element;
 
@@ -934,6 +1136,10 @@ class OrderItem {
             "Marmita M": null,
             "Marmita G": null,
             "Marmita F": null,
+            "Feijoada Individual": null,
+            "Feijoada Grande": null,
+            "Feijoada Família": null,
+            "Porção Feijoada": null,
             "Coca Lata 220ml": null,
             "Coca Lata 350ml": null,
             "Fanta Lata 350ml": null,
@@ -951,21 +1157,62 @@ class OrderItem {
           limit: 6,
           onAutocomplete: function (select) {
             switch (select) {
-              case 'Marmita P': {
+              case 'Marmita P':
                 self.updatePrice(8.00);
-              }
                 break;
-              case 'Marmita M': {
+              case 'Marmita M':
                 self.updatePrice(9.00);
-              }
                 break;
-              case 'Marmita G': {
+              case 'Marmita G':
                 self.updatePrice(11.00);
-              }
                 break;
-              case 'Marmita F': {
-                self.updatePrice(14.00);
-              }
+              case 'Feijoada Individual':
+                self.updatePrice(15.00);
+                break;
+              case 'Feijoada Grande':
+                self.updatePrice(20.00);
+                break;
+              case 'Feijoada Família':
+                self.updatePrice(25.00);
+                break;
+              case 'Porção Feijoada':
+                self.updatePrice(13.00);
+                break;
+              case 'Coca Lata 220ml':
+                self.updatePrice(2.00);
+                break;
+              case 'Coca Lata 350ml':
+                self.updatePrice(3.00);
+                break;
+              case 'Fanta Lata 350ml':
+                self.updatePrice(3.00);
+                break;
+              case 'Sprite Lata 350ml':
+                self.updatePrice(3.00);
+                break;
+              case 'Fanta Guarana Lata 350ml':
+                self.updatePrice(3.00);
+                break;
+              case 'Coca 600ml':
+                self.updatePrice(4.00);
+                break;
+              case 'Coca 1 Litro':
+                self.updatePrice(5.00);
+                break;
+              case 'Coca 2 Litros':
+                self.updatePrice(8.00);
+                break;
+              case 'Conquista 2 Litros':
+                self.updatePrice(6.00);
+                break;
+              case 'Suco Prats 330ml':
+                self.updatePrice(4.00);
+                break;
+              case 'Suco DeLVale Uva':
+                self.updatePrice(3.00);
+                break;
+              case 'Suco DeLVale Laranja':
+                self.updatePrice(3.00);
                 break;
               default: {
                 console.log('hehe');
@@ -1603,11 +1850,15 @@ class OrderPaymentItem {
 
   referenceValueDataChangeController(data) {
 
-    if (this.priceAmount) {
-      if (this.isDefault)
-        this.updateReferenceValue(this.priceAmount);
-      else if (parseFloat(data.referenceValue) > parseFloat(this.priceAmount))
-        this.updateReferenceValue(this.priceAmount);
+    try {
+      if (this.priceAmount) {
+        if (this.isDefault)
+          this.updateReferenceValue(this.priceAmount);
+        else if (parseFloat(data.referenceValue) > parseFloat(this.priceAmount))
+          this.updateReferenceValue(this.priceAmount);
+      }
+    } catch (e) {
+      console.log('eitaa..');
     }
 
   }
@@ -1735,8 +1986,8 @@ class OrderPaymentList {
 
     this.orderBillingRef.child('payments').push({
       method: method || '',
-      paidValue: this.priceAmount ? this.priceAmount.toFixed(2) : 0.00,
-      referenceValue: this.priceAmount ? this.priceAmount.toFixed(2) : 0.00
+      paidValue: this.priceAmount ? parseFloat(this.priceAmount).toFixed(2) : 0.00,
+      referenceValue: this.priceAmount ? parseFloat(this.priceAmount).toFixed(2) : 0.00
     });
 
   }
@@ -1795,19 +2046,22 @@ class OrderPriceAmount {
 
     this.orderRef.child('items').on('child_added', snap => {
 
-      this.updatePriceAmount(snap.ref, snap.val());
+      if (!this.priceAmountUnlocked)
+        this.updatePriceAmount(snap.ref, snap.val());
 
     });
 
     this.orderRef.child('items').on('child_changed', snap => {
 
-      this.updatePriceAmount(snap.ref, snap.val());
+      if (!this.priceAmountUnlocked)
+        this.updatePriceAmount(snap.ref, snap.val());
 
     });
 
     this.orderRef.child('items').on('child_removed', snap => {
 
-      this.updatePriceAmount(snap.ref, null);
+      if (!this.priceAmountUnlocked)
+        this.updatePriceAmount(snap.ref, null);
 
     });
 
@@ -1922,6 +2176,7 @@ class OrderPriceAmount {
     else
       this.priceList[orderItemRef.key] = null;
 
+
     this.refreshPriceAmount();
 
   }
@@ -1951,8 +2206,11 @@ class OrderPriceAmount {
     // isso evita que seja criado novamente o objeto no firebase
     this.orderRef.once('value', snap => {
 
-      if (snap.val() != null && !this.priceAmountUnlocked)
-        setTimeout(() => self.orderBillingRef.child('priceAmount').set(self.priceAmount), 1);
+      if (snap.val() != null)
+        this.orderBillingRef.child('priceAmountUnlocked').once('value', snap => {
+          if (!snap.val())
+            setTimeout(() => self.orderBillingRef.child('priceAmount').set(self.priceAmount), 1);
+        });
 
     });
 

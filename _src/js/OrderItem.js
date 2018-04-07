@@ -79,6 +79,10 @@ class OrderItem {
             "Marmita M": null,
             "Marmita G": null,
             "Marmita F": null,
+            "Feijoada Individual": null,
+            "Feijoada Grande": null,
+            "Feijoada Família": null,
+            "Porção Feijoada": null,
             "Coca Lata 220ml": null,
             "Coca Lata 350ml": null,
             "Fanta Lata 350ml": null,
@@ -96,21 +100,62 @@ class OrderItem {
           limit: 6,
           onAutocomplete: function (select) {
             switch (select) {
-              case 'Marmita P': {
+              case 'Marmita P':
                 self.updatePrice(8.00);
-              }
                 break;
-              case 'Marmita M': {
+              case 'Marmita M':
                 self.updatePrice(9.00);
-              }
                 break;
-              case 'Marmita G': {
+              case 'Marmita G':
                 self.updatePrice(11.00);
-              }
                 break;
-              case 'Marmita F': {
-                self.updatePrice(14.00);
-              }
+              case 'Feijoada Individual':
+                self.updatePrice(15.00);
+                break;
+              case 'Feijoada Grande':
+                self.updatePrice(20.00);
+                break;
+              case 'Feijoada Família':
+                self.updatePrice(25.00);
+                break;
+              case 'Porção Feijoada':
+                self.updatePrice(13.00);
+                break;
+              case 'Coca Lata 220ml':
+                self.updatePrice(2.00);
+                break;
+              case 'Coca Lata 350ml':
+                self.updatePrice(3.00);
+                break;
+              case 'Fanta Lata 350ml':
+                self.updatePrice(3.00);
+                break;
+              case 'Sprite Lata 350ml':
+                self.updatePrice(3.00);
+                break;
+              case 'Fanta Guarana Lata 350ml':
+                self.updatePrice(3.00);
+                break;
+              case 'Coca 600ml':
+                self.updatePrice(4.00);
+                break;
+              case 'Coca 1 Litro':
+                self.updatePrice(5.00);
+                break;
+              case 'Coca 2 Litros':
+                self.updatePrice(8.00);
+                break;
+              case 'Conquista 2 Litros':
+                self.updatePrice(6.00);
+                break;
+              case 'Suco Prats 330ml':
+                self.updatePrice(4.00);
+                break;
+              case 'Suco DeLVale Uva':
+                self.updatePrice(3.00);
+                break;
+              case 'Suco DeLVale Laranja':
+                self.updatePrice(3.00);
                 break;
               default: {
                 console.log('hehe');

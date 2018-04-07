@@ -284,11 +284,15 @@ class OrderPaymentItem {
 
   referenceValueDataChangeController(data) {
 
-    if (this.priceAmount) {
-      if (this.isDefault)
-        this.updateReferenceValue(this.priceAmount);
-      else if (parseFloat(data.referenceValue) > parseFloat(this.priceAmount))
-        this.updateReferenceValue(this.priceAmount);
+    try {
+      if (this.priceAmount) {
+        if (this.isDefault)
+          this.updateReferenceValue(this.priceAmount);
+        else if (parseFloat(data.referenceValue) > parseFloat(this.priceAmount))
+          this.updateReferenceValue(this.priceAmount);
+      }
+    } catch (e) {
+      console.log('eitaa..');
     }
 
   }

@@ -78,8 +78,8 @@ class OrderPaymentList {
 
     this.orderBillingRef.child('payments').push({
       method: method || '',
-      paidValue: this.priceAmount ? this.priceAmount.toFixed(2) : 0.00,
-      referenceValue: this.priceAmount ? this.priceAmount.toFixed(2) : 0.00
+      paidValue: this.priceAmount ? parseFloat(this.priceAmount).toFixed(2) : 0.00,
+      referenceValue: this.priceAmount ? parseFloat(this.priceAmount).toFixed(2) : 0.00
     });
 
   }

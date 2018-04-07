@@ -14,38 +14,96 @@ class OrderConsumer {
 
     this.element.className = 'OrderConsumer row';
 
-    this.element.appendChild(this.buildConsumerNameField());
+    this.element.consumerName = this.buildConsumerNameFieldElement();
+    this.element.deliveryTime = this.buildDeliveryTimeFieldElement();
 
   }
 
-  buildConsumerNameField() {
+  buildConsumerNameFieldElement() {
 
-    this.nameFieldElement = document.createElement('div');
-    this.nameFieldElement.className = 'OrderConsumer-consumerNameField input-field col s12';
+    const element = document.createElement('div');
+    element.className = 'OrderConsumer-consumerNameField input-field col s8';
+    this.element.appendChild(element);
 
     // input
-    this.nameFieldElement.input = document.createElement('input');
-    this.nameFieldElement.input.className = 'validate';
-    this.nameFieldElement.input.id = this.orderRef.key + '-consumerName';
-    this.nameFieldElement.input.type = 'text';
-    this.nameFieldElement.input.addEventListener('input', () => {
+    element.input = document.createElement('input');
+    element.input.className = 'validate';
+    element.input.id = this.orderRef.key + '-consumerName';
+    element.input.type = 'text';
+    element.input.addEventListener('input', () => {
 
-      this.orderRef.child('consumerName').set(this.nameFieldElement.input.value);
+      this.orderRef.child('consumerName').set(element.input.value);
 
     });
     this.orderRef.child('consumerName').on('value', snap => {
 
-      this.nameFieldElement.input.value = snap.val();
+      element.input.value = snap.val();
 
     });
-    this.nameFieldElement.appendChild(this.nameFieldElement.input);
+    element.appendChild(element.input);
 
     // label
-    this.nameFieldElement.labelElement = document.createElement('label');
-    this.nameFieldElement.labelElement.className = 'active';
-    this.nameFieldElement.labelElement.htmlFor = this.nameFieldElement.input.id;
-    this.nameFieldElement.labelElement.innerHTML = 'Nome';
-    this.nameFieldElement.appendChild(this.nameFieldElement.labelElement);
+    element.label = document.createElement('label');
+    element.label.className = 'active';
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Nome';
+    element.appendChild(element.label);
+
+    M.updateTextFields();
+
+    return this.nameFieldElement;
+
+  }
+
+  buildDeliveryTimeFieldElement() {
+
+    let newTime = '00:00';
+
+    if (moment())
+      newTime = moment().add(20, 'minutes').format('hh:mm');
+
+    const element = document.createElement('div');
+    element.className = 'OrderConsumer-deliveryTime input-field col s4';
+    this.element.appendChild(element);
+
+    // input
+    element.input = document.createElement('input');
+    element.input.id = this.orderRef.key + '-consumerName';
+    element.input.type = 'time';
+    element.input.step = '300';
+    element.input.addEventListener('focus', () => {
+
+      let newTime = '00:00';
+
+      if (moment())
+        newTime = moment().add(20, 'minutes').format('hh:mm');
+
+      this.orderRef.child('deliveryTime').set(newTime);
+
+      element.input.select();
+
+    });
+    element.input.addEventListener('input', () => {
+
+      this.orderRef.child('deliveryTime').set(element.input.value);
+
+    });
+    this.orderRef.child('deliveryTime').on('value', snap => {
+
+      if (!snap.val())
+        this.orderRef.child('deliveryTime').set(newTime);
+
+      element.input.value = snap.val();
+
+    });
+    element.appendChild(element.input);
+
+    // label
+    element.label = document.createElement('label');
+    element.label.className = 'active';
+    element.label.htmlFor = element.input.id;
+    element.label.innerHTML = 'Entrega';
+    element.appendChild(element.label);
 
     M.updateTextFields();
 
