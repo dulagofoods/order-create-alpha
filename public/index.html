@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="">
 <meta charset="UTF-8">
-<title></title>
+<title>Du Lago Order App</title>
 <meta name="viewport"
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
 <script src="dist/js/villa.min.js"></script>
@@ -98,28 +98,28 @@
 <script src="dist/js/socket.io.js"></script>
 <script>
 
-  const socket = io.connect('http://192.168.1.3:3000');
+  const socket = io.connect('http://192.168.1.80:8080');
   // const socket = false;
 
 </script>
 
-<script src="https://www.gstatic.com/firebasejs/4.12.0/firebase.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
 <script>
   // Initialize Firebase
-  const config = {
-    apiKey: "AIzaSyD-oJ2bifB4i3eq5XysEkkW34otJuuz1xE",
-    authDomain: "dulago-com-br.firebaseapp.com",
-    databaseURL: "https://dulago-com-br.firebaseio.com",
-    projectId: "dulago-com-br",
-    storageBucket: "dulago-com-br.appspot.com",
-    messagingSenderId: "265386755560"
+  var config = {
+    apiKey: "AIzaSyCd0gxcfc-VmRZ_zOfteYNJdIV_rJuVyUw",
+    authDomain: "dulago-app.firebaseapp.com",
+    databaseURL: "https://dulago-app.firebaseio.com",
+    projectId: "dulago-app",
+    storageBucket: "dulago-app.appspot.com",
+    messagingSenderId: "384067076512"
   };
   firebase.initializeApp(config);
 </script>
 <script>
 
   const databaseRef = firebase.database();
-  const ordersRef = databaseRef.ref('newOrders');
+  const ordersRef = databaseRef.ref('orders');
 
 </script>
 <script src="dist/js/order-create-alpha.js"></script>

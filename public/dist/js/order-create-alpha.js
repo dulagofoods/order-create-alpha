@@ -330,30 +330,32 @@ class Order {
     this.element.contentElement.appendChild(this.billing.element);
     this.element.contentElement.appendChild(this.delivery.element);
 
-    this.buildActionsElement();
+    this.element.contentElement = this.buildPrintStatusElement();
+
+    this.element.actions = this.buildActionsElement();
 
   }
 
   buildActionsElement() {
 
-    this.element.actionsElement = document.createElement('div');
-    this.element.actionsElement.className = 'Order-inner card-action';
-    this.element.appendChild(this.element.actionsElement);
+    const element = document.createElement('div');
+    element.className = 'Order-inner card-action';
+    this.element.appendChild(element);
 
-    this.element.printOrderButtonElement = document.createElement('button');
-    this.element.printOrderButtonElement.className = 'waves-effect waves-light-blue btn light-blue';
-    this.element.printOrderButtonElement.innerHTML = '<i class="material-icons left">print</i>Imprimir';
-    this.element.printOrderButtonElement.addEventListener('click', () => {
+    element.printButton = document.createElement('button');
+    element.printButton.className = 'waves-effect waves-light-blue btn light-blue';
+    element.printButton.innerHTML = '<i class="material-icons left">print</i>Imprimir';
+    element.printButton.addEventListener('click', () => {
 
       Order.print(this.orderRef, this.socket);
 
     });
-    this.element.actionsElement.appendChild(this.element.printOrderButtonElement);
+    element.appendChild(element.printButton);
 
-    this.element.deleteOrderButtonElement = document.createElement('button');
-    this.element.deleteOrderButtonElement.className = 'waves-effect waves-red btn-flat';
-    this.element.deleteOrderButtonElement.innerHTML = '<i class="material-icons left">delete</i>Excluir';
-    this.element.deleteOrderButtonElement.addEventListener('click', () => {
+    element.deleteButton = document.createElement('button');
+    element.deleteButton.className = 'waves-effect waves-red btn-flat';
+    element.deleteButton.innerHTML = '<i class="material-icons left">delete</i>Excluir';
+    element.deleteButton.addEventListener('click', () => {
 
       if (window.confirm('Tem certeza?')) {
 
@@ -374,7 +376,36 @@ class Order {
       }
 
     });
-    this.element.actionsElement.appendChild(this.element.deleteOrderButtonElement);
+    element.appendChild(element.deleteButton);
+
+    return element;
+
+  }
+
+  buildPrintStatusElement() {
+
+    const element = document.createElement('span');
+    element.className = 'Order-printStatus font-green';
+    element.delay = false;
+    this.orderRef.child('printouts').on('value', snap => {
+
+      let time = 1000;
+
+      if (element.delay) {
+        clearInterval(element.delay);
+        time = 5000;
+      }
+
+      element.delay = setInterval(() => {
+
+        element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
+
+      }, 5000);
+
+    });
+    this.element.contentElement.appendChild(element);
+
+    return element;
 
   }
 
@@ -400,6 +431,10 @@ class Order {
 
         console.log('enviando dados para impressao via socket...');
         socket.emit('print order', snap.val());
+
+        orderRef.child('printouts').set({
+          printingTime: moment().format()
+        });
 
       });
 
@@ -827,41 +862,84 @@ class OrderDelivery {
 
         let instance = M.Autocomplete.init(element.input, {
           data: {
-            "R Benjamin Caetano Zambon": null,
-            "R Pref Mário Junqueira": null,
-            "Av Comendador L Meneghel": null,
-            "Av Azarias Vieira de Rezende": null,
             "R José Francisco Ferreira": null,
-            "R Vereador Dino Veiga": null,
-            "R Manoel Nascimento Trindade": null,
-            "R Cyriaco Russo": null,
-            "R Francisco Presbítero Nogueira": null,
-            "Av Tiradentes": null,
-            "R Fibolito": null,
-            "R José de Oliveira": null,
-            "R Dr Yves Ribeiro": null,
-            "R Maria Ligia Ribeiro Conter (R Rubi)": null,
-            "R Gilberto Freire": null,
-            "R Shiniti Sassatani": null,
-            "R Benedito José de Andrade": null,
-            "R Yuzo Ochiai": null,
-            "R Piracicaba": null,
-            "R José Mendes Vilela": null,
-            "R Joversino de Assis Teixeira": null,
-            "R Vicente Inácio Filho": null,
-            "Av Edelina M Rand": null,
-            "R São Paul": null,
-            "R Prof Moacyr Castanho": null,
-            "R Frei Rafael Prone": null,
-            "R Juvenal Mesquit": null,
-            "R Eurípides Rodrigue": null,
-            "R Estevam Leite de Negreiros": null,
-            "Av Francisco Alves Pereira": null,
-            "R Carmelo Comegno": null,
-            "Av Edelina de Rezende": null,
-            "R Benedito Bernardes de Oliveira": null,
-            "Av Bandeirantes": null,
-            "Av Benedito Leite de Negreiros": null,
+            "R Pref José Mário Junqueira": "/dist/images/districts/CL.png",
+            "R Vereador Dino Veiga": "/dist/images/districts/CL.png",
+            "Av Comendador L Meneghel": "/dist/images/districts/CL.png",
+            "R Benjamin Caetano Zambon": "/dist/images/districts/LC.png",
+            "Av Azarias Vieira de Rezende": "/dist/images/districts/LC.png",
+            "Av Edelina Meneghel Rando": "/dist/images/districts/N.png",
+            "R São Paulo": "/dist/images/districts/N.png",
+            "R Frei Rafael Proner": "/dist/images/districts/NCS.png",
+            "R Manoel Nascimento Trindade": "/dist/images/districts/LPROMO.png",
+            "R Ciriaco Russo": "/dist/images/districts/LPROMO.png",
+            "R Francisco Presbítero Nogueira": "/dist/images/districts/L.png",
+            "Av Tiradentes": "/dist/images/districts/L.png",
+            "R Fibolito": "/dist/images/districts/L.png",
+            "R José de Oliveira": "/dist/images/districts/L.png",
+            "R Dr Yves Ribeiro": "/dist/images/districts/L.png",
+            "R Maria Ligia Ribeiro Conter (R Rubi)": "/dist/images/districts/L.png",
+            "R Gilberto Freire": "/dist/images/districts/L.png",
+            "R Shiniti Sassatani": "/dist/images/districts/L.png",
+            "R Benedito José de Andrade": "/dist/images/districts/L.png",
+            "R Yuzo Ochiai": "/dist/images/districts/L.png",
+            "R Piracicaba": "/dist/images/districts/L.png",
+            "R José Mendes Vilela": "/dist/images/districts/L.png",
+            "R Joversino de Assis Teixeira": "/dist/images/districts/L.png",
+            "R Vicente Inácio Filho": "/dist/images/districts/L.png",
+            "R Prof Moacyr Castanho": "/dist/images/districts/?.png",
+            "R Juvenal Mesquit": "/dist/images/districts/O.png",
+            "R Eurípides Rodrigue": "/dist/images/districts/O.png",
+            "R Estevam Leite de Negreiros": "/dist/images/districts/O.png",
+            "Av Francisco Alves Pereira": "/dist/images/districts/O.png",
+            "R Carmelo Comegno": "/dist/images/districts/O.png",
+            "Av Edelina de Rezende": "/dist/images/districts/O.png",
+            "R Benedito Bernardes de Oliveira": "/dist/images/districts/O.png",
+            "Av Bandeirantes": "/dist/images/districts/O.png",
+            "Av Benedito Leite de Negreiros": "/dist/images/districts/O.png",
+            "R Ademar Francisco Mateus": "/dist/images/districts/O.png",
+            "R Roberto Von Der Osten": "/dist/images/districts/O.png",
+            "R Salvador Chianca": "/dist/images/districts/O.png",
+            "R Antônio Rossi": "/dist/images/districts/O.png",
+            "R João Francisco Ferreira": "/dist/images/districts/O.png",
+            "R Osvaldo Barbosa": "/dist/images/districts/O.png",
+            "Av Bandeirantes": "/dist/images/districts/O.png",
+            "R Sebastião Jacinto da Silva": "/dist/images/districts/O.png",
+            "R Artur Emílio Leopoldo Conter": "/dist/images/districts/O.png",
+            "R Ricieri Ticianelli": "/dist/images/districts/O.png",
+            "R Joaquim Pereira Bueno": "/dist/images/districts/O.png",
+            "R Nair Galvao Cioff": "/dist/images/districts/O.png",
+            "R Hidekiti Hassegawa": "/dist/images/districts/O.png",
+            "R Elísio Manoel dos Santos": "/dist/images/districts/O.png",
+            "R Fioravante Malaghini": "/dist/images/districts/O.png",
+            "R João Vilar García": "/dist/images/districts/O.png",
+            "R Antonio Tome": "/dist/images/districts/O.png",
+            "R Guilherme Sachs": "/dist/images/districts/O.png",
+            "R Francisca Alvares Morilha": "/dist/images/districts/O.png",
+            "R Alberto Faria Cardoso": "/dist/images/districts/O.png",
+            "R Nicolas Sanches Garrido": "/dist/images/districts/O.png",
+            "R Sebastião Nogueira da Silva": "/dist/images/districts/O.png",
+            "R José Altizani": "/dist/images/districts/O.png",
+            "R Luis Dias": "/dist/images/districts/O.png",
+            "R Salvador Martines Sanches": "/dist/images/districts/O.png",
+            "R Claudio dos Santos": "/dist/images/districts/O.png",
+            "R Massao Kamiama": "/dist/images/districts/O.png",
+            "R Claudio dos Santos": "/dist/images/districts/O.png",
+            "R Isaura Matsubara": "/dist/images/districts/O.png",
+            "R Antonio Alvares Torres": "/dist/images/districts/O.png",
+            "R Teodoro Bonfante": "/dist/images/districts/O.png",
+            "R dos Expedicionários": "/dist/images/districts/O.png",
+            "R Pastor João José": "/dist/images/districts/O.png",
+            "R Sebastião Faria": "/dist/images/districts/O.png",
+            "R Pref Rafael Antonaci": "/dist/images/districts/O.png",
+            "R Emílio Luciano": "/dist/images/districts/O.png",
+            "R Maurício Antônio Ribeiro": "/dist/images/districts/O.png",
+            "R Irma Domingas Anna Pitchuk": "/dist/images/districts/O.png",
+            "R José Manoel Ramos": "/dist/images/districts/O.png",
+            "": null,
+            "": null,
+            "": null,
+            "": null,
             "Av das Torres": null
           },
           minLength: 1,
@@ -1067,50 +1145,7 @@ class OrderDelivery {
   }
 
 }
-/*
-Av Bandeirantes
-Benjamin Caetano Zambom
-Casa da tia do Eduardo
-Rua Ademar Francisco Matheus
-Roberto Von der Osten
-Nair Cioff
-Av Bandeirantes
-Pref. Jose M Junqueira,  Residencial inga bloco B, ap 3.
-Salvador Chianca
-Joao Vilar Garcia
-Antonio Rossi
-João Francisco Ferreira,
-Osvaldo Barbosa número
-Av Benedito Leite de Negreiros
-Piracicaba,
-Av Bandeirantes
-Juevenal Mesquita
-Av Bandeirantes
-Sebastião Jacinto da Silva
-Arthur Emílio Conter,
-Ricieri ticianelle
-Av Comendador L Meneghel
-Rua Joaquim Pereira Bueno
-Av Comendador L Meneghel
-Av Edelina M Rand
-R Juvenal Mesquita
-Av Comendador L Meneghel
-nair galvao cioff
-Hidequite Assegawa
-R Pref Mário Junqueira
-Eua elisio manoel dos santos n.33
-Pet shop da Anne
-Fioravante Maliguine
-Joao Vilar garcia
-Antônio Tomé
-R José de Oliveira
-Av Comendador L Meneghel
-R São Paulo
-Guilherme sacks
-R Benedito Bernardes de Oliveira
-Francisca Alves Morilha
-R Francisco Presbítero Nogueira
-*/
+
 class OrderItem {
 
   constructor(orderItemRef) {

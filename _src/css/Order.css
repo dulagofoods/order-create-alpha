@@ -45,3 +45,8 @@
 .Order-inner > .row:last-of-type {
     margin-bottom: 0;
 }
+
+.Order-printStatus {
+    margin: 0 10px;
+    font-size: 12px;
+}

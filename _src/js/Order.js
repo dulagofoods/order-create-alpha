@@ -51,30 +51,32 @@ class Order {
     this.element.contentElement.appendChild(this.billing.element);
     this.element.contentElement.appendChild(this.delivery.element);
 
-    this.buildActionsElement();
+    this.element.contentElement = this.buildPrintStatusElement();
+
+    this.element.actions = this.buildActionsElement();
 
   }
 
   buildActionsElement() {
 
-    this.element.actionsElement = document.createElement('div');
-    this.element.actionsElement.className = 'Order-inner card-action';
-    this.element.appendChild(this.element.actionsElement);
+    const element = document.createElement('div');
+    element.className = 'Order-inner card-action';
+    this.element.appendChild(element);
 
-    this.element.printOrderButtonElement = document.createElement('button');
-    this.element.printOrderButtonElement.className = 'waves-effect waves-light-blue btn light-blue';
-    this.element.printOrderButtonElement.innerHTML = '<i class="material-icons left">print</i>Imprimir';
-    this.element.printOrderButtonElement.addEventListener('click', () => {
+    element.printButton = document.createElement('button');
+    element.printButton.className = 'waves-effect waves-light-blue btn light-blue';
+    element.printButton.innerHTML = '<i class="material-icons left">print</i>Imprimir';
+    element.printButton.addEventListener('click', () => {
 
       Order.print(this.orderRef, this.socket);
 
     });
-    this.element.actionsElement.appendChild(this.element.printOrderButtonElement);
+    element.appendChild(element.printButton);
 
-    this.element.deleteOrderButtonElement = document.createElement('button');
-    this.element.deleteOrderButtonElement.className = 'waves-effect waves-red btn-flat';
-    this.element.deleteOrderButtonElement.innerHTML = '<i class="material-icons left">delete</i>Excluir';
-    this.element.deleteOrderButtonElement.addEventListener('click', () => {
+    element.deleteButton = document.createElement('button');
+    element.deleteButton.className = 'waves-effect waves-red btn-flat';
+    element.deleteButton.innerHTML = '<i class="material-icons left">delete</i>Excluir';
+    element.deleteButton.addEventListener('click', () => {
 
       if (window.confirm('Tem certeza?')) {
 
@@ -95,7 +97,36 @@ class Order {
       }
 
     });
-    this.element.actionsElement.appendChild(this.element.deleteOrderButtonElement);
+    element.appendChild(element.deleteButton);
+
+    return element;
+
+  }
+
+  buildPrintStatusElement() {
+
+    const element = document.createElement('span');
+    element.className = 'Order-printStatus font-green';
+    element.delay = false;
+    this.orderRef.child('printouts').on('value', snap => {
+
+      let time = 1000;
+
+      if (element.delay) {
+        clearInterval(element.delay);
+        time = 5000;
+      }
+
+      element.delay = setInterval(() => {
+
+        element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
+
+      }, 5000);
+
+    });
+    this.element.contentElement.appendChild(element);
+
+    return element;
 
   }
 
@@ -121,6 +152,10 @@ class Order {
 
         console.log('enviando dados para impressao via socket...');
         socket.emit('print order', snap.val());
+
+        orderRef.child('printouts').set({
+          printingTime: moment().format()
+        });
 
       });
 
