@@ -560,7 +560,7 @@ class OrderApp {
     }
 
   }
-
+  
 }
 class OrderBilling {
 
@@ -885,7 +885,7 @@ class OrderDelivery {
 
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
-    element.label.innerHTML = 'Bairro';
+    element.label.innerHTML = 'Rua';
     this.orderRef.child('address/street').once('value', snap => {
 
       if (!!snap.val())
@@ -1067,6 +1067,50 @@ class OrderDelivery {
   }
 
 }
+/*
+Av Bandeirantes
+Benjamin Caetano Zambom
+Casa da tia do Eduardo
+Rua Ademar Francisco Matheus
+Roberto Von der Osten
+Nair Cioff
+Av Bandeirantes
+Pref. Jose M Junqueira,  Residencial inga bloco B, ap 3.
+Salvador Chianca
+Joao Vilar Garcia
+Antonio Rossi
+João Francisco Ferreira,
+Osvaldo Barbosa número
+Av Benedito Leite de Negreiros
+Piracicaba,
+Av Bandeirantes
+Juevenal Mesquita
+Av Bandeirantes
+Sebastião Jacinto da Silva
+Arthur Emílio Conter,
+Ricieri ticianelle
+Av Comendador L Meneghel
+Rua Joaquim Pereira Bueno
+Av Comendador L Meneghel
+Av Edelina M Rand
+R Juvenal Mesquita
+Av Comendador L Meneghel
+nair galvao cioff
+Hidequite Assegawa
+R Pref Mário Junqueira
+Eua elisio manoel dos santos n.33
+Pet shop da Anne
+Fioravante Maliguine
+Joao Vilar garcia
+Antônio Tomé
+R José de Oliveira
+Av Comendador L Meneghel
+R São Paulo
+Guilherme sacks
+R Benedito Bernardes de Oliveira
+Francisca Alves Morilha
+R Francisco Presbítero Nogueira
+*/
 class OrderItem {
 
   constructor(orderItemRef) {
