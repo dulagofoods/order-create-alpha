@@ -74,7 +74,7 @@ class Order {
     element.appendChild(element.printButton);
 
     element.deleteButton = document.createElement('button');
-    element.deleteButton.className = 'waves-effect waves-red btn-flat';
+    element.deleteButton.className = 'waves-effect waves-red btn-flat red-text';
     element.deleteButton.innerHTML = '<i class="material-icons left">delete</i>Excluir';
     element.deleteButton.addEventListener('click', () => {
 
