@@ -119,7 +119,8 @@ class Order {
 
       element.delay = setInterval(() => {
 
-        element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
+        if (snap.val())
+          element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
 
       }, 5000);
 

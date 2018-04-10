@@ -1,4 +1,9 @@
 class OrderApp {
+  /*
+  TODO vincular o gerenciador com agenda de contatos
+  TODO corrigir orientação das ruas
+  TODO adicionar linha do tempo
+   */
 
   constructor(element, ordersRef, socket) {
 
@@ -25,8 +30,14 @@ class OrderApp {
 
     });
 
+    this.ordersRef.once('value', snap => {
+
+      console.log('conteúdo baixado');
+
+    });
+
     window.addEventListener('keydown', event => {
-      if (event.keyCode === 113)
+      if (event.keyCode === 113 && event.ctrlKey)
         this.createOrder();
     })
 
@@ -133,5 +144,5 @@ class OrderApp {
     }
 
   }
-  
+
 }

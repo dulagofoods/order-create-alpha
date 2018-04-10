@@ -76,7 +76,7 @@ class OrderConsumer {
       let newTime = '00:00';
 
       if (moment())
-        newTime = moment().add(20, 'minutes').format('hh:mm');
+        newTime = moment().add(20, 'minutes').format('HH:mm');
 
       this.orderRef.child('deliveryTime').set(newTime);
 
