@@ -279,12 +279,15 @@ class GridItem {
 }
 class Order {
 
-  constructor(orderRef, socket, autoInit) {
+  constructor(orderRef, autoInit) {
 
     this.orderRef = orderRef;
     this.orderKey = this.orderRef.key;
 
-    this.socket = socket || false;
+    this.createdTime = null;
+    this.data = {};
+
+    this.socket = socket;
 
     this.element = document.createElement('div');
 
@@ -305,10 +308,19 @@ class Order {
     // action listener
     this.orderRef.on('value', snap => {
 
-      // is deleted
-      if (snap.val() == null) {
+      const data = snap.val();
 
+      // is deleted
+      if (data == null) {
+
+        this.data = null;
         this.element.classList.add('is-deleted');
+
+      } else {
+
+        // this.data = {
+        //   consumerName: data.consumerName
+        // }
 
       }
 
@@ -468,13 +480,17 @@ class OrderApp {
   TODO adicionar linha do tempo
    */
 
-  constructor(element, ordersRef, socket) {
+  constructor(element, databaseRef, socket) {
 
     this.element = element;
-    this.ordersRef = ordersRef;
+    this.databaseRef = databaseRef;
     this.socket = socket;
 
-    this.activeOrderElement = false;
+    this.ordersRef = this.databaseRef.ref('orders');
+    this.ordersViewsRef = this.databaseRef.ref('ordersViews');
+
+    this.orderList = new OrderList(this.ordersRef);
+
     this.activeOrderKey = false;
 
     this.init();
@@ -485,24 +501,21 @@ class OrderApp {
 
     this.build();
 
-    // this.ordersGrid = new Grid(this.element.ordersGrid);
+    let ordersViewKey = moment().format('YYYY-MM-DD');
+    this.orderList.ordersViewRef = this.ordersViewsRef.child(ordersViewKey);
+    this.orderList.init();
 
-    this.ordersRef.orderByChild('createdTime').on('child_added', snap => {
+    this.orderList.ordersViewRef.on('child_added', snap => {
 
-      this.pushOrder(snap.ref);
-
-    });
-
-    this.ordersRef.once('value', snap => {
-
-      console.log('conteúdo baixado');
+      if (this.activeOrderKey === snap.key)
+          this.orderList.orders[snap.key].focus();
 
     });
 
     window.addEventListener('keydown', event => {
-      if (event.keyCode === 113 && event.ctrlKey)
-        this.createOrder();
-    })
+      if (event.keyCode === 113 && event.shiftKey)
+        this.addNewOrderToList();
+    });
 
   }
 
@@ -512,16 +525,13 @@ class OrderApp {
     this.element.inner.className = 'OrderApp-inner';
     this.element.append(this.element.inner);
 
-    this.element.ordersGrid = document.createElement('div');
-    this.element.ordersGrid.className = 'OrderApp-ordersGrid';
-    this.element.inner.append(this.element.ordersGrid);
+    this.element.inner.appendChild(this.orderList.element);
 
     this.actionButtons = document.createElement('div');
     this.actionButtons.className = 'OrderApp-actionButtons';
     this.element.inner.append(this.actionButtons);
 
     this.floatingActionButton = this.buildFloatingActionButton();
-    this.actionButtons.appendChild(this.floatingActionButton);
 
   }
 
@@ -529,6 +539,7 @@ class OrderApp {
 
     const element = document.createElement('div');
     element.className = 'fixed-action-btn';
+    this.actionButtons.appendChild(element);
 
     // btn element
     element.btn = document.createElement('a');
@@ -540,24 +551,8 @@ class OrderApp {
     element.btn.icon.innerHTML = 'add';
     element.btn.append(element.btn.icon);
     element.btn.addEventListener('click', event => {
-      this.createOrder();
+      this.addNewOrderToList();
     });
-
-    // TODO criar items no botao flutuante principal para produtos
-    // list element
-    // element.list = document.createElement('ul');
-    // element.appendChild(element.list);
-
-    // fist link option
-    // element.list.first = document.createElement('li');
-    // element.list.first.btn = document.createElement('a');
-    // element.list.first.btn.className = 'btn-floating red ';
-    // element.list.first.btn.icon = document.createElement('i');
-    // element.list.first.btn.icon.className = 'material-icons';
-    // element.list.first.btn.icon.innerHTML = 'insert_chart';
-    // element.list.first.btn.appendChild(element.list.first.btn.icon);
-    // element.list.first.appendChild(element.list.first.btn);
-    // element.list.appendChild(element.list.first);
 
     element.instance = M.FloatingActionButton.init(element);
 
@@ -565,9 +560,11 @@ class OrderApp {
 
   }
 
-  createOrder() {
+  addNewOrderToList() {
 
-    this.activeOrderKey = Order.create(this.ordersRef).key;
+    const order = Order.create(this.ordersRef);
+    this.activeOrderKey = order.key;
+    order.once('value', snap => this.orderList.addOrder(order, snap.val().createdTime));
 
     try {
 
@@ -578,31 +575,6 @@ class OrderApp {
     } catch (e) {
 
       console.log('materialize error');
-
-    }
-
-  }
-
-  pushOrder(orderRef) {
-
-    let self = this;
-
-    if (orderRef) {
-
-      let order = new Order(orderRef, this.socket);
-      this.element.ordersGrid.insertBefore(order.element, this.element.ordersGrid.firstChild);
-      order.init();
-
-      if (this.activeOrderKey === orderRef.key)
-        self.activeOrderElement = order.element;
-
-      // seta o focus para o pedido
-      setTimeout(function () {
-
-        if (self.activeOrderKey === orderRef.key)
-          order.focus();
-
-      }, 1);
 
     }
 
@@ -686,7 +658,10 @@ class OrderConsumer {
 
     // label
     element.label = document.createElement('label');
-    element.label.className = 'active';
+    this.orderRef.child('consumerName').once('value', snap => {
+      if (snap.val())
+        element.label.classList = 'active';
+    });
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Nome';
     element.appendChild(element.label);
@@ -1686,28 +1661,105 @@ class OrderItemList {
 }
 class OrderList {
 
-  pushOrder(orderRef) {
+  constructor(ordersRef, ordersViewRef = null) {
 
-    let self = this;
+    this.ordersRef = ordersRef;
+    this.ordersViewRef = ordersViewRef;
 
-    if (orderRef) {
+    this.element = document.createElement('div');
 
-      let order = new Order(orderRef, this.socket);
-      this.element.ordersGrid.insertBefore(order.element, this.element.ordersGrid.firstChild);
-      order.init();
+    this.orders = {};
 
-      if (this.activeOrderKey === orderRef.key)
-        self.activeOrderElement = order.element;
+    this.isLoaded = false;
 
-      // seta o focus para o pedido
-      setTimeout(function () {
+    if (this.ordersRef && this.ordersViewRef)
+      this.init();
 
-        if (self.activeOrderKey === orderRef.key)
-          order.focus();
+  }
 
-      }, 1);
+  init() {
 
+    this.build();
+
+    this.ordersViewRef.on('child_added', snap => this.pushOrder(this.ordersRef.child(snap.key), snap.val()));
+
+    this.ordersRef.on('child_removed', snap => this.removeOrder(this.ordersRef.child(snap.key)));
+
+    // faz algo aqui após a lista ser baixada
+    this.ordersViewRef.once('value', snap => {
+
+      this.buildView(!this.isLoaded);
+      this.isLoaded = true;
+
+    });
+
+  }
+
+  build() {
+
+    this.element.className = 'OrderList';
+
+  }
+
+  buildView(initializeOrders) {
+
+    this.element.innerHTML = '';
+
+    const view = Object.values(this.orders);
+
+    // ordena decrescente
+    view.sort((a, b) => {
+      if (a.createdTime.isBefore(b.createdTime))
+        return 1;
+      if (b.createdTime.isBefore(a.createdTime))
+        return -1;
+      return 0;
+    });
+
+    view.forEach(order => this.appendOrderToView(order));
+
+    if (initializeOrders)
+      view.forEach(order => order.init());
+
+  }
+
+  addOrder(orderRef, createdTime) {
+
+    if (this.ordersViewRef)
+      this.ordersViewRef.child(orderRef.key).set(createdTime);
+
+  }
+
+  pushOrder(orderRef, createdTime) {
+
+    if (orderRef)
+      this.orders[orderRef.key] = new Order(orderRef);
+
+    this.orders[orderRef.key].createdTime = moment(createdTime);
+
+    if (this.isLoaded) {
+      this.appendOrderToView(this.orders[orderRef.key], true);
+      this.orders[orderRef.key].init();
     }
+
+  }
+
+  removeOrder(orderRef) {
+
+    if (orderRef)
+      if (this.orders[orderRef.key]) {
+        this.ordersViewRef.child(orderRef.key).set(null);
+        delete this.orders[orderRef.key];
+      }
+
+  }
+
+  appendOrderToView(order, before) {
+
+    if (before)
+      this.element.insertBefore(order.element, this.element.firstChild);
+    else
+      this.element.appendChild(order.element);
 
   }
 

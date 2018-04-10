@@ -35,21 +35,6 @@
     width: 100%;
   }
 
-  .OrderApp-inner {
-    display: -webkit-box;
-    display: -moz-box;
-    display: -ms-flexbox;
-    display: -webkit-flex;
-    display: flex;
-    -webkit-flex-flow: column;
-    flex-flow: column;
-    height: 100%;
-    padding: 1rem;
-    position: relative;
-    width: 100%;
-    max-width: 600px;
-  }
-
   .OrderApp-actionButtons {
     display: -webkit-box;
     display: -moz-box;
@@ -64,13 +49,7 @@
     user-select: none;
   }
 
-  @media (min-width: 1200px) {
 
-    .OrderApp-inner {
-      max-width: 960px;
-    }
-
-  }
 
 </style>
 
@@ -119,14 +98,13 @@
 <script>
 
   const databaseRef = firebase.database();
-  const ordersRef = databaseRef.ref('orders');
 
 </script>
 <script src="dist/js/order-create-alpha.js"></script>
 
 <script>
 
-  const orderApp = new OrderApp(document.getElementById('orderApp'), ordersRef, socket);
+  const orderApp = new OrderApp(document.getElementById('orderApp'), databaseRef, socket);
   // orderApp.createOrder();
 
 </script>

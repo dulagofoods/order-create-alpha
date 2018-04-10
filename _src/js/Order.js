@@ -1,11 +1,14 @@
 class Order {
 
-  constructor(orderRef, socket, autoInit) {
+  constructor(orderRef, autoInit) {
 
     this.orderRef = orderRef;
     this.orderKey = this.orderRef.key;
 
-    this.socket = socket || false;
+    this.createdTime = null;
+    this.data = {};
+
+    this.socket = socket;
 
     this.element = document.createElement('div');
 
@@ -26,10 +29,19 @@ class Order {
     // action listener
     this.orderRef.on('value', snap => {
 
-      // is deleted
-      if (snap.val() == null) {
+      const data = snap.val();
 
+      // is deleted
+      if (data == null) {
+
+        this.data = null;
         this.element.classList.add('is-deleted');
+
+      } else {
+
+        // this.data = {
+        //   consumerName: data.consumerName
+        // }
 
       }
 

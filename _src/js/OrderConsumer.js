@@ -44,7 +44,10 @@ class OrderConsumer {
 
     // label
     element.label = document.createElement('label');
-    element.label.className = 'active';
+    this.orderRef.child('consumerName').once('value', snap => {
+      if (snap.val())
+        element.label.classList = 'active';
+    });
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Nome';
     element.appendChild(element.label);

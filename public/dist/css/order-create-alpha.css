@@ -167,6 +167,26 @@
   margin-bottom: 4px;
 }
 
+.OrderList {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column;
+  flex-flow: column;
+  height: 100%;
+  padding: 1rem;
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+}
+
+@media (min-width: 1200px) {
+  .OrderList {
+    max-width: 960px;
+  }
+}
 .OrderPaymentItem {
   -webkit-align-items: center;
   align-items: center;

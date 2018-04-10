@@ -5,13 +5,17 @@ class OrderApp {
   TODO adicionar linha do tempo
    */
 
-  constructor(element, ordersRef, socket) {
+  constructor(element, databaseRef, socket) {
 
     this.element = element;
-    this.ordersRef = ordersRef;
+    this.databaseRef = databaseRef;
     this.socket = socket;
 
-    this.activeOrderElement = false;
+    this.ordersRef = this.databaseRef.ref('orders');
+    this.ordersViewsRef = this.databaseRef.ref('ordersViews');
+
+    this.orderList = new OrderList(this.ordersRef);
+
     this.activeOrderKey = false;
 
     this.init();
@@ -22,24 +26,21 @@ class OrderApp {
 
     this.build();
 
-    // this.ordersGrid = new Grid(this.element.ordersGrid);
+    let ordersViewKey = moment().format('YYYY-MM-DD');
+    this.orderList.ordersViewRef = this.ordersViewsRef.child(ordersViewKey);
+    this.orderList.init();
 
-    this.ordersRef.orderByChild('createdTime').on('child_added', snap => {
+    this.orderList.ordersViewRef.on('child_added', snap => {
 
-      this.pushOrder(snap.ref);
-
-    });
-
-    this.ordersRef.once('value', snap => {
-
-      console.log('conteúdo baixado');
+      if (this.activeOrderKey === snap.key)
+          this.orderList.orders[snap.key].focus();
 
     });
 
     window.addEventListener('keydown', event => {
-      if (event.keyCode === 113 && event.ctrlKey)
-        this.createOrder();
-    })
+      if (event.keyCode === 113 && event.shiftKey)
+        this.addNewOrderToList();
+    });
 
   }
 
@@ -49,16 +50,13 @@ class OrderApp {
     this.element.inner.className = 'OrderApp-inner';
     this.element.append(this.element.inner);
 
-    this.element.ordersGrid = document.createElement('div');
-    this.element.ordersGrid.className = 'OrderApp-ordersGrid';
-    this.element.inner.append(this.element.ordersGrid);
+    this.element.inner.appendChild(this.orderList.element);
 
     this.actionButtons = document.createElement('div');
     this.actionButtons.className = 'OrderApp-actionButtons';
     this.element.inner.append(this.actionButtons);
 
     this.floatingActionButton = this.buildFloatingActionButton();
-    this.actionButtons.appendChild(this.floatingActionButton);
 
   }
 
@@ -66,6 +64,7 @@ class OrderApp {
 
     const element = document.createElement('div');
     element.className = 'fixed-action-btn';
+    this.actionButtons.appendChild(element);
 
     // btn element
     element.btn = document.createElement('a');
@@ -77,24 +76,8 @@ class OrderApp {
     element.btn.icon.innerHTML = 'add';
     element.btn.append(element.btn.icon);
     element.btn.addEventListener('click', event => {
-      this.createOrder();
+      this.addNewOrderToList();
     });
-
-    // TODO criar items no botao flutuante principal para produtos
-    // list element
-    // element.list = document.createElement('ul');
-    // element.appendChild(element.list);
-
-    // fist link option
-    // element.list.first = document.createElement('li');
-    // element.list.first.btn = document.createElement('a');
-    // element.list.first.btn.className = 'btn-floating red ';
-    // element.list.first.btn.icon = document.createElement('i');
-    // element.list.first.btn.icon.className = 'material-icons';
-    // element.list.first.btn.icon.innerHTML = 'insert_chart';
-    // element.list.first.btn.appendChild(element.list.first.btn.icon);
-    // element.list.first.appendChild(element.list.first.btn);
-    // element.list.appendChild(element.list.first);
 
     element.instance = M.FloatingActionButton.init(element);
 
@@ -102,9 +85,11 @@ class OrderApp {
 
   }
 
-  createOrder() {
+  addNewOrderToList() {
 
-    this.activeOrderKey = Order.create(this.ordersRef).key;
+    const order = Order.create(this.ordersRef);
+    this.activeOrderKey = order.key;
+    order.once('value', snap => this.orderList.addOrder(order, snap.val().createdTime));
 
     try {
 
@@ -115,31 +100,6 @@ class OrderApp {
     } catch (e) {
 
       console.log('materialize error');
-
-    }
-
-  }
-
-  pushOrder(orderRef) {
-
-    let self = this;
-
-    if (orderRef) {
-
-      let order = new Order(orderRef, this.socket);
-      this.element.ordersGrid.insertBefore(order.element, this.element.ordersGrid.firstChild);
-      order.init();
-
-      if (this.activeOrderKey === orderRef.key)
-        self.activeOrderElement = order.element;
-
-      // seta o focus para o pedido
-      setTimeout(function () {
-
-        if (self.activeOrderKey === orderRef.key)
-          order.focus();
-
-      }, 1);
 
     }
 
