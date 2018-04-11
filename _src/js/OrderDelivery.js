@@ -118,7 +118,7 @@ class OrderDelivery {
             "Av Bandeirantes": "/dist/images/districts/NC.png",
 
             "R São Paulo": "/dist/images/districts/NCS.png",
-            "R Prof Moacyr Castanho": "/dist/images/districts/NCS.png",
+            "Av Pref Moacir Castanho": "/dist/images/districts/NCS.png",
             "R Eurípides Rodrigues": "/dist/images/districts/NCS.png",
             "R Juvenal Mesquita": "/dist/images/districts/NCS.png",
             "R Frei Rafael Proner": "/dist/images/districts/NCS.png",
@@ -150,6 +150,7 @@ class OrderDelivery {
             "R José Mendes Vilela": "/dist/images/districts/LPROMO.png",
             "R Joversino de Assis Teixeira": "/dist/images/districts/LPROMO.png",
             "R Vicente Inácio Filho": "/dist/images/districts/LPROMO.png",
+            "R Irenice Guardiana Patrocinio": "/dist/images/districts/LPROMO.png",
             "R Ademar Francisco Mateus": "/dist/images/districts/L.png",
             "R Mauricio Antônio Ribeiro": "/dist/images/districts/L.png",
             "R Irma Domingas Anna Pitchuk": "/dist/images/districts/L.png",
@@ -180,6 +181,7 @@ class OrderDelivery {
             "R Isaura Matsubara": "/dist/images/districts/N.png",
             "R Antonio Alvares Torres": "/dist/images/districts/N.png",
             "R Projetada I": "/dist/images/districts/N.png",
+            "R Gregorio Magalhães Trindade": "/dist/images/districts/N.png",
 
             // O
             "R Antonio Rossi": "/dist/images/districts/O.png",
@@ -196,10 +198,10 @@ class OrderDelivery {
             "R Emilio Luciano": "/dist/images/districts/S.png",
             "R Wantuil Goularte Barbosa": "/dist/images/districts/S.png",
             "R Antonio Candido Zulmires de Campos": "/dist/images/districts/S.png",
-
-
+            "R Vereador Vicente Rodrigues de Matos": "/dist/images/districts/S.png",
             "Av João da Silva Cravo": "/dist/images/districts/S.png",
             "Av das Torres": "/dist/images/districts/S.png",
+
             "": null,
           },
           minLength: 1,
@@ -213,7 +215,10 @@ class OrderDelivery {
       }
 
     }, 500);
-    this.orderRef.child('address/street').on('value', snap => element.input.value = snap.val());
+    this.orderRef.child('address/street').on('value', snap => {
+      element.input.value = snap.val();
+      console.log(snap.val());
+    });
     element.input.addEventListener('change', () => {
 
       this.orderRef.child('address/street').set(element.input.value);
