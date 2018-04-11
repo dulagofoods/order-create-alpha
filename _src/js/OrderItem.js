@@ -109,6 +109,9 @@ class OrderItem {
               case 'Marmita G':
                 self.updatePrice(11.00);
                 break;
+              case 'Marmita F':
+                self.updatePrice(14.00);
+                break;
               case 'Feijoada Individual':
                 self.updatePrice(15.00);
                 break;
@@ -158,7 +161,7 @@ class OrderItem {
                 self.updatePrice(3.00);
                 break;
               default: {
-                console.log('hehe');
+                self.updatePrice(0.00);
               }
             }
           }
