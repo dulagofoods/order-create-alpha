@@ -74,9 +74,15 @@
 <script src="dist/js/socket.io.js"></script>
 <script>
 
-  const socket = io.connect('http://192.168.1.80:8080');
-  // const socket = io.connect('http://192.168.43.80:8080');
-  // const socket = false;
+  let socket = io.connect('http://127.0.0.1:8080');
+  socket.on('connect_error', (error) => {
+    socket.close();
+    console.error('erro de conexão no servidor de impressão local, conexão rejeitada');
+    console.info('tentando conexão remota..');
+    socket = io.connect('http://192.168.1.80:8080');
+    socket.on('connect', () => console.info('conectado com sucesso em servidor de impressão remoto'));
+    socket.on('connect_error', () => console.error('erro na conexão com servidor remoto'));
+  });
 
 </script>
 
