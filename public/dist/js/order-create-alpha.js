@@ -442,12 +442,16 @@ class Order {
 
         console.log(snap.val());
 
-        console.log('enviando dados para impressao via socket...');
-        socket.emit('print order', snap.val());
-
-        orderRef.child('printouts').set({
-          printingTime: moment().format()
-        });
+        try {
+          console.log('enviando dados para impressao via socket...');
+          socket.emit('print order', snap.val());
+          orderRef.child('printouts').set({
+            printingTime: moment().format()
+          });
+          console.log('impressão enviada');
+        } catch (e) {
+          console.log('erro no socket');
+        }
 
       });
 
@@ -960,7 +964,7 @@ class OrderDelivery {
     }, 500);
     this.orderRef.child('address/street').on('value', snap => {
       element.input.value = snap.val();
-      console.log(snap.val());
+      // console.log(snap.val());
     });
     element.input.addEventListener('change', () => {
 

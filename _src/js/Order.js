@@ -163,12 +163,16 @@ class Order {
 
         console.log(snap.val());
 
-        console.log('enviando dados para impressao via socket...');
-        socket.emit('print order', snap.val());
-
-        orderRef.child('printouts').set({
-          printingTime: moment().format()
-        });
+        try {
+          console.log('enviando dados para impressao via socket...');
+          socket.emit('print order', snap.val());
+          orderRef.child('printouts').set({
+            printingTime: moment().format()
+          });
+          console.log('impressão enviada');
+        } catch (e) {
+          console.log('erro no socket');
+        }
 
       });
 
