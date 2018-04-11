@@ -37,6 +37,7 @@
   .TimelineItem {
     background-color: #ffffff;
     border-bottom: solid 1px #eeeeee;
+    color: #212121;
     cursor: default;
     display: -webkit-box;
     display: -moz-box;
@@ -71,6 +72,12 @@
 
   .TimelineItem.is-deleted {
     display: none;
+  }
+
+  .TimelineItem.is-archived {
+    background-color: #212121;
+    border-color: #212121;
+    color: #bdbdbd;
   }
 
   .TimelineItem-actions {
@@ -111,7 +118,7 @@
     background-color: transparent;
     border: none;
     /*border-left: solid 1px #eeeeee;*/
-    color: #00C853;
+    color: #9E9E9E;
     cursor: pointer;
     height: 3.75rem;
     -webkit-transition: all .3s ease-in-out;
@@ -122,10 +129,32 @@
     width: 3.75rem;
   }
 
+  .TimelineItem.is-archived button.TimelineItem-actionButton {
+    color: #bdbdbd !important;
+  }
+
   button.TimelineItem-actionButton:hover {
+    background-color: #9E9E9E;
+    border-color: #9E9E9E;
+    color: #ffffff;
+  }
+
+  button.TimelineItem-actionButton--print {
+    color: #00C853;
+  }
+
+  button.TimelineItem-actionButton--print:hover {
     background-color: #00C853;
     border-color: #00C853;
-    color: #ffffff;
+  }
+
+  button.TimelineItem-actionButton--archive {
+    color: #DD2C00;
+  }
+
+  button.TimelineItem-actionButton--archive:hover {
+    background-color: #DD2C00;
+    border-color: #DD2C00;
   }
 
   button.TimelineItem-actionButton span.material-icons {
@@ -207,103 +236,6 @@
 </script>
 
 <script>
-
-  class TimelineItem {
-
-    constructor(orderRef, autoInit) {
-
-      this.orderRef = orderRef;
-
-      this.element = document.createElement('div');
-
-      if (autoInit)
-        this.init();
-
-    }
-
-    init() {
-
-      this.build();
-
-      this.orderRef.on('value', snap => {
-        if (!snap.val())
-        {
-          this.element.classList.add('is-deleted');
-          console.log('aaaa :(');
-        }
-      })
-
-    }
-
-    build() {
-
-      this.element.className = 'TimelineItem';
-      this.element.dataset.orderRefKey = this.orderRef.key;
-
-      // content
-      this.element.content = document.createElement('div');
-      this.element.content.className = 'TimelineItem-content';
-      this.element.appendChild(this.element.content);
-
-      // actions
-      this.element.actions = document.createElement('div');
-      this.element.actions.className = 'TimelineItem-actions';
-      this.element.appendChild(this.element.actions);
-
-      this.element.content.consumerName = this.buildConsumerNameElement();
-      this.element.content.createdTime = this.buildCreatedTimeElement();
-      this.element.actions.printButton = this.buildPrintButtonElement();
-
-    }
-
-    buildConsumerNameElement() {
-
-      const element = document.createElement('div');
-      element.className = 'TimelineItem-consumerName';
-      this.element.content.appendChild(element);
-
-      element.span = document.createElement('span');
-      this.orderRef.child('consumerName').on('value', snap => element.span.innerHTML = snap.val());
-      element.appendChild(element.span);
-
-      return element;
-
-    }
-
-    buildCreatedTimeElement() {
-
-      const element = document.createElement('div');
-      element.className = 'TimelineItem-createdTime font-green';
-      this.element.content.appendChild(element);
-
-      element.span = document.createElement('span');
-      this.orderRef.child('createdTime').once('value', snap => {
-        element.span.innerHTML = moment(snap.val()).fromNow();
-        setInterval(() => element.span.innerHTML = moment(snap.val()).fromNow(), 10000);
-      });
-      element.appendChild(element.span);
-
-      return element;
-
-    }
-
-    buildPrintButtonElement() {
-
-      const element = document.createElement('button');
-      element.className = 'TimelineItem-actionButton TimelineItem-actionButton--print';
-      element.addEventListener('click', () => Order.print(this.orderRef, socket));
-      this.element.actions.appendChild(element);
-
-      element.icon = document.createElement('span');
-      element.icon.className = 'material-icons';
-      element.icon.innerHTML = 'print';
-      element.appendChild(element.icon);
-
-      return element;
-
-    }
-
-  }
 
 </script>
 

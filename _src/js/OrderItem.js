@@ -79,6 +79,8 @@ class OrderItem {
             "Marmita M": null,
             "Marmita G": null,
             "Marmita F": null,
+            "Porção Panqueca": null,
+            "Porção Panqueca G": null,
             "Feijoada Individual": null,
             "Feijoada Grande": null,
             "Feijoada Família": null,
@@ -111,6 +113,12 @@ class OrderItem {
                 break;
               case 'Marmita F':
                 self.updatePrice(14.00);
+                break;
+              case 'Porção Panqueca':
+                self.updatePrice(9.00);
+                break;
+              case 'Porção Panqueca G':
+                self.updatePrice(12.00);
                 break;
               case 'Feijoada Individual':
                 self.updatePrice(15.00);

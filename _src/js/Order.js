@@ -186,7 +186,8 @@ class Order {
 
     const orderRef = ordersRef.push({
       createdTime: createdTime,
-      delivery: false
+      delivery: false,
+      archived: false
     }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,
