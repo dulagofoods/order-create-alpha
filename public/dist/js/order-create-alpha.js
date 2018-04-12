@@ -571,7 +571,7 @@ class OrderApp {
     this.element.floatingActionButton = this.buildFloatingActionButton();
 
     if (window.innerWidth < 720)
-      this.element.toggle('is-timelineHidden');
+      this.element.classList.toggle('is-timelineHidden');
 
   }
 
