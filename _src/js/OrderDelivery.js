@@ -224,7 +224,7 @@ class OrderDelivery {
     }, 500);
     this.orderRef.child('address/street').on('value', snap => {
       element.input.value = snap.val();
-      console.log(snap.val());
+      // console.log(snap.val());
     });
     element.input.addEventListener('change', () => {
 
