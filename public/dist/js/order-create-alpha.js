@@ -1329,9 +1329,8 @@ class OrderItem {
               case 'Suco DeLVale Laranja':
                 self.updatePrice(3.00);
                 break;
-              default: {
+              default:
                 self.updatePrice(0.00);
-              }
             }
           }
         });
