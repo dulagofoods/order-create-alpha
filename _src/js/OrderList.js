@@ -1,9 +1,10 @@
 class OrderList {
 
-  constructor(ordersRef, ordersViewRef = null) {
+  constructor(ordersRef, ordersViewRef = null, optionalClass = '') {
 
     this.ordersRef = ordersRef;
     this.ordersViewRef = ordersViewRef;
+    this.optionalClass = optionalClass;
 
     this.element = document.createElement('div');
 
@@ -37,12 +38,18 @@ class OrderList {
   build() {
 
     this.element.className = 'OrderList';
+    this.element.classList.add(this.optionalClass);
+
+    // inner
+    this.element.inner = document.createElement('div');
+    this.element.inner.className = 'OrderList-inner';
+    this.element.appendChild(this.element.inner);
 
   }
 
   buildView(initializeOrders) {
 
-    this.element.innerHTML = '';
+    this.element.inner.innerHTML = '';
 
     const view = Object.values(this.orders);
 
@@ -71,6 +78,8 @@ class OrderList {
 
   pushOrder(orderRef, createdTime) {
 
+    console.log(createdTime);
+
     if (orderRef)
       this.orders[orderRef.key] = new Order(orderRef);
 
@@ -96,9 +105,9 @@ class OrderList {
   appendOrderToView(order, before) {
 
     if (before)
-      this.element.insertBefore(order.element, this.element.firstChild);
+      this.element.inner.insertBefore(order.element, this.element.inner.firstChild);
     else
-      this.element.appendChild(order.element);
+      this.element.inner.appendChild(order.element);
 
   }
 

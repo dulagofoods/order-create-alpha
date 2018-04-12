@@ -34,6 +34,49 @@
     width: 100%;
   }
 
+  .OrderApp-inner {
+    width: 100%;
+    padding-right: 360px;
+    /*padding-top: 56px;*/
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-transition: padding-right .6s;
+    -moz-transition: padding-right .6s;
+    -ms-transition: padding-right .6s;
+    -o-transition: padding-right .6s;
+    transition: padding-right .6s;
+    height: 100vh;
+  }
+
+  .OrderApp.is-timelineHidden .OrderApp-inner {
+    padding-right: 0;
+  }
+
+  @media (min-width: 601px) {
+
+    .OrderApp-inner {
+      padding-top: 64px;
+    }
+
+  }
+
+  .OrderApp-header {
+    width: 100%;
+    top: 0;
+  }
+
+  .OrderApp-header .nav-wrapper {
+    padding: 0 14px;
+  }
+  
+  @media (min-width: 601px) {
+
+    .OrderApp-header {
+      position: fixed;
+    }
+
+  }
+
   .OrderApp-actionButtons {
     display: -webkit-box;
     display: -moz-box;
@@ -48,11 +91,35 @@
     user-select: none;
   }
 
+  .OrderApp-actionButtons .fixed-action-btn {
+    right: auto;
+    padding-right: 23px;
+  }
+
+  .OrderApp-list {
+    margin: 0 auto;
+  }
+
+  .OrderApp-timeline {
+    padding-top: 64px;
+    position: fixed;
+    right: 0;
+    top: 0;
+    width: 360px;
+    -webkit-transition: transform .6s;
+    -moz-transition: transform .6s;
+    -ms-transition: transform .6s;
+    -o-transition: transform .6s;
+    transition: transform .6s;
+  }
+
+  .OrderApp.is-timelineHidden .OrderApp-timeline {
+    transform: translate3d(360px, 0, 0);
+  }
+
 </style>
 
 <body class="grey-200">
-
-<h1 class="header">Order App</h1>
 
 <div id="orderApp" class="OrderApp">
 

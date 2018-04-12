@@ -1,3 +1,15 @@
+html {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
 /* ajustes especificos para aumentar a area util em smartphones */
 @media (max-width: 800px) {
 
@@ -22,14 +34,6 @@
 
     .input-field.col label {
         left: .5rem;
-    }
-
-    button,
-    input,
-    optgroup,
-    select,
-    textarea {
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
     }
 
 }

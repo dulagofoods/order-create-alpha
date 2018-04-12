@@ -1,8 +1,9 @@
 class TimelineItem {
 
-  constructor(orderRef, autoInit) {
+  constructor(orderRef, orderList, autoInit = false) {
 
     this.orderRef = orderRef;
+    this.orderList = orderList;
 
     this.element = document.createElement('div');
 
@@ -16,7 +17,17 @@ class TimelineItem {
     this.build();
 
     this.orderRef.on('value', snap => {
-      if (!snap.val()) this.element.classList.add('is-deleted');
+
+      const self = this;
+
+      if (snap.val() === null) {
+        self.element.classList.add('is-deleting');
+        setTimeout(() => {
+          self.element.classList.remove('is-deleting');
+          self.element.classList.add('is-deleted');
+        }, 1300);
+      }
+
     });
 
     this.orderRef.child('archived').on('value', snap => {
@@ -25,6 +36,26 @@ class TimelineItem {
       else
         this.unarchive();
     });
+
+    this.element.content.addEventListener('click', event => {
+
+      let scrollType = !event.shiftKey ? 'smooth' : 'instant';
+
+      try {
+
+        let orderElement = this.orderList.orders[this.orderRef.key].element;
+
+        orderElement.scrollIntoView({
+          behavior: scrollType
+        });
+
+      } catch (e) {
+        console.log(e);
+      }
+
+    });
+
+    this.element.content.addEventListener('dblclick', event => console.log(event));
 
   }
 
@@ -57,7 +88,14 @@ class TimelineItem {
     this.element.content.appendChild(element);
 
     element.span = document.createElement('span');
-    this.orderRef.child('consumerName').on('value', snap => element.span.innerHTML = snap.val());
+    this.orderRef.child('consumerName').on('value', snap => {
+
+      if (snap.val() !== null)
+        element.span.innerHTML = snap.val();
+      else
+        setTimeout(() => element.span.innerHTML = snap.val(), 1300);
+
+    });
     element.appendChild(element.span);
 
     return element;

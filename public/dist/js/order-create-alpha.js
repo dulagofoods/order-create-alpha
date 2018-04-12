@@ -398,22 +398,39 @@ class Order {
 
     const element = document.createElement('span');
     element.className = 'Order-printStatus font-green';
-    element.delay = false;
+    element.updateInterval = false;
     this.orderRef.child('printouts').on('value', snap => {
 
-      let time = 1000;
+      if (snap.val()) {
 
-      if (element.delay) {
-        clearInterval(element.delay);
-        time = 5000;
+        let printouts = false;
+
+        if (!snap.val().printingTime)
+          printouts = Object.values(snap.val());
+
+        if (element.updateInterval)
+          clearInterval(element.updateInterval);
+
+        function updateText() {
+
+          if (printouts)
+            element.innerHTML = 'impresso' +
+              ' ' + moment(printouts[printouts.length - 1].printingTime).fromNow() +
+              ' (' + printouts.length +
+              ' vez' + (printouts.length > 1 ? 'es)' : ')');
+          else if (snap.val())
+            element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
+
+        }
+
+        setTimeout(() => updateText(), 10);
+        element.updateInterval = setInterval(() => updateText(), 5000);
+
+      } else if (element.updateInterval) {
+
+        clearInterval(element.updateInterval);
+
       }
-
-      element.delay = setInterval(() => {
-
-        if (snap.val())
-          element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
-
-      }, 5000);
 
     });
     this.element.contentElement.appendChild(element);
@@ -445,7 +462,7 @@ class Order {
         try {
           console.log('enviando dados para impressao via socket...');
           socket.emit('print order', snap.val());
-          orderRef.child('printouts').set({
+          orderRef.child('printouts').push({
             printingTime: moment().format()
           });
           console.log('impressão enviada');
@@ -464,6 +481,10 @@ class Order {
     let createdTime = moment().toISOString();
 
     const orderRef = ordersRef.push({
+      billing: {
+        priceAmount: 0.00,
+        priceAmountUnlocked: false
+      },
       createdTime: createdTime,
       delivery: false,
       archived: false
@@ -494,7 +515,8 @@ class OrderApp {
     this.ordersRef = this.databaseRef.ref('orders');
     this.ordersViewsRef = this.databaseRef.ref('ordersViews');
 
-    this.orderList = new OrderList(this.ordersRef);
+    this.orderList = new OrderList(this.ordersRef, false, 'OrderApp-list');
+    this.orderTimeline = new Timeline(this.ordersRef, false, this.orderList, 'OrderApp-timeline');
 
     this.activeOrderKey = false;
 
@@ -506,14 +528,21 @@ class OrderApp {
 
     this.build();
 
-    let ordersViewKey = moment().format('YYYY-MM-DD');
-    this.orderList.ordersViewRef = this.ordersViewsRef.child(ordersViewKey);
+    // get ordersView child key
+    this.activeOrdersViewRef = this.ordersViewsRef.child(moment().format('YYYY-MM-DD'));
+
+    // init orderList
+    this.orderList.ordersViewRef = this.activeOrdersViewRef;
     this.orderList.init();
+
+    // init timeline
+    this.orderTimeline.ordersViewRef = this.activeOrdersViewRef;
+    this.orderTimeline.init();
 
     this.orderList.ordersViewRef.on('child_added', snap => {
 
       if (this.activeOrderKey === snap.key)
-          this.orderList.orders[snap.key].focus();
+        this.orderList.orders[snap.key].focus();
 
     });
 
@@ -530,13 +559,54 @@ class OrderApp {
     this.element.inner.className = 'OrderApp-inner';
     this.element.append(this.element.inner);
 
+    this.element.header = this.buildHeaderElement();
+
     this.element.inner.appendChild(this.orderList.element);
+    this.element.inner.appendChild(this.orderTimeline.element);
 
     this.actionButtons = document.createElement('div');
     this.actionButtons.className = 'OrderApp-actionButtons';
     this.element.inner.append(this.actionButtons);
 
-    this.floatingActionButton = this.buildFloatingActionButton();
+    this.element.floatingActionButton = this.buildFloatingActionButton();
+
+  }
+
+  buildHeaderElement() {
+
+    const element = document.createElement('header');
+    element.className = 'OrderApp-header navbar-fixed';
+    this.element.inner.appendChild(element);
+
+    element.nav = document.createElement('nav');
+    element.nav.className = 'grey darken-4';
+    element.appendChild(element.nav);
+
+    element.nav.wrapper = document.createElement('div');
+    element.nav.wrapper.className = 'nav-wrapper';
+    element.nav.appendChild(element.nav.wrapper);
+
+    element.nav.brandLogo = document.createElement('a');
+    element.nav.brandLogo.className = 'brand-logo';
+    element.nav.brandLogo.innerHTML = 'Du Lago App';
+    element.nav.wrapper.appendChild(element.nav.brandLogo);
+
+    element.nav.timelineTrigger = document.createElement('a');
+    element.nav.timelineTrigger.className = 'sidenav-trigger';
+    element.nav.timelineTrigger.style.float = 'right';
+    element.nav.timelineTrigger.style.display = 'block';
+    element.nav.timelineTrigger.href = '#';
+    element.nav.timelineTrigger.innerHTML = '<i class="material-icons">view list</i>';
+    element.nav.timelineTrigger.addEventListener('click', event => {
+
+      event.preventDefault();
+
+      this.element.classList.toggle('is-timelineHidden');
+
+    });
+    element.nav.wrapper.appendChild(element.nav.timelineTrigger);
+
+    return element;
 
   }
 
@@ -569,7 +639,7 @@ class OrderApp {
 
     const order = Order.create(this.ordersRef);
     this.activeOrderKey = order.key;
-    order.once('value', snap => this.orderList.addOrder(order, snap.val().createdTime));
+    order.once('value', snap => this.activeOrdersViewRef.child(order.key).set(snap.val().createdTime));
 
     try {
 
@@ -903,6 +973,7 @@ class OrderDelivery {
             "R Mauricio Antônio Ribeiro": "/dist/images/districts/L.png",
             "R Irma Domingas Anna Pitchuk": "/dist/images/districts/L.png",
             "R José Manoel Ramos": "/dist/images/districts/L.png",
+            "R Idalino Cipriano Carneiro": "/dist/images/districts/L.png",
 
             // N
             "R Estevan Leite de Negreiros": "/dist/images/districts/N.png",
@@ -930,11 +1001,16 @@ class OrderDelivery {
             "R Antonio Alvares Torres": "/dist/images/districts/N.png",
             "R Projetada I": "/dist/images/districts/N.png",
             "R Gregorio Magalhães Trindade": "/dist/images/districts/N.png",
+            "R Antonio Ranazzi Bentivenha": "/dist/images/districts/N.png",
+            "R Francisco Gomes Nogueira": "/dist/images/districts/N.png",
 
             // O
             "R Antonio Rossi": "/dist/images/districts/O.png",
             "R Nair Galvao Cioff": "/dist/images/districts/O.png",
             "R João Vilar Garcia": "/dist/images/districts/O.png",
+            "R Celso Marcondes": "/dist/images/districts/O.png",
+            "R Antonio Orozimbo da Silva": "/dist/images/districts/O.png",
+            "R José Carvalho da Silva": "/dist/images/districts/O.png",
             "Colegio Sesi": "/dist/images/districts/O.png",
 
             // S
@@ -949,6 +1025,7 @@ class OrderDelivery {
             "R Vereador Vicente Rodrigues de Matos": "/dist/images/districts/S.png",
             "Av João da Silva Cravo": "/dist/images/districts/S.png",
             "Av das Torres": "/dist/images/districts/S.png",
+            "R Pedro Tiago de Almeida": "/dist/images/districts/S.png",
 
             "": null,
           },
@@ -965,7 +1042,7 @@ class OrderDelivery {
     }, 500);
     this.orderRef.child('address/street').on('value', snap => {
       element.input.value = snap.val();
-      // console.log(snap.val());
+      console.log(snap.val());
     });
     element.input.addEventListener('change', () => {
 
@@ -1074,6 +1151,7 @@ class OrderDelivery {
             "Conj Jardim Yara (SUL)": null,
             "Jardim Morumbi (SUL)": null,
             "Conj Berto Meneghel (SUL)": null,
+            "Jd Alphaville (SUL)": null,
             "Conj Pombal I (SUL)": null,
             "Conj Pombal II (SUL)": null,
             "Vila São Geraldo (SUL)": null,
@@ -1680,10 +1758,11 @@ class OrderItemList {
 }
 class OrderList {
 
-  constructor(ordersRef, ordersViewRef = null) {
+  constructor(ordersRef, ordersViewRef = null, optionalClass = '') {
 
     this.ordersRef = ordersRef;
     this.ordersViewRef = ordersViewRef;
+    this.optionalClass = optionalClass;
 
     this.element = document.createElement('div');
 
@@ -1717,12 +1796,18 @@ class OrderList {
   build() {
 
     this.element.className = 'OrderList';
+    this.element.classList.add(this.optionalClass);
+
+    // inner
+    this.element.inner = document.createElement('div');
+    this.element.inner.className = 'OrderList-inner';
+    this.element.appendChild(this.element.inner);
 
   }
 
   buildView(initializeOrders) {
 
-    this.element.innerHTML = '';
+    this.element.inner.innerHTML = '';
 
     const view = Object.values(this.orders);
 
@@ -1751,6 +1836,8 @@ class OrderList {
 
   pushOrder(orderRef, createdTime) {
 
+    console.log(createdTime);
+
     if (orderRef)
       this.orders[orderRef.key] = new Order(orderRef);
 
@@ -1776,9 +1863,9 @@ class OrderList {
   appendOrderToView(order, before) {
 
     if (before)
-      this.element.insertBefore(order.element, this.element.firstChild);
+      this.element.inner.insertBefore(order.element, this.element.inner.firstChild);
     else
-      this.element.appendChild(order.element);
+      this.element.inner.appendChild(order.element);
 
   }
 
@@ -2341,6 +2428,11 @@ class OrderPriceAmount {
 
     element.label = document.createElement('label');
     element.label.className = 'active';
+    this.orderBillingRef.child('priceAmount').on('value', snap => {
+
+      element.label.className = snap.val() !== null ? 'active' : '';
+
+    });
     element.label.innerHTML = 'Total';
     element.label.htmlFor = element.input.id;
     element.appendChild(element.label);
@@ -2495,12 +2587,58 @@ class OrdersGridItem extends GridItem {
   }
 
 }
+class Timeline {
 
+  constructor(ordersRef, ordersViewRef = null, orderList = false, optionalClass = '') {
+
+    this.ordersRef = ordersRef;
+    this.ordersViewRef = ordersViewRef;
+    this.orderList = orderList;
+    this.optionalClass = optionalClass;
+
+    this.element = document.createElement('div');
+
+    if (this.ordersRef && this.ordersViewRef)
+      this.init();
+
+  }
+
+  init() {
+
+    this.build();
+
+    this.ordersViewRef.orderByChild('createdTime').on('child_added', snap => {
+
+      const timelineItem = new TimelineItem(this.ordersRef.child(snap.key), this.orderList, false);
+      this.element.inner.insertBefore(timelineItem.element, this.element.inner.firstChild);
+      timelineItem.init();
+
+    });
+
+  }
+
+  build() {
+
+    this.element.className = 'Timeline';
+    this.element.classList.add(this.optionalClass);
+
+    this.element.inner = document.createElement('div');
+    this.element.inner.className = 'Timeline-inner';
+    this.element.appendChild(this.element.inner);
+
+    this.element.footer = document.createElement('div');
+    this.element.footer.className = 'Timeline-footer';
+    this.element.appendChild(this.element.footer);
+
+  }
+
+}
 class TimelineItem {
 
-  constructor(orderRef, autoInit) {
+  constructor(orderRef, orderList, autoInit = false) {
 
     this.orderRef = orderRef;
+    this.orderList = orderList;
 
     this.element = document.createElement('div');
 
@@ -2514,7 +2652,17 @@ class TimelineItem {
     this.build();
 
     this.orderRef.on('value', snap => {
-      if (!snap.val()) this.element.classList.add('is-deleted');
+
+      const self = this;
+
+      if (snap.val() === null) {
+        self.element.classList.add('is-deleting');
+        setTimeout(() => {
+          self.element.classList.remove('is-deleting');
+          self.element.classList.add('is-deleted');
+        }, 1300);
+      }
+
     });
 
     this.orderRef.child('archived').on('value', snap => {
@@ -2523,6 +2671,26 @@ class TimelineItem {
       else
         this.unarchive();
     });
+
+    this.element.content.addEventListener('click', event => {
+
+      let scrollType = !event.shiftKey ? 'smooth' : 'instant';
+
+      try {
+
+        let orderElement = this.orderList.orders[this.orderRef.key].element;
+
+        orderElement.scrollIntoView({
+          behavior: scrollType
+        });
+
+      } catch (e) {
+        console.log(e);
+      }
+
+    });
+
+    this.element.content.addEventListener('dblclick', event => console.log(event));
 
   }
 
@@ -2555,7 +2723,14 @@ class TimelineItem {
     this.element.content.appendChild(element);
 
     element.span = document.createElement('span');
-    this.orderRef.child('consumerName').on('value', snap => element.span.innerHTML = snap.val());
+    this.orderRef.child('consumerName').on('value', snap => {
+
+      if (snap.val() !== null)
+        element.span.innerHTML = snap.val();
+      else
+        setTimeout(() => element.span.innerHTML = snap.val(), 1300);
+
+    });
     element.appendChild(element.span);
 
     return element;

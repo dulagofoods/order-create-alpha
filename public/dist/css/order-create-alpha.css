@@ -9,6 +9,7 @@
   flex-flow: column;
   margin-bottom: 1em;
   width: 100%;
+  max-width: 500px;
 }
 
 .Order button,
@@ -168,6 +169,17 @@
 }
 
 .OrderList {
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+.OrderList-inner {
+  -webkit-align-items: center;
+  align-items: center;
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;
@@ -175,17 +187,7 @@
   display: flex;
   -webkit-flex-flow: column;
   flex-flow: column;
-  height: 100%;
   padding: 1rem;
-  position: relative;
-  width: 100%;
-  max-width: 600px;
-}
-
-@media (min-width: 1200px) {
-  .OrderList {
-    max-width: 960px;
-  }
 }
 .OrderPaymentItem {
   -webkit-align-items: center;
@@ -232,11 +234,191 @@
 .OrderPriceAmount input {
   font-weight: 700;
 }
+.Timeline {
+  background-color: #e0e0e0;
+  border-left: 1px solid #bdbdbd;
+  display: block;
+  overflow-x: hidden;
+  overflow-y: auto;
+  height: 100%;
+}
+
+.Timeline-inner {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column;
+  flex-flow: column;
+  position: relative;
+  width: 100%;
+}
+.TimelineItem {
+  background-color: #fafafa;
+  border-bottom: solid 1px #eeeeee;
+  color: #212121;
+  cursor: default;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row;
+  flex-flow: row;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  -webkit-transition: all .3s ease-in-out, opacity .6s ease-out .8s;
+  -moz-transition: all .3s ease-in-out, opacity .6s ease-out .8s;
+  -ms-transition: all .3s ease-in-out, opacity .6s ease-out .8s;
+  -o-transition: all .3s ease-in-out, opacity .6s ease-out .8s;
+  transition: all .3s ease-in-out, opacity .6s ease-out .8s;
+  width: 100%;
+  height: 60px;
+}
+
+.TimelineItem:hover {
+  background-color: #fafafa;
+}
+
+.TimelineItem:last-of-type {
+  border-bottom: none;
+}
+
+.TimelineItem.is-deleting {
+  background-color: #EF5350;
+  opacity: 0;
+}
+
+.TimelineItem.is-deleting * {
+  color: #ffffff !important;
+}
+
+.TimelineItem.is-deleted {
+  display: none;
+}
+
+.TimelineItem.is-archived {
+  background-color: #212121;
+  border-color: #212121;
+  color: #bdbdbd;
+}
+
+.TimelineItem.is-archived:hover {
+  background-color: #000000;
+  border-color: #000000;
+}
+
+.TimelineItem-actions {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: row nowrap;
+  flex-flow: row nowrap;
+}
+
+.TimelineItem-content {
+  -webkit-align-items: flex-start;
+  align-items: flex-start;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column;
+  flex-flow: column;
+  -webkit-justify-content: center;
+  justify-content: center;
+  max-width: 140px;
+  overflow: hidden;
+  padding: 0 .5rem;
+  width: 100%;
+}
+
+.TimelineItem-consumerName span {
+  font-weight: 700;
+  font-size: 1rem;
+  white-space: nowrap;
+}
+
+.TimelineItem-createdTime span {
+  font-size: .75rem;
+}
+
+button.TimelineItem-actionButton {
+  background-color: transparent;
+  border: none;
+  /*border-left: solid 1px #eeeeee;*/
+  color: #9E9E9E;
+  cursor: pointer;
+  height: 60px;
+  -webkit-transition: all .3s ease-in-out;
+  -moz-transition: all .3s ease-in-out;
+  -ms-transition: all .3s ease-in-out;
+  -o-transition: all .3s ease-in-out;
+  transition: all .3s ease-in-out;
+  width: 60px;
+}
+
+.TimelineItem.is-archived button.TimelineItem-actionButton {
+  color: #bdbdbd;
+}
+
+.TimelineItem.is-archived button.TimelineItem-actionButton:hover {
+  color: #ffffff;
+}
+
+button.TimelineItem-actionButton:hover {
+  background-color: #9E9E9E;
+  border-color: #9E9E9E;
+  color: #ffffff;
+}
+
+button.TimelineItem-actionButton--print {
+  color: #00C853;
+}
+
+button.TimelineItem-actionButton--print:hover {
+  background-color: #00C853;
+  border-color: #00C853;
+}
+
+button.TimelineItem-actionButton--archive {
+  color: #FFAB00;
+}
+
+button.TimelineItem-actionButton--archive:hover {
+  background-color: #FFAB00;
+  border-color: #FFAB00;
+}
+
+button.TimelineItem-actionButton span.material-icons {
+  font-size: 1.3125rem;
+}
 /*!
  * Du Lago {ProjectName} Project v0.0.0 (http://elbit.com.br/)
  * Copyright 2013-2018 Elbit Developers
  * Licensed under MIT (https://github.com/elbitdigital/base/blob/master/LICENSE)
 */
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+}
+
 /* ajustes especificos para aumentar a area util em smartphones */
 
 @media (max-width: 800px) {
@@ -261,13 +443,5 @@
 
   .input-field.col label {
     left: .5rem;
-  }
-
-  button,
-  input,
-  optgroup,
-  select,
-  textarea {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
   }
 }

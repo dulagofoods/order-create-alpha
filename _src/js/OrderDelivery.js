@@ -155,6 +155,7 @@ class OrderDelivery {
             "R Mauricio Antônio Ribeiro": "/dist/images/districts/L.png",
             "R Irma Domingas Anna Pitchuk": "/dist/images/districts/L.png",
             "R José Manoel Ramos": "/dist/images/districts/L.png",
+            "R Idalino Cipriano Carneiro": "/dist/images/districts/L.png",
 
             // N
             "R Estevan Leite de Negreiros": "/dist/images/districts/N.png",
@@ -182,11 +183,16 @@ class OrderDelivery {
             "R Antonio Alvares Torres": "/dist/images/districts/N.png",
             "R Projetada I": "/dist/images/districts/N.png",
             "R Gregorio Magalhães Trindade": "/dist/images/districts/N.png",
+            "R Antonio Ranazzi Bentivenha": "/dist/images/districts/N.png",
+            "R Francisco Gomes Nogueira": "/dist/images/districts/N.png",
 
             // O
             "R Antonio Rossi": "/dist/images/districts/O.png",
             "R Nair Galvao Cioff": "/dist/images/districts/O.png",
             "R João Vilar Garcia": "/dist/images/districts/O.png",
+            "R Celso Marcondes": "/dist/images/districts/O.png",
+            "R Antonio Orozimbo da Silva": "/dist/images/districts/O.png",
+            "R José Carvalho da Silva": "/dist/images/districts/O.png",
             "Colegio Sesi": "/dist/images/districts/O.png",
 
             // S
@@ -201,6 +207,7 @@ class OrderDelivery {
             "R Vereador Vicente Rodrigues de Matos": "/dist/images/districts/S.png",
             "Av João da Silva Cravo": "/dist/images/districts/S.png",
             "Av das Torres": "/dist/images/districts/S.png",
+            "R Pedro Tiago de Almeida": "/dist/images/districts/S.png",
 
             "": null,
           },
@@ -217,7 +224,7 @@ class OrderDelivery {
     }, 500);
     this.orderRef.child('address/street').on('value', snap => {
       element.input.value = snap.val();
-      // console.log(snap.val());
+      console.log(snap.val());
     });
     element.input.addEventListener('change', () => {
 
@@ -326,6 +333,7 @@ class OrderDelivery {
             "Conj Jardim Yara (SUL)": null,
             "Jardim Morumbi (SUL)": null,
             "Conj Berto Meneghel (SUL)": null,
+            "Jd Alphaville (SUL)": null,
             "Conj Pombal I (SUL)": null,
             "Conj Pombal II (SUL)": null,
             "Vila São Geraldo (SUL)": null,

@@ -119,22 +119,39 @@ class Order {
 
     const element = document.createElement('span');
     element.className = 'Order-printStatus font-green';
-    element.delay = false;
+    element.updateInterval = false;
     this.orderRef.child('printouts').on('value', snap => {
 
-      let time = 1000;
+      if (snap.val()) {
 
-      if (element.delay) {
-        clearInterval(element.delay);
-        time = 5000;
+        let printouts = false;
+
+        if (!snap.val().printingTime)
+          printouts = Object.values(snap.val());
+
+        if (element.updateInterval)
+          clearInterval(element.updateInterval);
+
+        function updateText() {
+
+          if (printouts)
+            element.innerHTML = 'impresso' +
+              ' ' + moment(printouts[printouts.length - 1].printingTime).fromNow() +
+              ' (' + printouts.length +
+              ' vez' + (printouts.length > 1 ? 'es)' : ')');
+          else if (snap.val())
+            element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
+
+        }
+
+        setTimeout(() => updateText(), 10);
+        element.updateInterval = setInterval(() => updateText(), 5000);
+
+      } else if (element.updateInterval) {
+
+        clearInterval(element.updateInterval);
+
       }
-
-      element.delay = setInterval(() => {
-
-        if (snap.val())
-          element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
-
-      }, 5000);
 
     });
     this.element.contentElement.appendChild(element);
@@ -166,7 +183,7 @@ class Order {
         try {
           console.log('enviando dados para impressao via socket...');
           socket.emit('print order', snap.val());
-          orderRef.child('printouts').set({
+          orderRef.child('printouts').push({
             printingTime: moment().format()
           });
           console.log('impressão enviada');
@@ -185,6 +202,10 @@ class Order {
     let createdTime = moment().toISOString();
 
     const orderRef = ordersRef.push({
+      billing: {
+        priceAmount: 0.00,
+        priceAmountUnlocked: false
+      },
       createdTime: createdTime,
       delivery: false,
       archived: false

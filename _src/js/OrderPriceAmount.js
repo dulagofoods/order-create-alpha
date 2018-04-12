@@ -97,6 +97,11 @@ class OrderPriceAmount {
 
     element.label = document.createElement('label');
     element.label.className = 'active';
+    this.orderBillingRef.child('priceAmount').on('value', snap => {
+
+      element.label.className = snap.val() !== null ? 'active' : '';
+
+    });
     element.label.innerHTML = 'Total';
     element.label.htmlFor = element.input.id;
     element.appendChild(element.label);

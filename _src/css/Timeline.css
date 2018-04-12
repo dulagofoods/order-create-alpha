@@ -1,15 +1,13 @@
-.OrderList {
+.Timeline {
+    background-color: #e0e0e0;
+    border-left: 1px solid #bdbdbd;
     display: block;
     overflow-x: hidden;
     overflow-y: auto;
-    position: relative;
     height: 100%;
-    width: 100%;
 }
 
-.OrderList-inner {
-    -webkit-align-items: center;
-    align-items: center;
+.Timeline-inner {
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
@@ -17,5 +15,6 @@
     display: flex;
     -webkit-flex-flow: column;
     flex-flow: column;
-    padding: 1rem;
+    position: relative;
+    width: 100%;
 }
