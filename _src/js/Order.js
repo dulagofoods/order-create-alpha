@@ -193,7 +193,7 @@ class Order {
 
   }
 
-  static create(ordersRef, options = {}) {
+  static create(ordersRef, ordersViewRef = false, options = {}) {
 
     let createdTime = moment().toISOString();
 
@@ -221,6 +221,11 @@ class Order {
       referenceValue: 0.00
     });
 
+    if (ordersViewRef)
+      setTimeout(() => ordersViewRef.child(orderRef.key).set({
+        createdTime: createdTime
+      }), 1);
+
     if (options.customer) {
 
       let customerData = options.customer.data;
@@ -230,10 +235,10 @@ class Order {
         customerContact: customerData.customerContact,
       });
 
-      orderRef.child('delivery').set(true);
-
-      if (customerData.defaultAddress)
+      if (customerData.defaultAddress) {
+        orderRef.child('delivery').set(true);
         orderRef.child('address').set(customerData.defaultAddress);
+      }
 
     }
 

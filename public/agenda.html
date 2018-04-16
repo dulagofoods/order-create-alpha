@@ -148,7 +148,7 @@
       this.element.className = 'Customer';
       this.element.dataset.customerRefKey = this.customerRef.key;
       this.element.addEventListener('click', () => {
-        let order = Order.create(ordersRef, {customer: this});
+        let order = Order.create(ordersRef, false, {customer: this});
         console.log(order.key);
         activeOrdersViewRef.child(order.key).set({
           createdTime: moment().format()

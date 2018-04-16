@@ -472,7 +472,7 @@ class Order {
 
   }
 
-  static create(ordersRef, options = {}) {
+  static create(ordersRef, ordersViewRef = false, options = {}) {
 
     let createdTime = moment().toISOString();
 
@@ -500,6 +500,11 @@ class Order {
       referenceValue: 0.00
     });
 
+    if (ordersViewRef)
+      setTimeout(() => ordersViewRef.child(orderRef.key).set({
+        createdTime: createdTime
+      }), 1);
+
     if (options.customer) {
 
       let customerData = options.customer.data;
@@ -509,10 +514,10 @@ class Order {
         customerContact: customerData.customerContact,
       });
 
-      orderRef.child('delivery').set(true);
-
-      if (customerData.defaultAddress)
+      if (customerData.defaultAddress) {
+        orderRef.child('delivery').set(true);
         orderRef.child('address').set(customerData.defaultAddress);
+      }
 
     }
 
@@ -565,16 +570,19 @@ class OrderApp {
     this.orderList.ordersViewRef.on('child_added', snap => {
 
       if (this.activeOrderKey === snap.key)
-      {
-        console.log(this.orderList.orders[snap.key].element.className);
         this.orderList.orders[snap.key].focus();
-      }
 
     });
 
     window.addEventListener('keydown', event => {
-      if (event.keyCode === 113 && event.shiftKey)
+      if (event.keyCode === 113 && event.shiftKey) {
+        // shift + f2
         this.addNewOrderToList();
+      } else if (event.keyCode === 114 && event.shiftKey) {
+        // shift + f3
+        event.preventDefault();
+        console.log('pesquisando...');
+      }
     });
 
   }
@@ -666,13 +674,7 @@ class OrderApp {
 
   addNewOrderToList() {
 
-    const order = Order.create(this.ordersRef);
-    this.activeOrderKey = order.key;
-    order.once('value', snap => {
-      this.activeOrdersViewRef.child(order.key).set({
-        createdTime: snap.val().createdTime
-      });
-    });
+    this.activeOrderKey = Order.create(this.ordersRef, this.activeOrdersViewRef).key;
 
     try {
 
