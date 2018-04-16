@@ -1,4 +1,4 @@
-class OrderConsumer {
+class OrderCustomer {
 
   constructor(orderRef) {
 
@@ -12,39 +12,40 @@ class OrderConsumer {
 
   build() {
 
-    this.element.className = 'OrderConsumer row';
+    this.element.className = 'OrderCustomer row';
 
-    this.element.consumerName = this.buildConsumerNameFieldElement();
+    this.element.customerName = this.buildCustomerNameFieldElement();
     this.element.deliveryTime = this.buildDeliveryTimeFieldElement();
 
   }
 
-  buildConsumerNameFieldElement() {
+  buildCustomerNameFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderConsumer-consumerNameField input-field col s8';
+    element.className = 'OrderCustomer-customerNameField input-field col s8';
     this.element.appendChild(element);
 
     // input
     element.input = document.createElement('input');
     element.input.className = 'validate';
-    element.input.id = this.orderRef.key + '-consumerName';
+    element.input.id = this.orderRef.key + '-customerName';
     element.input.type = 'text';
     element.input.addEventListener('input', () => {
 
-      this.orderRef.child('consumerName').set(element.input.value);
+      this.orderRef.child('customerName').set(element.input.value);
 
     });
-    this.orderRef.child('consumerName').on('value', snap => {
+    this.orderRef.child('customerName').on('value', snap => {
 
-      element.input.value = snap.val();
+      if (snap.val() !== element.input.value)
+        element.input.value = snap.val();
 
     });
     element.appendChild(element.input);
 
     // label
     element.label = document.createElement('label');
-    this.orderRef.child('consumerName').on('value', snap => {
+    this.orderRef.child('customerName').on('value', snap => {
       if (snap.val()) element.label.classList = 'active';
     });
     element.label.htmlFor = element.input.id;
@@ -65,12 +66,12 @@ class OrderConsumer {
       newTime = moment().add(20, 'minutes').format('hh:mm');
 
     const element = document.createElement('div');
-    element.className = 'OrderConsumer-deliveryTime input-field col s4';
+    element.className = 'OrderCustomer-deliveryTime input-field col s4';
     this.element.appendChild(element);
 
     // input
     element.input = document.createElement('input');
-    element.input.id = this.orderRef.key + '-consumerName';
+    element.input.id = this.orderRef.key + '-customerName';
     element.input.type = 'time';
     element.input.step = '300';
     element.input.addEventListener('focus', () => {
@@ -119,7 +120,7 @@ class OrderConsumer {
   focus() {
 
     try {
-      this.element.consumerName.input.focus();
+      this.element.customerName.input.focus();
     } catch (e) {
       console.log(e);
     }

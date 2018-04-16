@@ -298,7 +298,7 @@ class Order {
 
   init() {
 
-    this.consumer = new OrderConsumer(this.orderRef);
+    this.customer = new OrderCustomer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
     this.billing = new OrderBilling(this.orderRef);
     this.delivery = new OrderDelivery(this.orderRef);
@@ -319,7 +319,7 @@ class Order {
       } else {
 
         // this.data = {
-        //   consumerName: data.consumerName
+        //   customerName: data.customerName
         // }
 
       }
@@ -337,7 +337,7 @@ class Order {
     this.element.contentElement.className = 'Order-inner card-content';
     this.element.appendChild(this.element.contentElement);
 
-    this.element.contentElement.appendChild(this.consumer.element);
+    this.element.contentElement.appendChild(this.customer.element);
     this.element.contentElement.appendChild(this.items.element);
     this.element.contentElement.appendChild(this.billing.element);
     this.element.contentElement.appendChild(this.delivery.element);
@@ -441,13 +441,13 @@ class Order {
 
   focus() {
 
-    this.consumer.focus();
+    this.customer.focus();
 
   }
 
   delete() {
 
-    this.orderRef.set(null);
+    this.orderRef.child('deleted').set(moment().format());
 
   }
 
@@ -487,7 +487,8 @@ class Order {
       },
       createdTime: createdTime,
       delivery: false,
-      archived: false
+      archived: false,
+      deleted: false
     }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,
@@ -690,7 +691,7 @@ class OrderBilling {
   }
 
 }
-class OrderConsumer {
+class OrderCustomer {
 
   constructor(orderRef) {
 
@@ -704,39 +705,40 @@ class OrderConsumer {
 
   build() {
 
-    this.element.className = 'OrderConsumer row';
+    this.element.className = 'OrderCustomer row';
 
-    this.element.consumerName = this.buildConsumerNameFieldElement();
+    this.element.customerName = this.buildCustomerNameFieldElement();
     this.element.deliveryTime = this.buildDeliveryTimeFieldElement();
 
   }
 
-  buildConsumerNameFieldElement() {
+  buildCustomerNameFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderConsumer-consumerNameField input-field col s8';
+    element.className = 'OrderCustomer-customerNameField input-field col s8';
     this.element.appendChild(element);
 
     // input
     element.input = document.createElement('input');
     element.input.className = 'validate';
-    element.input.id = this.orderRef.key + '-consumerName';
+    element.input.id = this.orderRef.key + '-customerName';
     element.input.type = 'text';
     element.input.addEventListener('input', () => {
 
-      this.orderRef.child('consumerName').set(element.input.value);
+      this.orderRef.child('customerName').set(element.input.value);
 
     });
-    this.orderRef.child('consumerName').on('value', snap => {
+    this.orderRef.child('customerName').on('value', snap => {
 
-      element.input.value = snap.val();
+      if (snap.val() !== element.input.value)
+        element.input.value = snap.val();
 
     });
     element.appendChild(element.input);
 
     // label
     element.label = document.createElement('label');
-    this.orderRef.child('consumerName').on('value', snap => {
+    this.orderRef.child('customerName').on('value', snap => {
       if (snap.val()) element.label.classList = 'active';
     });
     element.label.htmlFor = element.input.id;
@@ -757,12 +759,12 @@ class OrderConsumer {
       newTime = moment().add(20, 'minutes').format('hh:mm');
 
     const element = document.createElement('div');
-    element.className = 'OrderConsumer-deliveryTime input-field col s4';
+    element.className = 'OrderCustomer-deliveryTime input-field col s4';
     this.element.appendChild(element);
 
     // input
     element.input = document.createElement('input');
-    element.input.id = this.orderRef.key + '-consumerName';
+    element.input.id = this.orderRef.key + '-customerName';
     element.input.type = 'time';
     element.input.step = '300';
     element.input.addEventListener('focus', () => {
@@ -811,7 +813,7 @@ class OrderConsumer {
   focus() {
 
     try {
-      this.element.consumerName.input.focus();
+      this.element.customerName.input.focus();
     } catch (e) {
       console.log(e);
     }
@@ -1045,7 +1047,7 @@ class OrderDelivery {
     }, 500);
     this.orderRef.child('address/street').on('value', snap => {
       element.input.value = snap.val();
-      console.log(snap.val());
+      // console.log(snap.val());
     });
     element.input.addEventListener('change', () => {
 
@@ -1838,8 +1840,6 @@ class OrderList {
   }
 
   pushOrder(orderRef, createdTime) {
-
-    console.log(createdTime);
 
     if (orderRef)
       this.orders[orderRef.key] = new Order(orderRef);
@@ -2658,7 +2658,7 @@ class TimelineItem {
 
       const self = this;
 
-      if (snap.val() === null) {
+      if (snap.val().isDeleted) {
         self.element.classList.add('is-deleting');
         setTimeout(() => {
           self.element.classList.remove('is-deleting');
@@ -2712,28 +2712,21 @@ class TimelineItem {
     this.element.actions.className = 'TimelineItem-actions';
     this.element.appendChild(this.element.actions);
 
-    this.element.content.consumerName = this.buildConsumerNameElement();
+    this.element.content.customerName = this.buildCustomerNameElement();
     this.element.content.createdTime = this.buildCreatedTimeElement();
     this.element.actions.printButton = this.buildPrintButtonElement();
     this.element.actions.deleteButton = this.buildArchiveButtonElement();
 
   }
 
-  buildConsumerNameElement() {
+  buildCustomerNameElement() {
 
     const element = document.createElement('div');
-    element.className = 'TimelineItem-consumerName';
+    element.className = 'TimelineItem-customerName';
     this.element.content.appendChild(element);
 
     element.span = document.createElement('span');
-    this.orderRef.child('consumerName').on('value', snap => {
-
-      if (snap.val() !== null)
-        element.span.innerHTML = snap.val();
-      else
-        setTimeout(() => element.span.innerHTML = snap.val(), 1300);
-
-    });
+    this.orderRef.child('customerName').on('value', snap => element.span.innerHTML = snap.val());
     element.appendChild(element.span);
 
     return element;

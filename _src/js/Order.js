@@ -19,7 +19,7 @@ class Order {
 
   init() {
 
-    this.consumer = new OrderConsumer(this.orderRef);
+    this.customer = new OrderCustomer(this.orderRef);
     this.items = new OrderItemList(this.orderRef);
     this.billing = new OrderBilling(this.orderRef);
     this.delivery = new OrderDelivery(this.orderRef);
@@ -40,7 +40,7 @@ class Order {
       } else {
 
         // this.data = {
-        //   consumerName: data.consumerName
+        //   customerName: data.customerName
         // }
 
       }
@@ -58,7 +58,7 @@ class Order {
     this.element.contentElement.className = 'Order-inner card-content';
     this.element.appendChild(this.element.contentElement);
 
-    this.element.contentElement.appendChild(this.consumer.element);
+    this.element.contentElement.appendChild(this.customer.element);
     this.element.contentElement.appendChild(this.items.element);
     this.element.contentElement.appendChild(this.billing.element);
     this.element.contentElement.appendChild(this.delivery.element);
@@ -162,13 +162,13 @@ class Order {
 
   focus() {
 
-    this.consumer.focus();
+    this.customer.focus();
 
   }
 
   delete() {
 
-    this.orderRef.set(null);
+    this.orderRef.child('deleted').set(moment().format());
 
   }
 
@@ -208,7 +208,8 @@ class Order {
       },
       createdTime: createdTime,
       delivery: false,
-      archived: false
+      archived: false,
+      deleted: false
     }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,

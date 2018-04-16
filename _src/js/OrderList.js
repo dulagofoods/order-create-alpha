@@ -78,8 +78,6 @@ class OrderList {
 
   pushOrder(orderRef, createdTime) {
 
-    console.log(createdTime);
-
     if (orderRef)
       this.orders[orderRef.key] = new Order(orderRef);
 

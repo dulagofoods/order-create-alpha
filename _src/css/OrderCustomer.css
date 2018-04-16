@@ -1,0 +1,7 @@
+.OrderCustomer {
+    width: 100%;
+}
+
+.OrderCustomer-customerNameField input {
+    font-weight: 700;
+}

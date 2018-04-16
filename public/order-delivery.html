@@ -73,7 +73,7 @@
   ordersRef.orderByChild('createdTime').on('child_added', snap => {
 
     let orderDelivery = new OrderDelivery(snap.ref);
-    console.log(snap.val().consumerName);
+    console.log(snap.val().customerName);
     orderDeliveryList.push(orderDelivery);
     document.getElementById('orderApp').insertBefore(orderDelivery.element, document.getElementById('orderApp').firstChild);
 

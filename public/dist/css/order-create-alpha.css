@@ -56,11 +56,11 @@
 .OrderBilling > .row {
   margin-bottom: 10px;
 }
-.OrderConsumer {
+.OrderCustomer {
   width: 100%;
 }
 
-.OrderConsumer-consumerNameField input {
+.OrderCustomer-customerNameField input {
   font-weight: 700;
 }
 .OrderDelivery {
@@ -342,7 +342,7 @@
   width: 100%;
 }
 
-.TimelineItem-consumerName span {
+.TimelineItem-customerName span {
   font-weight: 700;
   font-size: 1rem;
   white-space: nowrap;
