@@ -2813,14 +2813,14 @@ class TimelineItem {
     const element = document.createElement('button');
     element.className = 'TimelineItem-actionButton TimelineItem-actionButton--archive';
     element.addEventListener('click', () => {
-      this.orderRef.child('archived').once('value', snap => this.orderRef.child('archived').set(!snap.val()));
+      this.orderRef.child('isArchived').once('value', snap => this.orderRef.child('isArchived').set(!snap.val()));
     });
     this.element.actions.appendChild(element);
 
     element.icon = document.createElement('span');
     element.icon.className = 'material-icons';
     element.icon.innerHTML = 'archive';
-    this.orderRef.child('archived').on('value', snap => {
+    this.orderRef.child('isArchived').on('value', snap => {
       if (snap.val())
         element.icon.innerHTML = 'unarchive';
       else
