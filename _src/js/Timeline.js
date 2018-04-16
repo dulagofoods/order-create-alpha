@@ -20,7 +20,7 @@ class Timeline {
 
     this.ordersViewRef.orderByChild('createdTime').on('child_added', snap => {
 
-      if (!snap.val().isDeleted) {
+      if (snap.val()) {
 
         const timelineItem = new TimelineItem(this.ordersRef.child(snap.key), this.orderList, false);
         this.element.inner.insertBefore(timelineItem.element, this.element.inner.firstChild);

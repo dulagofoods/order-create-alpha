@@ -490,6 +490,12 @@ class Order {
       itemPrice: 0.00,
       quantity: 1
     });
+    orderRef.child('billing/payments').push({
+      isDefault: true,
+      method: 'money',
+      paidValue: 0.00,
+      referenceValue: 0.00
+    });
 
     return orderRef;
 
@@ -645,9 +651,7 @@ class OrderApp {
     this.activeOrderKey = order.key;
     order.once('value', snap => {
       this.activeOrdersViewRef.child(order.key).set({
-        createdTime: snap.val().createdTime,
-        isArchived: false,
-        isDeleted: false
+        createdTime: snap.val().createdTime
       });
     });
 
@@ -1792,7 +1796,6 @@ class OrderList {
     this.build();
 
     this.ordersViewRef.on('child_added', snap => this.pushOrder(this.ordersRef.child(snap.key), snap.val()));
-
     this.ordersRef.on('child_removed', snap => this.removeOrder(this.ordersRef.child(snap.key)));
 
     // faz algo aqui após a lista ser baixada
@@ -1841,26 +1844,25 @@ class OrderList {
 
   pushOrder(orderRef, data) {
 
-    if (orderRef)
-      this.orders[orderRef.key] = new Order(orderRef, false);
+    if (data) {
 
-    this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
-    this.orders[orderRef.key].createdTime = moment(data.createdTime);
-    this.orders[orderRef.key].isArchived = !!data.isArchived;
-    this.orders[orderRef.key].isDeleted = !!data.isDeleted;
+      if (orderRef)
+        this.orders[orderRef.key] = new Order(orderRef, false);
 
-    if (this.isLoaded) {
-      this.appendOrderToView(this.orders[orderRef.key], true);
-      this.orders[orderRef.key].init();
+      this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
+      this.orders[orderRef.key].createdTime = moment(data.createdTime);
+
+      this.orders[orderRef.key].orderRef.child('isDeleted').on('value', snap => {
+        if (!!snap.val())
+          this.orders[orderRef.key].ordersViewItemRef.set(false);
+      });
+
+      if (this.isLoaded) {
+        this.appendOrderToView(this.orders[orderRef.key], true);
+        this.orders[orderRef.key].init();
+      }
+
     }
-
-    orderRef.child('isArchived').on('value', snap => {
-      this.orders[orderRef.key].ordersViewItemRef.child('isArchived').set(!!snap.val());
-    });
-
-    orderRef.child('isDeleted').on('value', snap => {
-      this.orders[orderRef.key].ordersViewItemRef.child('isDeleted').set(!!snap.val());
-    });
 
   }
 
@@ -2623,7 +2625,7 @@ class Timeline {
 
     this.ordersViewRef.orderByChild('createdTime').on('child_added', snap => {
 
-      if (!snap.val().isDeleted) {
+      if (snap.val()) {
 
         const timelineItem = new TimelineItem(this.ordersRef.child(snap.key), this.orderList, false);
         this.element.inner.insertBefore(timelineItem.element, this.element.inner.firstChild);

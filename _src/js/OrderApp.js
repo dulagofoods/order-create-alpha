@@ -146,9 +146,7 @@ class OrderApp {
     this.activeOrderKey = order.key;
     order.once('value', snap => {
       this.activeOrdersViewRef.child(order.key).set({
-        createdTime: snap.val().createdTime,
-        isArchived: false,
-        isDeleted: false
+        createdTime: snap.val().createdTime
       });
     });
 

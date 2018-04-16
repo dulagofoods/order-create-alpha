@@ -211,6 +211,12 @@ class Order {
       itemPrice: 0.00,
       quantity: 1
     });
+    orderRef.child('billing/payments').push({
+      isDefault: true,
+      method: 'money',
+      paidValue: 0.00,
+      referenceValue: 0.00
+    });
 
     return orderRef;
 
