@@ -3,6 +3,7 @@ class OrderCustomer {
   constructor(orderRef) {
 
     this.orderRef = orderRef;
+    this.customerRef = this.orderRef.child('customer');
 
     this.element = document.createElement('div');
 
@@ -32,10 +33,10 @@ class OrderCustomer {
     element.input.type = 'text';
     element.input.addEventListener('input', () => {
 
-      this.orderRef.child('customerName').set(element.input.value);
+      this.customerRef.child('customerName').set(element.input.value);
 
     });
-    this.orderRef.child('customerName').on('value', snap => {
+    this.customerRef.child('customerName').on('value', snap => {
 
       if (snap.val() !== element.input.value)
         element.input.value = snap.val();
@@ -45,7 +46,7 @@ class OrderCustomer {
 
     // label
     element.label = document.createElement('label');
-    this.orderRef.child('customerName').on('value', snap => {
+    this.customerRef.child('customerName').on('value', snap => {
       if (snap.val()) element.label.classList = 'active';
     });
     element.label.htmlFor = element.input.id;

@@ -193,7 +193,7 @@ class Order {
 
   }
 
-  static create(ordersRef) {
+  static create(ordersRef, options = {}) {
 
     let createdTime = moment().toISOString();
 
@@ -203,6 +203,9 @@ class Order {
         priceAmountUnlocked: false
       },
       createdTime: createdTime,
+      customer: {
+        customerName: ''
+      },
       delivery: false,
       isArchived: false,
       isDeleted: false
@@ -217,6 +220,22 @@ class Order {
       paidValue: 0.00,
       referenceValue: 0.00
     });
+
+    if (options.customer) {
+
+      let customerData = options.customer.data;
+
+      orderRef.child('customer').set({
+        customerName: customerData.customerName,
+        customerContact: customerData.customerContact,
+      });
+
+      orderRef.child('delivery').set(true);
+
+      if (customerData.defaultAddress)
+        orderRef.child('address').set(customerData.defaultAddress);
+
+    }
 
     return orderRef;
 

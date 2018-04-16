@@ -91,7 +91,7 @@ class TimelineItem {
     this.element.content.appendChild(element);
 
     element.span = document.createElement('span');
-    this.orderRef.child('customerName').on('value', snap => element.span.innerHTML = snap.val());
+    this.orderRef.child('customer/customerName').on('value', snap => element.span.innerHTML = snap.val());
     element.appendChild(element.span);
 
     return element;

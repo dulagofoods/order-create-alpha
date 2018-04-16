@@ -472,7 +472,7 @@ class Order {
 
   }
 
-  static create(ordersRef) {
+  static create(ordersRef, options = {}) {
 
     let createdTime = moment().toISOString();
 
@@ -482,6 +482,9 @@ class Order {
         priceAmountUnlocked: false
       },
       createdTime: createdTime,
+      customer: {
+        customerName: ''
+      },
       delivery: false,
       isArchived: false,
       isDeleted: false
@@ -496,6 +499,22 @@ class Order {
       paidValue: 0.00,
       referenceValue: 0.00
     });
+
+    if (options.customer) {
+
+      let customerData = options.customer.data;
+
+      orderRef.child('customer').set({
+        customerName: customerData.customerName,
+        customerContact: customerData.customerContact,
+      });
+
+      orderRef.child('delivery').set(true);
+
+      if (customerData.defaultAddress)
+        orderRef.child('address').set(customerData.defaultAddress);
+
+    }
 
     return orderRef;
 
@@ -707,6 +726,7 @@ class OrderCustomer {
   constructor(orderRef) {
 
     this.orderRef = orderRef;
+    this.customerRef = this.orderRef.child('customer');
 
     this.element = document.createElement('div');
 
@@ -736,10 +756,10 @@ class OrderCustomer {
     element.input.type = 'text';
     element.input.addEventListener('input', () => {
 
-      this.orderRef.child('customerName').set(element.input.value);
+      this.customerRef.child('customerName').set(element.input.value);
 
     });
-    this.orderRef.child('customerName').on('value', snap => {
+    this.customerRef.child('customerName').on('value', snap => {
 
       if (snap.val() !== element.input.value)
         element.input.value = snap.val();
@@ -749,7 +769,7 @@ class OrderCustomer {
 
     // label
     element.label = document.createElement('label');
-    this.orderRef.child('customerName').on('value', snap => {
+    this.customerRef.child('customerName').on('value', snap => {
       if (snap.val()) element.label.classList = 'active';
     });
     element.label.htmlFor = element.input.id;
@@ -1058,7 +1078,7 @@ class OrderDelivery {
     }, 500);
     this.orderRef.child('address/street').on('value', snap => {
       element.input.value = snap.val();
-      // console.log(snap.val());
+      console.log(snap.val());
     });
     element.input.addEventListener('change', () => {
 
@@ -2746,7 +2766,7 @@ class TimelineItem {
     this.element.content.appendChild(element);
 
     element.span = document.createElement('span');
-    this.orderRef.child('customerName').on('value', snap => element.span.innerHTML = snap.val());
+    this.orderRef.child('customer/customerName').on('value', snap => element.span.innerHTML = snap.val());
     element.appendChild(element.span);
 
     return element;
