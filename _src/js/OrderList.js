@@ -69,24 +69,28 @@ class OrderList {
 
   }
 
-  addOrder(orderRef, createdTime) {
-
-    if (this.ordersViewRef)
-      this.ordersViewRef.child(orderRef.key).set(createdTime);
-
-  }
-
-  pushOrder(orderRef, createdTime) {
+  pushOrder(orderRef, data) {
 
     if (orderRef)
-      this.orders[orderRef.key] = new Order(orderRef);
+      this.orders[orderRef.key] = new Order(orderRef, false);
 
-    this.orders[orderRef.key].createdTime = moment(createdTime);
+    this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
+    this.orders[orderRef.key].createdTime = moment(data.createdTime);
+    this.orders[orderRef.key].isArchived = !!data.isArchived;
+    this.orders[orderRef.key].isDeleted = !!data.isDeleted;
 
     if (this.isLoaded) {
       this.appendOrderToView(this.orders[orderRef.key], true);
       this.orders[orderRef.key].init();
     }
+
+    orderRef.child('isArchived').on('value', snap => {
+      this.orders[orderRef.key].ordersViewItemRef.child('isArchived').set(!!snap.val());
+    });
+
+    orderRef.child('isDeleted').on('value', snap => {
+      this.orders[orderRef.key].ordersViewItemRef.child('isDeleted').set(!!snap.val());
+    });
 
   }
 

@@ -308,19 +308,15 @@ class Order {
     // action listener
     this.orderRef.on('value', snap => {
 
-      const data = snap.val();
+      this.data = snap.val();
+      this.isArchived = !!snap.val().isArchived;
+      this.isDeleted = !!snap.val().isDeleted;
 
       // is deleted
-      if (data == null) {
+      if (this.isDeleted) {
 
         this.data = null;
         this.element.classList.add('is-deleted');
-
-      } else {
-
-        // this.data = {
-        //   customerName: data.customerName
-        // }
 
       }
 
@@ -447,7 +443,7 @@ class Order {
 
   delete() {
 
-    this.orderRef.child('deleted').set(moment().format());
+    this.orderRef.child('isDeleted').set(moment().format());
 
   }
 
@@ -487,8 +483,8 @@ class Order {
       },
       createdTime: createdTime,
       delivery: false,
-      archived: false,
-      deleted: false
+      isArchived: false,
+      isDeleted: false
     }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,
@@ -500,6 +496,7 @@ class Order {
   }
 
 }
+
 class OrderApp {
   /*
   TODO vincular o gerenciador com agenda de contatos
@@ -543,7 +540,10 @@ class OrderApp {
     this.orderList.ordersViewRef.on('child_added', snap => {
 
       if (this.activeOrderKey === snap.key)
+      {
+        console.log(this.orderList.orders[snap.key].element.className);
         this.orderList.orders[snap.key].focus();
+      }
 
     });
 
@@ -643,12 +643,19 @@ class OrderApp {
 
     const order = Order.create(this.ordersRef);
     this.activeOrderKey = order.key;
-    order.once('value', snap => this.activeOrdersViewRef.child(order.key).set(snap.val().createdTime));
+    order.once('value', snap => {
+      this.activeOrdersViewRef.child(order.key).set({
+        createdTime: snap.val().createdTime,
+        isArchived: false,
+        isDeleted: false
+      });
+    });
 
     try {
 
       M.toast({
-        html: 'Pedido Criado!'
+        html: 'Pedido Criado!',
+        displayLength: 2000
       });
 
     } catch (e) {
@@ -1832,24 +1839,28 @@ class OrderList {
 
   }
 
-  addOrder(orderRef, createdTime) {
-
-    if (this.ordersViewRef)
-      this.ordersViewRef.child(orderRef.key).set(createdTime);
-
-  }
-
-  pushOrder(orderRef, createdTime) {
+  pushOrder(orderRef, data) {
 
     if (orderRef)
-      this.orders[orderRef.key] = new Order(orderRef);
+      this.orders[orderRef.key] = new Order(orderRef, false);
 
-    this.orders[orderRef.key].createdTime = moment(createdTime);
+    this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
+    this.orders[orderRef.key].createdTime = moment(data.createdTime);
+    this.orders[orderRef.key].isArchived = !!data.isArchived;
+    this.orders[orderRef.key].isDeleted = !!data.isDeleted;
 
     if (this.isLoaded) {
       this.appendOrderToView(this.orders[orderRef.key], true);
       this.orders[orderRef.key].init();
     }
+
+    orderRef.child('isArchived').on('value', snap => {
+      this.orders[orderRef.key].ordersViewItemRef.child('isArchived').set(!!snap.val());
+    });
+
+    orderRef.child('isDeleted').on('value', snap => {
+      this.orders[orderRef.key].ordersViewItemRef.child('isDeleted').set(!!snap.val());
+    });
 
   }
 
@@ -2612,9 +2623,13 @@ class Timeline {
 
     this.ordersViewRef.orderByChild('createdTime').on('child_added', snap => {
 
-      const timelineItem = new TimelineItem(this.ordersRef.child(snap.key), this.orderList, false);
-      this.element.inner.insertBefore(timelineItem.element, this.element.inner.firstChild);
-      timelineItem.init();
+      if (!snap.val().isDeleted) {
+
+        const timelineItem = new TimelineItem(this.ordersRef.child(snap.key), this.orderList, false);
+        this.element.inner.insertBefore(timelineItem.element, this.element.inner.firstChild);
+        timelineItem.init();
+
+      }
 
     });
 
@@ -2654,21 +2669,24 @@ class TimelineItem {
 
     this.build();
 
-    this.orderRef.on('value', snap => {
+    this.orderRef.child('isDeleted').on('value', snap => {
 
       const self = this;
 
-      if (snap.val().isDeleted) {
+      if (snap.val()) {
+
         self.element.classList.add('is-deleting');
+
         setTimeout(() => {
           self.element.classList.remove('is-deleting');
           self.element.classList.add('is-deleted');
         }, 1300);
+
       }
 
     });
 
-    this.orderRef.child('archived').on('value', snap => {
+    this.orderRef.child('isArchived').on('value', snap => {
       if (snap.val())
         this.archive();
       else

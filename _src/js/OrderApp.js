@@ -41,7 +41,10 @@ class OrderApp {
     this.orderList.ordersViewRef.on('child_added', snap => {
 
       if (this.activeOrderKey === snap.key)
+      {
+        console.log(this.orderList.orders[snap.key].element.className);
         this.orderList.orders[snap.key].focus();
+      }
 
     });
 
@@ -141,12 +144,19 @@ class OrderApp {
 
     const order = Order.create(this.ordersRef);
     this.activeOrderKey = order.key;
-    order.once('value', snap => this.activeOrdersViewRef.child(order.key).set(snap.val().createdTime));
+    order.once('value', snap => {
+      this.activeOrdersViewRef.child(order.key).set({
+        createdTime: snap.val().createdTime,
+        isArchived: false,
+        isDeleted: false
+      });
+    });
 
     try {
 
       M.toast({
-        html: 'Pedido Criado!'
+        html: 'Pedido Criado!',
+        displayLength: 2000
       });
 
     } catch (e) {

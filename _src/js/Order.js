@@ -29,19 +29,15 @@ class Order {
     // action listener
     this.orderRef.on('value', snap => {
 
-      const data = snap.val();
+      this.data = snap.val();
+      this.isArchived = !!snap.val().isArchived;
+      this.isDeleted = !!snap.val().isDeleted;
 
       // is deleted
-      if (data == null) {
+      if (this.isDeleted) {
 
         this.data = null;
         this.element.classList.add('is-deleted');
-
-      } else {
-
-        // this.data = {
-        //   customerName: data.customerName
-        // }
 
       }
 
@@ -168,7 +164,7 @@ class Order {
 
   delete() {
 
-    this.orderRef.child('deleted').set(moment().format());
+    this.orderRef.child('isDeleted').set(moment().format());
 
   }
 
@@ -208,8 +204,8 @@ class Order {
       },
       createdTime: createdTime,
       delivery: false,
-      archived: false,
-      deleted: false
+      isArchived: false,
+      isDeleted: false
     }).ref;
     orderRef.child('items').push({
       itemPrice: 0.00,

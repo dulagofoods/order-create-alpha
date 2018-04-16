@@ -16,21 +16,24 @@ class TimelineItem {
 
     this.build();
 
-    this.orderRef.on('value', snap => {
+    this.orderRef.child('isDeleted').on('value', snap => {
 
       const self = this;
 
-      if (snap.val() === null) {
+      if (snap.val()) {
+
         self.element.classList.add('is-deleting');
+
         setTimeout(() => {
           self.element.classList.remove('is-deleting');
           self.element.classList.add('is-deleted');
         }, 1300);
+
       }
 
     });
 
-    this.orderRef.child('archived').on('value', snap => {
+    this.orderRef.child('isArchived').on('value', snap => {
       if (snap.val())
         this.archive();
       else
@@ -74,28 +77,21 @@ class TimelineItem {
     this.element.actions.className = 'TimelineItem-actions';
     this.element.appendChild(this.element.actions);
 
-    this.element.content.consumerName = this.buildConsumerNameElement();
+    this.element.content.customerName = this.buildCustomerNameElement();
     this.element.content.createdTime = this.buildCreatedTimeElement();
     this.element.actions.printButton = this.buildPrintButtonElement();
     this.element.actions.deleteButton = this.buildArchiveButtonElement();
 
   }
 
-  buildConsumerNameElement() {
+  buildCustomerNameElement() {
 
     const element = document.createElement('div');
-    element.className = 'TimelineItem-consumerName';
+    element.className = 'TimelineItem-customerName';
     this.element.content.appendChild(element);
 
     element.span = document.createElement('span');
-    this.orderRef.child('consumerName').on('value', snap => {
-
-      if (snap.val() !== null)
-        element.span.innerHTML = snap.val();
-      else
-        setTimeout(() => element.span.innerHTML = snap.val(), 1300);
-
-    });
+    this.orderRef.child('customerName').on('value', snap => element.span.innerHTML = snap.val());
     element.appendChild(element.span);
 
     return element;
