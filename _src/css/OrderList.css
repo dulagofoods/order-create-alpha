@@ -17,5 +17,13 @@
     display: flex;
     -webkit-flex-flow: column;
     flex-flow: column;
-    padding: 1rem 1rem 6rem;
+    padding: 1rem 1rem 8rem;
+}
+
+@media (min-width: 601px) {
+
+    .OrderList-inner {
+        padding: 1rem 1rem 6rem;
+    }
+
 }
