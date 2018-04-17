@@ -1,0 +1,78 @@
+.Customer {
+    display: block;
+    width: 100%;
+    -webkit-transition: background .3s ease-in-out;
+    -moz-transition: background .3s ease-in-out;
+    -ms-transition: background .3s ease-in-out;
+    -o-transition: background .3s ease-in-out;
+    transition: background .3s ease-in-out;
+}
+
+.Customer:hover {
+    background-color: #fafafa;
+}
+
+.Customer-inner {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row nowrap;
+    flex-flow: row nowrap;
+    -webkit-justify-content: space-between;
+    justify-content: space-between;
+    min-height: 72px;
+    padding: 14px 12px;
+}
+
+.Customer-content {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+}
+
+.Customer-customerName {
+    margin-bottom: 1pt;
+    max-width: 240px;
+}
+
+.Customer-customerName span {
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: 1.5
+}
+
+.Customer-address {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    max-width: 240px;
+}
+
+.Customer-address span {
+    color: #424242;
+    font-size: .875rem;
+}
+
+.Customer-actions {
+    -webkit-align-items: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    -webkit-justify-content: center;
+    justify-content: center;
+}

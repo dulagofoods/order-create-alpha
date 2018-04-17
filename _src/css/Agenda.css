@@ -1,0 +1,17 @@
+.Agenda {
+    background-color: #e0e0e0;
+    border-right: 1px solid #bdbdbd;
+    overflow-x: hidden;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.Agenda-inner {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+}

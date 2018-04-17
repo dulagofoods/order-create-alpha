@@ -207,56 +207,65 @@ class Order {
 
   }
 
-  static create(ordersRef, ordersViewRef = false, options = {}) {
+  static create(ordersRef = false, ordersViewRef = false, options = {}) {
 
-    let createdTime = moment().toISOString();
+    if (ordersRef || databaseRef) {
 
-    const orderRef = ordersRef.push({
-      billing: {
-        priceAmount: 0.00,
-        priceAmountUnlocked: false
-      },
-      createdTime: createdTime,
-      customer: {
-        customerName: ''
-      },
-      delivery: false,
-      isArchived: false,
-      isDeleted: false
-    }).ref;
-    orderRef.child('items').push({
-      itemPrice: 0.00,
-      quantity: 1
-    });
-    orderRef.child('billing/payments').push({
-      isDefault: true,
-      method: 'money',
-      paidValue: 0.00,
-      referenceValue: 0.00
-    });
+      ordersRef = ordersRef ? ordersRef : databaseRef.ref('orders');
+      ordersViewRef = ordersViewRef ? ordersViewRef : databaseRef.ref('ordersViews').child(moment().format('YYYY-MM-DD'));
 
-    if (ordersViewRef)
-      setTimeout(() => ordersViewRef.child(orderRef.key).set({
-        createdTime: createdTime
-      }), 1);
+      let createdTime = moment().toISOString();
 
-    if (options.customer) {
-
-      let customerData = options.customer.data;
-
-      orderRef.child('customer').set({
-        customerName: customerData.customerName,
-        customerContact: customerData.customerContact,
+      const orderRef = ordersRef.push({
+        billing: {
+          priceAmount: 0.00,
+          priceAmountUnlocked: false
+        },
+        createdTime: createdTime,
+        customer: {
+          customerName: ''
+        },
+        delivery: false,
+        isArchived: false,
+        isDeleted: false
+      }).ref;
+      orderRef.child('items').push({
+        itemPrice: 0.00,
+        quantity: 1
+      });
+      orderRef.child('billing/payments').push({
+        isDefault: true,
+        method: 'money',
+        paidValue: 0.00,
+        referenceValue: 0.00
       });
 
-      if (customerData.defaultAddress) {
-        orderRef.child('delivery').set(true);
-        orderRef.child('address').set(customerData.defaultAddress);
+      if (ordersViewRef)
+        setTimeout(() => ordersViewRef.child(orderRef.key).set({
+          createdTime: createdTime
+        }), 1);
+
+      if (options.customer) {
+
+        let customerData = options.customer.data;
+
+        orderRef.child('customer').set({
+          customerName: customerData.customerName,
+          customerContact: customerData.customerContact,
+        });
+
+        if (customerData.defaultAddress) {
+          orderRef.child('delivery').set(true);
+          orderRef.child('address').set(customerData.defaultAddress);
+        }
+
       }
+
+      return orderRef;
 
     }
 
-    return orderRef;
+    return false;
 
   }
 

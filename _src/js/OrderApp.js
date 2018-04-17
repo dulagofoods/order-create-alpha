@@ -1,8 +1,6 @@
 class OrderApp {
   /*
   TODO vincular o gerenciador com agenda de contatos
-  TODO corrigir orientação das ruas
-  TODO adicionar linha do tempo
    */
 
   constructor(element, databaseRef, socket) {
@@ -16,6 +14,7 @@ class OrderApp {
 
     this.orderList = new OrderList(this.ordersRef, false, 'OrderApp-list');
     this.orderTimeline = new Timeline(this.ordersRef, false, this.orderList, 'OrderApp-timeline');
+    this.agenda = new Agenda(this.databaseRef, this.orderList, 'OrderApp-agenda');
 
     this.activeOrderKey = false;
 
@@ -71,6 +70,7 @@ class OrderApp {
 
     this.element.inner.appendChild(this.orderList.element);
     this.element.inner.appendChild(this.orderTimeline.element);
+    this.element.inner.appendChild(this.agenda.element);
 
     this.actionButtons = document.createElement('div');
     this.actionButtons.className = 'OrderApp-actionButtons';
