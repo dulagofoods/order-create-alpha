@@ -375,7 +375,8 @@ class Order {
 
     element.deleteButton = document.createElement('button');
     element.deleteButton.className = 'right waves-effect waves-red btn-flat red-text';
-    element.deleteButton.innerHTML = '<i class="material-icons">delete</i>';
+    element.deleteButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">delete</i>Excluir</span>' +
+      '<span class="hide-on-large-only"><i class="material-icons">delete</i></span>';
     element.deleteButton.addEventListener('click', () => {
 
       if (window.confirm('Tem certeza?')) {
