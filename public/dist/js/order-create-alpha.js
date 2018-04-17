@@ -639,13 +639,9 @@ class OrderApp {
     element.nav.menu.appendChild(element.nav.menu.agendaTrigger);
 
     element.nav.menu.agendaTrigger.link = document.createElement('a');
-    element.nav.menu.agendaTrigger.link.href = '#';
     element.nav.menu.agendaTrigger.link.className = 'waves-effect waves-light';
     element.nav.menu.agendaTrigger.link.innerHTML = '<i class="material-icons">import_contacts</i>';
-    element.nav.menu.agendaTrigger.link.addEventListener('click', event => {
-      event.preventDefault();
-      this.element.classList.toggle('is-agendaVisible');
-    });
+    element.nav.menu.agendaTrigger.link.addEventListener('click', () => this.element.classList.toggle('is-agendaVisible'));
     element.nav.menu.agendaTrigger.appendChild(element.nav.menu.agendaTrigger.link);
 
     // timeline trigger
@@ -653,13 +649,9 @@ class OrderApp {
     element.nav.menu.appendChild(element.nav.menu.timelineTrigger);
 
     element.nav.menu.timelineTrigger.link = document.createElement('a');
-    element.nav.menu.timelineTrigger.link.href = '#';
     element.nav.menu.timelineTrigger.link.className = 'waves-effect waves-light';
     element.nav.menu.timelineTrigger.link.innerHTML = '<i class="material-icons">view_list</i>';
-    element.nav.menu.timelineTrigger.link.addEventListener('click', event => {
-      event.preventDefault();
-      this.element.classList.toggle('is-timelineVisible');
-    });
+    element.nav.menu.timelineTrigger.link.addEventListener('click', () => this.element.classList.toggle('is-timelineVisible'));
     element.nav.menu.timelineTrigger.appendChild(element.nav.menu.timelineTrigger.link);
 
     return element;
