@@ -136,4 +136,27 @@ class Customer {
 
   }
 
+  static create(data) {
+
+    console.log(data);
+
+    if (databaseRef) {
+      const customerRef = databaseRef.ref('customers').push(data).ref;
+      customerRef.child('createdTime').set(moment().format());
+      return customerRef;
+    }
+
+    return {key: null};
+
+  }
+
+  static update(customerKey, data) {
+
+    if (databaseRef)
+      return databaseRef.ref('customers').child(customerKey).update(data);
+
+    return {key: null};
+
+  }
+
 }

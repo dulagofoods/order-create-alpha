@@ -88,7 +88,33 @@ class Order {
     element.saveButton.addEventListener('click', () => {
 
       this.orderRef.once('value', snap => {
-        console.log(snap.val());
+
+        let data = snap.val();
+        let customerRefKey = data.customer.customerRefKey;
+
+        try {
+
+          data = {
+            customerName: data.customer.customerName,
+            defaultAddress: data.address || {
+              street: '',
+              houseNumber: '',
+              neighborhood: '',
+              addressReference: ''
+            }
+          };
+
+          if (customerRefKey) {
+            Customer.update(customerRefKey, data);
+          } else {
+            customerRefKey = Customer.create(data).key;
+            this.orderRef.child('customer/customerRefKey').set(customerRefKey);
+          }
+
+        } catch (e) {
+          console.log(e);
+        }
+
       })
 
     });
@@ -247,9 +273,11 @@ class Order {
 
       if (options.customer) {
 
+        let customerKey = options.customer.customerRef.key;
         let customerData = options.customer.data;
 
         orderRef.child('customer').set({
+          customerRef: customerKey,
           customerName: customerData.customerName,
           customerContact: customerData.customerContact,
         });
