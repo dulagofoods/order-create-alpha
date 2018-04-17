@@ -351,7 +351,7 @@ class Order {
     this.element.appendChild(element);
 
     element.printButton = document.createElement('button');
-    element.printButton.className = 'waves-effect waves-light-blue btn light-blue';
+    element.printButton.className = 'waves-effect waves-green btn light-blue';
     element.printButton.innerHTML = '<i class="material-icons left">print</i>Imprimir';
     element.printButton.addEventListener('click', () => {
 
@@ -360,9 +360,22 @@ class Order {
     });
     element.appendChild(element.printButton);
 
+    element.saveButton = document.createElement('button');
+    element.saveButton.className = 'waves-effect waves-orange btn-flat orange-text';
+    element.saveButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">save</i>Salvar</span>' +
+      '<span class="hide-on-large-only"><i class="material-icons">save</i></span>';
+    element.saveButton.addEventListener('click', () => {
+
+      this.orderRef.once('value', snap => {
+        console.log(snap.val());
+      })
+
+    });
+    element.appendChild(element.saveButton);
+
     element.deleteButton = document.createElement('button');
-    element.deleteButton.className = 'waves-effect waves-red btn-flat red-text';
-    element.deleteButton.innerHTML = '<i class="material-icons left">delete</i>Excluir';
+    element.deleteButton.className = 'right waves-effect waves-red btn-flat red-text';
+    element.deleteButton.innerHTML = '<i class="material-icons">delete</i>';
     element.deleteButton.addEventListener('click', () => {
 
       if (window.confirm('Tem certeza?')) {
@@ -588,6 +601,9 @@ class OrderApp {
   }
 
   build() {
+
+    if (window.innerWidth < 601)
+      this.element.classList.remove('is-timelineVisible');
 
     this.element.inner = document.createElement('div');
     this.element.inner.className = 'OrderApp-inner';

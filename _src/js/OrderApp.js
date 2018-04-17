@@ -60,6 +60,9 @@ class OrderApp {
 
   build() {
 
+    if (window.innerWidth < 601)
+      this.element.classList.remove('is-timelineVisible');
+
     this.element.inner = document.createElement('div');
     this.element.inner.className = 'OrderApp-inner';
     this.element.append(this.element.inner);
