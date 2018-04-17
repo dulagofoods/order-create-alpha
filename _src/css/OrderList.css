@@ -17,5 +17,5 @@
     display: flex;
     -webkit-flex-flow: column;
     flex-flow: column;
-    padding: 1rem;
+    padding: 1rem 1rem 6rem;
 }
