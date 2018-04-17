@@ -23,7 +23,7 @@ class Agenda {
     this.customersRef.on('child_added', snap => {
 
       const customer = new Customer(snap.ref);
-      this.element.inner.appendChild(customer.element);
+      this.element.inner.insertBefore(customer.element, this.element.inner.firstChild);
       this.customers[snap.key] = customer;
 
     });

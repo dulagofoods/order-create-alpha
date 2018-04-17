@@ -23,7 +23,7 @@ class Agenda {
     this.customersRef.on('child_added', snap => {
 
       const customer = new Customer(snap.ref);
-      this.element.inner.appendChild(customer.element);
+      this.element.inner.insertBefore(customer.element, this.element.inner.firstChild);
       this.customers[snap.key] = customer;
 
     });
@@ -797,6 +797,9 @@ class OrderApp {
 
     if (window.innerWidth < 601)
       this.element.classList.remove('is-timelineVisible');
+
+    if (window.innerWidth > 1200)
+      this.element.classList.add('is-agendaVisible');
 
     this.element.inner = document.createElement('div');
     this.element.inner.className = 'OrderApp-inner';
