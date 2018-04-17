@@ -9,6 +9,7 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,500,700" rel="stylesheet">
 <link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css"  media="screen,projection"/>
+<link rel="stylesheet" href="dist/css/materialize.custom.css">
 <link rel="stylesheet" href="dist/css/order-create-alpha.css">
 <!--[if lt IE 9]>
 <link rel="stylesheet" type="text/css" href="dist/css/material-colors.css"/>
@@ -36,15 +37,13 @@
 
   .OrderApp-inner {
     width: 100%;
-    padding-right: 360px;
-    /*padding-top: 56px;*/
     overflow-y: auto;
     overflow-x: hidden;
-    -webkit-transition: padding-right .6s;
-    -moz-transition: padding-right .6s;
-    -ms-transition: padding-right .6s;
-    -o-transition: padding-right .6s;
-    transition: padding-right .6s;
+    -webkit-transition: padding-right .2s ease .4s;
+    -moz-transition: padding-right .2s ease .4s;
+    -ms-transition: padding-right .2s ease .4s;
+    -o-transition: padding-right .2s ease .4s;
+    transition: padding-right .2s ease .4s;
     height: 100vh;
   }
 
@@ -63,10 +62,11 @@
   .OrderApp-header {
     width: 100%;
     top: 0;
+    z-index: 9600;
   }
 
   .OrderApp-header .nav-wrapper {
-    padding: 0 14px;
+    padding-left: 14px;
   }
   
   @media (min-width: 601px) {
@@ -110,17 +110,78 @@
     -ms-transition: transform .6s;
     -o-transition: transform .6s;
     transition: transform .6s;
+    -webkit-transform: translate3d(100%, 0, 0);
+    -moz-transform: translate3d(100%, 0, 0);
+    -ms-transform: translate3d(100%, 0, 0);
+    -o-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);
     width: 360px;
+    z-index: 9000;
   }
 
-  .OrderApp.is-timelineHidden .OrderApp-timeline {
-    transform: translate3d(360px, 0, 0);
+  .OrderApp.is-timelineVisible .OrderApp-timeline {
+    -webkit-transform: translate3d(0, 0, 0);
+    -moz-transform: translate3d(0, 0, 0);
+    -ms-transform: translate3d(0, 0, 0);
+    -o-transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0);
   }
 
   @media (min-width: 601px) {
 
+    .OrderApp.is-timelineVisible .OrderApp-inner {
+      padding-right: 320px;
+    }
+
     .OrderApp-timeline {
       padding-top: 64px;
+    }
+
+    .OrderApp.is-timelineVisible .OrderApp-timeline {
+      -webkit-transform: translate3d(0, 0, 0);
+      -moz-transform: translate3d(0, 0, 0);
+      -ms-transform: translate3d(0, 0, 0);
+      -o-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      width: 320px;
+    }
+
+  }
+
+  @media (min-width: 993px) {
+
+    .OrderApp.is-timelineVisible .OrderApp-inner {
+      padding-right: 320px;
+    }
+
+    .OrderApp-timeline {
+      padding-top: 64px;
+    }
+
+    .OrderApp.is-timelineVisible .OrderApp-timeline {
+      -webkit-transform: translate3d(0, 0, 0);
+      -moz-transform: translate3d(0, 0, 0);
+      -ms-transform: translate3d(0, 0, 0);
+      -o-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      width: 320px;
+    }
+
+  }
+
+  @media (min-width: 1201px) {
+
+    .OrderApp.is-timelineVisible .OrderApp-inner {
+      padding-right: 360px;
+    }
+
+    .OrderApp.is-timelineVisible .OrderApp-timeline {
+      -webkit-transform: translate3d(0, 0, 0);
+      -moz-transform: translate3d(0, 0, 0);
+      -ms-transform: translate3d(0, 0, 0);
+      -o-transform: translate3d(0, 0, 0);
+      transform: translate3d(0, 0, 0);
+      width: 360px;
     }
 
   }
@@ -129,7 +190,7 @@
 
 <body class="grey-200">
 
-<div id="orderApp" class="OrderApp">
+<div id="orderApp" class="OrderApp is-timelineVisible">
 
 </div>
 

@@ -292,6 +292,7 @@
 
 .TimelineItem.is-deleting {
   background-color: #EF5350;
+  border-color: #EF5350;
   opacity: 0;
 }
 
@@ -402,46 +403,64 @@ button.TimelineItem-actionButton--archive:hover {
 button.TimelineItem-actionButton span.material-icons {
   font-size: 1.3125rem;
 }
+
+button.TimelineItem-actionButton span.material-icons.pulse {
+  z-index: 9200;
+}
+
+button.TimelineItem-actionButton span.material-icons.pulse:before {
+  -webkit-animation: actionButton-pulse-animation 1s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  animation: actionButton-pulse-animation 1s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  background-color: #bdbdbd;
+  border-radius: 50%;
+  z-index: 9100;
+}
+
+button.TimelineItem-actionButton--print span.material-icons.pulse:before {
+  background-color: #00C853;
+}
+
+@-webkit-keyframes actionButton-pulse-animation {
+  0% {
+    opacity: 1;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0;
+    -webkit-transform: scale(2.5);
+    transform: scale(2.5);
+  }
+
+  100% {
+    opacity: 0;
+    -webkit-transform: scale(2.5);
+    transform: scale(2.5);
+  }
+}
+
+@keyframes actionButton-pulse-animation {
+  0% {
+    opacity: .8;
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0;
+    -webkit-transform: scale(2.5);
+    transform: scale(2.5);
+  }
+
+  100% {
+    opacity: 0;
+    -webkit-transform: scale(2.5);
+    transform: scale(2.5);
+  }
+}
 /*!
  * Du Lago {ProjectName} Project v0.0.0 (http://elbit.com.br/)
  * Copyright 2013-2018 Elbit Developers
  * Licensed under MIT (https://github.com/elbitdigital/base/blob/master/LICENSE)
 */
-html {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-}
-
-button,
-input,
-optgroup,
-select,
-textarea {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", 'Roboto Condensed', Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-}
-
-/* ajustes especificos para aumentar a area util em smartphones */
-
-@media (max-width: 800px) {
-  .card-panel,
-  .card .card-image .card-title,
-  .card .card-reveal {
-    padding: 20px 16px;
-  }
-
-  .card .card-content,
-  .modal .modal-content {
-    padding: 24px 16px;
-  }
-
-  .card .card-action {
-    padding: 16px;
-  }
-
-  .row .col {
-    padding: .5rem;
-  }
-
-  .input-field.col label {
-    left: .5rem;
-  }
-}

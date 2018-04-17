@@ -36,6 +36,7 @@
 
 .TimelineItem.is-deleting {
     background-color: #EF5350;
+    border-color: #EF5350;
     opacity: 0;
 }
 
@@ -145,4 +146,56 @@ button.TimelineItem-actionButton--archive:hover {
 
 button.TimelineItem-actionButton span.material-icons {
     font-size: 1.3125rem;
+}
+
+button.TimelineItem-actionButton span.material-icons.pulse {
+    z-index: 9200;
+}
+
+button.TimelineItem-actionButton span.material-icons.pulse:before {
+    -webkit-animation: actionButton-pulse-animation 1s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    animation: actionButton-pulse-animation 1s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+    background-color: #bdbdbd;
+    border-radius: 50%;
+    z-index: 9100;
+}
+
+button.TimelineItem-actionButton--print span.material-icons.pulse:before {
+    background-color: #00C853;
+}
+
+@-webkit-keyframes actionButton-pulse-animation {
+    0% {
+        opacity: 1;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0;
+        -webkit-transform: scale(2.5);
+        transform: scale(2.5);
+    }
+    100% {
+        opacity: 0;
+        -webkit-transform: scale(2.5);
+        transform: scale(2.5);
+    }
+}
+
+@keyframes actionButton-pulse-animation {
+    0% {
+        opacity: .8;
+        -webkit-transform: scale(1);
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0;
+        -webkit-transform: scale(2.5);
+        transform: scale(2.5);
+    }
+    100% {
+        opacity: 0;
+        -webkit-transform: scale(2.5);
+        transform: scale(2.5);
+    }
 }

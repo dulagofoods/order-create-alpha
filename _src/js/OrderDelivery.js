@@ -236,7 +236,7 @@ class OrderDelivery {
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Rua';
-    this.orderRef.child('address/street').once('value', snap => {
+    this.orderRef.child('address/street').on('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -261,7 +261,7 @@ class OrderDelivery {
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Número';
-    this.orderRef.child('address/houseNumber').once('value', snap => {
+    this.orderRef.child('address/houseNumber').on('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -376,7 +376,7 @@ class OrderDelivery {
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Bairro';
-    this.orderRef.child('address/neighborhood').once('value', snap => {
+    this.orderRef.child('address/neighborhood').on('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -403,7 +403,7 @@ class OrderDelivery {
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Complemento ou Referência';
-    this.orderRef.child('address/addressReference').once('value', snap => {
+    this.orderRef.child('address/addressReference').on('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';

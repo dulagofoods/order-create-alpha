@@ -125,6 +125,12 @@ class TimelineItem {
     element.icon = document.createElement('span');
     element.icon.className = 'material-icons';
     element.icon.innerHTML = 'print';
+    this.orderRef.child('printouts').on('value', snap => {
+      if (snap.val())
+        element.icon.classList.remove('pulse');
+      else
+        element.icon.classList.add('pulse');
+    });
     element.appendChild(element.icon);
 
     return element;

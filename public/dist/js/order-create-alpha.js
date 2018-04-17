@@ -623,25 +623,44 @@ class OrderApp {
     element.nav.wrapper.className = 'nav-wrapper';
     element.nav.appendChild(element.nav.wrapper);
 
+    // brand
     element.nav.brandLogo = document.createElement('a');
     element.nav.brandLogo.className = 'brand-logo';
     element.nav.brandLogo.innerHTML = 'Du Lago App';
     element.nav.wrapper.appendChild(element.nav.brandLogo);
 
-    element.nav.timelineTrigger = document.createElement('a');
-    element.nav.timelineTrigger.className = 'sidenav-trigger';
-    element.nav.timelineTrigger.style.float = 'right';
-    element.nav.timelineTrigger.style.display = 'block';
-    element.nav.timelineTrigger.href = '#';
-    element.nav.timelineTrigger.innerHTML = '<i class="material-icons">view list</i>';
-    element.nav.timelineTrigger.addEventListener('click', event => {
+    // menu
+    element.nav.menu = document.createElement('ul');
+    element.nav.menu.className = 'right';
+    element.nav.wrapper.appendChild(element.nav.menu);
 
+    // agenda trigger
+    element.nav.menu.agendaTrigger = document.createElement('li');
+    element.nav.menu.appendChild(element.nav.menu.agendaTrigger);
+
+    element.nav.menu.agendaTrigger.link = document.createElement('a');
+    element.nav.menu.agendaTrigger.link.href = '#';
+    element.nav.menu.agendaTrigger.link.className = 'waves-effect waves-light';
+    element.nav.menu.agendaTrigger.link.innerHTML = '<i class="material-icons">import_contacts</i>';
+    element.nav.menu.agendaTrigger.link.addEventListener('click', event => {
       event.preventDefault();
-
-      this.element.classList.toggle('is-timelineHidden');
-
+      this.element.classList.toggle('is-agendaVisible');
     });
-    element.nav.wrapper.appendChild(element.nav.timelineTrigger);
+    element.nav.menu.agendaTrigger.appendChild(element.nav.menu.agendaTrigger.link);
+
+    // timeline trigger
+    element.nav.menu.timelineTrigger = document.createElement('li');
+    element.nav.menu.appendChild(element.nav.menu.timelineTrigger);
+
+    element.nav.menu.timelineTrigger.link = document.createElement('a');
+    element.nav.menu.timelineTrigger.link.href = '#';
+    element.nav.menu.timelineTrigger.link.className = 'waves-effect waves-light';
+    element.nav.menu.timelineTrigger.link.innerHTML = '<i class="material-icons">view_list</i>';
+    element.nav.menu.timelineTrigger.link.addEventListener('click', event => {
+      event.preventDefault();
+      this.element.classList.toggle('is-timelineVisible');
+    });
+    element.nav.menu.timelineTrigger.appendChild(element.nav.menu.timelineTrigger.link);
 
     return element;
 
@@ -1092,7 +1111,7 @@ class OrderDelivery {
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Rua';
-    this.orderRef.child('address/street').once('value', snap => {
+    this.orderRef.child('address/street').on('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -1117,7 +1136,7 @@ class OrderDelivery {
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Número';
-    this.orderRef.child('address/houseNumber').once('value', snap => {
+    this.orderRef.child('address/houseNumber').on('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -1232,7 +1251,7 @@ class OrderDelivery {
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Bairro';
-    this.orderRef.child('address/neighborhood').once('value', snap => {
+    this.orderRef.child('address/neighborhood').on('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -1259,7 +1278,7 @@ class OrderDelivery {
     element.label = document.createElement('label');
     element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Complemento ou Referência';
-    this.orderRef.child('address/addressReference').once('value', snap => {
+    this.orderRef.child('address/addressReference').on('value', snap => {
 
       if (!!snap.val())
         element.label.className = 'active';
@@ -2802,6 +2821,12 @@ class TimelineItem {
     element.icon = document.createElement('span');
     element.icon.className = 'material-icons';
     element.icon.innerHTML = 'print';
+    this.orderRef.child('printouts').on('value', snap => {
+      if (snap.val())
+        element.icon.classList.remove('pulse');
+      else
+        element.icon.classList.add('pulse');
+    });
     element.appendChild(element.icon);
 
     return element;
