@@ -581,6 +581,7 @@ class Order {
 
           data = {
             customerName: data.customer.customerName,
+            customerContact: '',
             defaultAddress: data.address || {
               street: '',
               houseNumber: '',
@@ -762,7 +763,7 @@ class Order {
         let customerData = options.customer.data;
 
         orderRef.child('customer').set({
-          customerRef: customerKey,
+          customerRefKey: customerKey,
           customerName: customerData.customerName,
           customerContact: customerData.customerContact,
         });
