@@ -1,12 +1,17 @@
 .Agenda {
     background-color: #e0e0e0;
     border-right: 1px solid #bdbdbd;
-    overflow-x: hidden;
+    height: 100%;
+    position: relative;
+}
+
+.Agenda-inner {
+    position: relative;
     overflow-y: auto;
     height: 100%;
 }
 
-.Agenda-inner {
+.Agenda-customersList {
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
@@ -14,4 +19,7 @@
     display: flex;
     -webkit-flex-flow: column;
     flex-flow: column;
+}
+
+.Agenda-header {
 }

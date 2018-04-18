@@ -1,4 +1,4 @@
-.Customer {
+.AgendaCustomer {
     display: block;
     width: 100%;
     -webkit-transition: background .3s ease-in-out;
@@ -8,11 +8,11 @@
     transition: background .3s ease-in-out;
 }
 
-.Customer:hover {
+.AgendaCustomer:hover {
     background-color: #fafafa;
 }
 
-.Customer-inner {
+.AgendaCustomer-inner {
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
@@ -26,7 +26,7 @@
     padding: 14px 12px;
 }
 
-.Customer-content {
+.AgendaCustomer-content {
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
@@ -36,18 +36,18 @@
     flex-flow: column;
 }
 
-.Customer-customerName {
+.AgendaCustomer-customerName {
     margin-bottom: 1pt;
     max-width: 240px;
 }
 
-.Customer-customerName span {
+.AgendaCustomer-customerName span {
     font-size: 1rem;
     font-weight: 700;
     line-height: 1.5
 }
 
-.Customer-address {
+.AgendaCustomer-address {
     display: -webkit-box;
     display: -moz-box;
     display: -ms-flexbox;
@@ -58,12 +58,12 @@
     max-width: 240px;
 }
 
-.Customer-address span {
+.AgendaCustomer-address span {
     color: #424242;
     font-size: .875rem;
 }
 
-.Customer-actions {
+.AgendaCustomer-actions {
     -webkit-align-items: center;
     align-items: center;
     display: -webkit-box;

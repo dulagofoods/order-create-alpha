@@ -5,11 +5,12 @@ class Timeline {
     this.app = app;
     this.optionalClass = optionalClass;
 
-    this.element = document.createElement('div');
-
+    // define database instances
     this.ordersRef = this.app.ordersRef;
-    this.ordersViewRef = this.app.ordersViewRef;
+    this.ordersViewRef = this.app.ordersViewRef || this.app.activeOrdersViewRef;
     this.orderList = this.app.orderList;
+
+    this.element = document.createElement('div');
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
       this.init();

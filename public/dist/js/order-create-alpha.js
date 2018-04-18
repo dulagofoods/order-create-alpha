@@ -7,11 +7,11 @@ class Agenda {
       this.app = app;
       this.optionalClass = optionalClass;
 
-      this.element = document.createElement('div');
-
+      // define database listeners
       this.customersRef = this.app.databaseRef.ref('customers');
       this.orderList = this.app.orderList;
 
+      this.element = document.createElement('div');
       this.customers = {};
       this.isLoaded = false;
       this.isVisible = false;
@@ -29,10 +29,10 @@ class Agenda {
 
     this.build();
 
-    this.customersRef.on('child_added', snap => {
+    this.customersRef.orderByChild('usageCounter').on('child_added', snap => {
 
-      const customer = new Customer(snap.ref);
-      this.element.inner.insertBefore(customer.element, this.element.inner.firstChild);
+      const customer = new AgendaCustomer(snap.ref);
+      this.element.customersList.insertBefore(customer.element, this.element.customersList.firstChild);
       this.customers[snap.key] = customer;
 
     });
@@ -47,6 +47,82 @@ class Agenda {
     this.element.inner = document.createElement('div');
     this.element.inner.className = 'Agenda-inner';
     this.element.appendChild(this.element.inner);
+
+    this.element.header = document.createElement('nav');
+    this.element.header.className = 'Agenda-header';
+    this.element.inner.appendChild(this.element.header);
+
+    this.element.searchBar = this.buildSearchBarElement();
+
+    this.element.customersList = document.createElement('div');
+    this.element.customersList.className = 'Agenda-customersList';
+    this.element.inner.appendChild(this.element.customersList);
+
+  }
+
+  buildSearchBarElement() {
+
+    const element = document.createElement('nav');
+    element.className = 'nav-wrapper grey darken-2';
+    this.element.header.appendChild(element);
+
+    element.inputField = document.createElement('div');
+    element.inputField.className = 'input-field';
+    element.appendChild(element.inputField);
+
+    element.input = document.createElement('input');
+    element.input.id = 'search';
+    element.input.type = 'search';
+    element.input.placeholder = 'Busque pelo nome'
+    element.input.required = true;
+    element.input.addEventListener('input', () => this.search(element.input.value));
+    element.inputField.appendChild(element.input);
+
+    element.label = document.createElement('label');
+    element.label.className = 'label-icon';
+    element.label.htmlFor = 'search';
+    element.label.innerHTML = '<i class="material-icons">search</i>';
+    element.inputField.appendChild(element.label);
+
+    element.closeIcon = document.createElement('i');
+    element.closeIcon.className = 'material-icons';
+    element.closeIcon.innerHTML = 'close';
+    element.closeIcon.addEventListener('click', () => {
+      this.search('');
+      element.input.value = '';
+    });
+    element.inputField.appendChild(element.closeIcon);
+
+    return element;
+
+  }
+
+  search(queryString = '') {
+
+    if (queryString.length > 1) {
+
+      queryString = queryString.toLowerCase();
+
+      let dataArray = Object.values(this.customers);
+
+      let query = dataArray.filter(customer => {
+        return customer.data.customerName.toLowerCase().includes(queryString);
+      });
+
+      while (this.element.customersList.firstChild)
+        this.element.customersList.removeChild(this.element.customersList.firstChild);
+
+      query.forEach(customer => {
+        this.element.customersList.insertBefore(customer.element, this.element.customersList.firstChild);
+      });
+
+    } else {
+
+      Object.values(this.customers).forEach(customer => {
+        this.element.customersList.insertBefore(customer.element, this.element.customersList.firstChild);
+      });
+
+    }
 
   }
 
@@ -82,13 +158,13 @@ class Agenda {
 
 }
 
-class Customer {
+class AgendaCustomer {
 
   constructor(customerRef = false) {
 
-    this.element = document.createElement('div');
-
     this.customerRef = customerRef;
+
+    this.element = document.createElement('div');
     this.data = false;
 
     this.init();
@@ -105,16 +181,16 @@ class Customer {
 
   build() {
 
-    this.element.className = 'Customer';
+    this.element.className = 'AgendaCustomer';
     this.element.dataset.customerRefKey = this.customerRef.key;
 
     this.element.inner = document.createElement('div');
-    this.element.inner.className = 'Customer-inner';
+    this.element.inner.className = 'AgendaCustomer-inner';
     this.element.appendChild(this.element.inner);
 
     // content
     this.element.content = document.createElement('div');
-    this.element.content.className = 'Customer-content';
+    this.element.content.className = 'AgendaCustomer-content';
     this.element.inner.appendChild(this.element.content);
 
     this.element.customerName = this.buildCustomerNameElement();
@@ -122,7 +198,7 @@ class Customer {
 
     // actions
     this.element.actions = document.createElement('div');
-    this.element.actions.className = 'Customer-actions';
+    this.element.actions.className = 'AgendaCustomer-actions';
     this.element.inner.appendChild(this.element.actions);
 
     this.element.createOrderButton = this.buildCreateOrderButtonElement();
@@ -132,7 +208,7 @@ class Customer {
   buildCustomerNameElement() {
 
     const element = document.createElement('div');
-    element.className = 'Customer-customerName';
+    element.className = 'AgendaCustomer-customerName';
     this.element.content.appendChild(element);
 
     element.span = document.createElement('span');
@@ -148,19 +224,19 @@ class Customer {
   buildAddressElement() {
 
     const element = document.createElement('div');
-    element.className = 'Customer-address';
+    element.className = 'AgendaCustomer-address';
     this.element.content.appendChild(element);
 
     element.streetLine = document.createElement('span');
-    element.streetLine.className = 'Customer-streetLine';
+    element.streetLine.className = 'AgendaCustomer-streetLine';
     element.appendChild(element.streetLine);
 
     element.neighborhood = document.createElement('span');
-    element.neighborhood.className = 'Customer-neighborhood';
+    element.neighborhood.className = 'AgendaCustomer-neighborhood';
     element.appendChild(element.neighborhood);
 
     element.note = document.createElement('span');
-    element.note.className = 'Customer-note';
+    element.note.className = 'AgendaCustomer-note';
     element.appendChild(element.note);
 
     this.customerRef.child('defaultAddress').on('value', snap => {
@@ -193,7 +269,8 @@ class Customer {
     element.className = 'btn-small waves-effect waves-light light-blue';
     element.addEventListener('click', () => {
 
-      Order.create(false, false, {customer: this});
+      if (Order.create(false, false, {customer: this}))
+        this.customerRef.child('usageCounter').once('value', snap => snap.ref.set(snap.val() + 1));
 
       try {
 
@@ -222,12 +299,13 @@ class Customer {
 
   static create(data) {
 
-    console.log(data);
-
     if (databaseRef) {
+
       const customerRef = databaseRef.ref('customers').push(data).ref;
       customerRef.child('createdTime').set(moment().format());
+
       return customerRef;
+
     }
 
     return {key: null};
@@ -631,9 +709,9 @@ class Order {
           };
 
           if (customerRefKey) {
-            Customer.update(customerRefKey, data);
+            AgendaCustomer.update(customerRefKey, data);
           } else {
-            customerRefKey = Customer.create(data).key;
+            customerRefKey = AgendaCustomer.create(data).key;
             this.orderRef.child('customer/customerRefKey').set(customerRefKey);
           }
 
@@ -768,6 +846,7 @@ class Order {
 
       let createdTime = moment().toISOString();
 
+      // push new order
       const orderRef = ordersRef.push({
         billing: {
           priceAmount: 0.00,
@@ -781,10 +860,14 @@ class Order {
         isArchived: false,
         isDeleted: false
       }).ref;
+
+      // add default items
       orderRef.child('items').push({
         itemPrice: 0.00,
         quantity: 1
       });
+
+      // add default payments
       orderRef.child('billing/payments').push({
         isDefault: true,
         method: 'money',
@@ -833,12 +916,14 @@ class OrderApp {
     this.databaseRef = databaseRef;
     this.socket = socket;
 
+    // define database instances
     this.ordersRef = this.databaseRef.ref('orders');
     this.ordersViewsRef = this.databaseRef.ref('ordersViews');
     this.activeOrdersViewRef = this.ordersViewsRef.child(moment().format('YYYY-MM-DD'));
 
-    this.orderList = new OrderList(this, 'OrderApp-list', false);
-    this.timeline = new Timeline(this, 'OrderApp-timeline');
+    // define components instances
+    this.orderList = new OrderList(this, 'OrderApp-list', true);
+    this.timeline = new Timeline(this, 'OrderApp-timeline', true);
     this.agenda = new Agenda(this, 'OrderApp-agenda', false);
 
     this.activeOrderRef = false;
@@ -850,14 +935,6 @@ class OrderApp {
   init() {
 
     this.build();
-
-    // init orderList
-    this.orderList.ordersViewRef = this.activeOrdersViewRef;
-    this.orderList.init();
-
-    // init timeline
-    this.timeline.ordersViewRef = this.activeOrdersViewRef;
-    this.timeline.init();
 
     this.orderList.ordersViewRef.on('child_added', snap => {
 
@@ -2112,13 +2189,12 @@ class OrderList {
     this.app = app;
     this.optionalClass = optionalClass;
 
+    // define database instances
     this.ordersRef = this.app.ordersRef;
-    this.ordersViewRef = this.app.ordersViewRef;
+    this.ordersViewRef = this.app.ordersViewRef || this.app.activeOrdersViewRef;
 
     this.element = document.createElement('div');
-
     this.orders = {};
-
     this.isLoaded = false;
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
@@ -2130,10 +2206,11 @@ class OrderList {
 
     this.build();
 
+    // define global listeners
     this.ordersViewRef.on('child_added', snap => this.pushOrder(this.ordersRef.child(snap.key), snap.val()));
     this.ordersRef.on('child_removed', snap => this.removeOrder(this.ordersRef.child(snap.key)));
 
-    // faz algo aqui após a lista ser baixada
+    // faz algo após a lista de dados ser baixada
     this.ordersViewRef.once('value', snap => {
 
       this.buildView(!this.isLoaded);
@@ -2946,11 +3023,12 @@ class Timeline {
     this.app = app;
     this.optionalClass = optionalClass;
 
-    this.element = document.createElement('div');
-
+    // define database instances
     this.ordersRef = this.app.ordersRef;
-    this.ordersViewRef = this.app.ordersViewRef;
+    this.ordersViewRef = this.app.ordersViewRef || this.app.activeOrdersViewRef;
     this.orderList = this.app.orderList;
+
+    this.element = document.createElement('div');
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
       this.init();

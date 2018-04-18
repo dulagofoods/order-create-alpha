@@ -106,9 +106,9 @@ class Order {
           };
 
           if (customerRefKey) {
-            Customer.update(customerRefKey, data);
+            AgendaCustomer.update(customerRefKey, data);
           } else {
-            customerRefKey = Customer.create(data).key;
+            customerRefKey = AgendaCustomer.create(data).key;
             this.orderRef.child('customer/customerRefKey').set(customerRefKey);
           }
 
@@ -243,6 +243,7 @@ class Order {
 
       let createdTime = moment().toISOString();
 
+      // push new order
       const orderRef = ordersRef.push({
         billing: {
           priceAmount: 0.00,
@@ -256,10 +257,14 @@ class Order {
         isArchived: false,
         isDeleted: false
       }).ref;
+
+      // add default items
       orderRef.child('items').push({
         itemPrice: 0.00,
         quantity: 1
       });
+
+      // add default payments
       orderRef.child('billing/payments').push({
         isDefault: true,
         method: 'money',

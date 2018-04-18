@@ -1,10 +1,10 @@
-class Customer {
+class AgendaCustomer {
 
   constructor(customerRef = false) {
 
-    this.element = document.createElement('div');
-
     this.customerRef = customerRef;
+
+    this.element = document.createElement('div');
     this.data = false;
 
     this.init();
@@ -21,16 +21,16 @@ class Customer {
 
   build() {
 
-    this.element.className = 'Customer';
+    this.element.className = 'AgendaCustomer';
     this.element.dataset.customerRefKey = this.customerRef.key;
 
     this.element.inner = document.createElement('div');
-    this.element.inner.className = 'Customer-inner';
+    this.element.inner.className = 'AgendaCustomer-inner';
     this.element.appendChild(this.element.inner);
 
     // content
     this.element.content = document.createElement('div');
-    this.element.content.className = 'Customer-content';
+    this.element.content.className = 'AgendaCustomer-content';
     this.element.inner.appendChild(this.element.content);
 
     this.element.customerName = this.buildCustomerNameElement();
@@ -38,7 +38,7 @@ class Customer {
 
     // actions
     this.element.actions = document.createElement('div');
-    this.element.actions.className = 'Customer-actions';
+    this.element.actions.className = 'AgendaCustomer-actions';
     this.element.inner.appendChild(this.element.actions);
 
     this.element.createOrderButton = this.buildCreateOrderButtonElement();
@@ -48,7 +48,7 @@ class Customer {
   buildCustomerNameElement() {
 
     const element = document.createElement('div');
-    element.className = 'Customer-customerName';
+    element.className = 'AgendaCustomer-customerName';
     this.element.content.appendChild(element);
 
     element.span = document.createElement('span');
@@ -64,19 +64,19 @@ class Customer {
   buildAddressElement() {
 
     const element = document.createElement('div');
-    element.className = 'Customer-address';
+    element.className = 'AgendaCustomer-address';
     this.element.content.appendChild(element);
 
     element.streetLine = document.createElement('span');
-    element.streetLine.className = 'Customer-streetLine';
+    element.streetLine.className = 'AgendaCustomer-streetLine';
     element.appendChild(element.streetLine);
 
     element.neighborhood = document.createElement('span');
-    element.neighborhood.className = 'Customer-neighborhood';
+    element.neighborhood.className = 'AgendaCustomer-neighborhood';
     element.appendChild(element.neighborhood);
 
     element.note = document.createElement('span');
-    element.note.className = 'Customer-note';
+    element.note.className = 'AgendaCustomer-note';
     element.appendChild(element.note);
 
     this.customerRef.child('defaultAddress').on('value', snap => {
@@ -109,7 +109,8 @@ class Customer {
     element.className = 'btn-small waves-effect waves-light light-blue';
     element.addEventListener('click', () => {
 
-      Order.create(false, false, {customer: this});
+      if (Order.create(false, false, {customer: this}))
+        this.customerRef.child('usageCounter').once('value', snap => snap.ref.set(snap.val() + 1));
 
       try {
 
@@ -138,12 +139,13 @@ class Customer {
 
   static create(data) {
 
-    console.log(data);
-
     if (databaseRef) {
+
       const customerRef = databaseRef.ref('customers').push(data).ref;
       customerRef.child('createdTime').set(moment().format());
+
       return customerRef;
+
     }
 
     return {key: null};

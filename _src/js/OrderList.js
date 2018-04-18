@@ -5,13 +5,12 @@ class OrderList {
     this.app = app;
     this.optionalClass = optionalClass;
 
+    // define database instances
     this.ordersRef = this.app.ordersRef;
-    this.ordersViewRef = this.app.ordersViewRef;
+    this.ordersViewRef = this.app.ordersViewRef || this.app.activeOrdersViewRef;
 
     this.element = document.createElement('div');
-
     this.orders = {};
-
     this.isLoaded = false;
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
@@ -23,10 +22,11 @@ class OrderList {
 
     this.build();
 
+    // define global listeners
     this.ordersViewRef.on('child_added', snap => this.pushOrder(this.ordersRef.child(snap.key), snap.val()));
     this.ordersRef.on('child_removed', snap => this.removeOrder(this.ordersRef.child(snap.key)));
 
-    // faz algo aqui após a lista ser baixada
+    // faz algo após a lista de dados ser baixada
     this.ordersViewRef.once('value', snap => {
 
       this.buildView(!this.isLoaded);

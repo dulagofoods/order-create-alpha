@@ -6,12 +6,14 @@ class OrderApp {
     this.databaseRef = databaseRef;
     this.socket = socket;
 
+    // define database instances
     this.ordersRef = this.databaseRef.ref('orders');
     this.ordersViewsRef = this.databaseRef.ref('ordersViews');
     this.activeOrdersViewRef = this.ordersViewsRef.child(moment().format('YYYY-MM-DD'));
 
-    this.orderList = new OrderList(this, 'OrderApp-list', false);
-    this.timeline = new Timeline(this, 'OrderApp-timeline');
+    // define components instances
+    this.orderList = new OrderList(this, 'OrderApp-list', true);
+    this.timeline = new Timeline(this, 'OrderApp-timeline', true);
     this.agenda = new Agenda(this, 'OrderApp-agenda', false);
 
     this.activeOrderRef = false;
@@ -23,14 +25,6 @@ class OrderApp {
   init() {
 
     this.build();
-
-    // init orderList
-    this.orderList.ordersViewRef = this.activeOrdersViewRef;
-    this.orderList.init();
-
-    // init timeline
-    this.timeline.ordersViewRef = this.activeOrdersViewRef;
-    this.timeline.init();
 
     this.orderList.ordersViewRef.on('child_added', snap => {
 
