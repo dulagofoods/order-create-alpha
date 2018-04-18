@@ -109,8 +109,12 @@ class AgendaCustomer {
     element.className = 'btn-small waves-effect waves-light light-blue';
     element.addEventListener('click', () => {
 
-      if (Order.create(false, false, {customer: this}))
+      let order = Order.create(false, false, {customer: this});
+      if (order) {
         this.customerRef.child('usageCounter').once('value', snap => snap.ref.set(snap.val() + 1));
+        this.customerRef.child('lastOrder').set(moment().format());
+        this.customerRef.child('orders/' + order.key).set(true);
+      }
 
       try {
 
