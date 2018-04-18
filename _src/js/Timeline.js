@@ -11,6 +11,7 @@ class Timeline {
     this.orderList = this.app.orderList;
 
     this.element = document.createElement('div');
+    this.orders = {};
     this.isVisible = false;
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
@@ -26,9 +27,9 @@ class Timeline {
 
       if (snap.val()) {
 
-        const timelineItem = new TimelineItem(this.ordersRef.child(snap.key), this.orderList, false);
-        this.element.inner.insertBefore(timelineItem.element, this.element.inner.firstChild);
-        timelineItem.init();
+        this.orders[snap.key] = new TimelineItem(this.ordersRef.child(snap.key), this.orderList, false);
+        this.element.inner.insertBefore(this.orders[snap.key].element, this.element.inner.firstChild);
+        this.orders[snap.key].init();
 
       }
 
@@ -66,9 +67,6 @@ class Timeline {
       this.app.element.classList.add('is-timelineVisible');
 
     this.isVisible = true;
-
-    if (!this.isLoaded)
-      this.init();
 
   }
 
