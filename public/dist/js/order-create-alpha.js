@@ -1027,7 +1027,7 @@ class OrderApp {
     element.nav.menu.timelineTrigger.link = document.createElement('a');
     element.nav.menu.timelineTrigger.link.className = 'waves-effect waves-light';
     element.nav.menu.timelineTrigger.link.innerHTML = '<i class="material-icons">view_list</i>';
-    element.nav.menu.timelineTrigger.link.addEventListener('click', () => this.element.classList.toggle('is-timelineVisible'));
+    element.nav.menu.timelineTrigger.link.addEventListener('click', () => this.timeline.toggle());
     element.nav.menu.timelineTrigger.appendChild(element.nav.menu.timelineTrigger.link);
 
     return element;
@@ -3029,6 +3029,7 @@ class Timeline {
     this.orderList = this.app.orderList;
 
     this.element = document.createElement('div');
+    this.isVisible = false;
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
       this.init();
@@ -3080,7 +3081,7 @@ class Timeline {
   active() {
 
     if (this.app.element)
-      this.app.element.classList.add('is-agendaVisible');
+      this.app.element.classList.add('is-timelineVisible');
 
     this.isVisible = true;
 
@@ -3092,7 +3093,7 @@ class Timeline {
   inactive() {
 
     if (this.app.element)
-      this.app.element.classList.remove('is-agendaVisible');
+      this.app.element.classList.remove('is-timelineVisible');
 
     this.isVisible = false;
 

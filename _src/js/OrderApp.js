@@ -117,7 +117,7 @@ class OrderApp {
     element.nav.menu.timelineTrigger.link = document.createElement('a');
     element.nav.menu.timelineTrigger.link.className = 'waves-effect waves-light';
     element.nav.menu.timelineTrigger.link.innerHTML = '<i class="material-icons">view_list</i>';
-    element.nav.menu.timelineTrigger.link.addEventListener('click', () => this.element.classList.toggle('is-timelineVisible'));
+    element.nav.menu.timelineTrigger.link.addEventListener('click', () => this.timeline.toggle());
     element.nav.menu.timelineTrigger.appendChild(element.nav.menu.timelineTrigger.link);
 
     return element;

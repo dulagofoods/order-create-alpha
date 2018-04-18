@@ -11,6 +11,7 @@ class Timeline {
     this.orderList = this.app.orderList;
 
     this.element = document.createElement('div');
+    this.isVisible = false;
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
       this.init();
@@ -62,7 +63,7 @@ class Timeline {
   active() {
 
     if (this.app.element)
-      this.app.element.classList.add('is-agendaVisible');
+      this.app.element.classList.add('is-timelineVisible');
 
     this.isVisible = true;
 
@@ -74,7 +75,7 @@ class Timeline {
   inactive() {
 
     if (this.app.element)
-      this.app.element.classList.remove('is-agendaVisible');
+      this.app.element.classList.remove('is-timelineVisible');
 
     this.isVisible = false;
 
