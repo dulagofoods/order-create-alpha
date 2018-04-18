@@ -1,7 +1,4 @@
 class OrderApp {
-  /*
-  TODO vincular o gerenciador com agenda de contatos
-   */
 
   constructor(element, databaseRef, socket) {
 
@@ -11,12 +8,13 @@ class OrderApp {
 
     this.ordersRef = this.databaseRef.ref('orders');
     this.ordersViewsRef = this.databaseRef.ref('ordersViews');
+    this.activeOrdersViewRef = this.ordersViewsRef.child(moment().format('YYYY-MM-DD'));
 
-    this.orderList = new OrderList(this.ordersRef, false, 'OrderApp-list');
-    this.orderTimeline = new Timeline(this.ordersRef, false, this.orderList, 'OrderApp-timeline');
-    this.agenda = new Agenda(this.databaseRef, this.orderList, 'OrderApp-agenda');
+    this.orderList = new OrderList(this, 'OrderApp-list', false);
+    this.timeline = new Timeline(this, 'OrderApp-timeline');
+    this.agenda = new Agenda(this, 'OrderApp-agenda', false);
 
-    this.activeOrderKey = false;
+    this.activeOrderRef = false;
 
     this.init();
 
@@ -26,21 +24,21 @@ class OrderApp {
 
     this.build();
 
-    // get ordersView child key
-    this.activeOrdersViewRef = this.ordersViewsRef.child(moment().format('YYYY-MM-DD'));
-
     // init orderList
     this.orderList.ordersViewRef = this.activeOrdersViewRef;
     this.orderList.init();
 
     // init timeline
-    this.orderTimeline.ordersViewRef = this.activeOrdersViewRef;
-    this.orderTimeline.init();
+    this.timeline.ordersViewRef = this.activeOrdersViewRef;
+    this.timeline.init();
 
     this.orderList.ordersViewRef.on('child_added', snap => {
 
-      if (this.activeOrderKey === snap.key)
-        this.orderList.orders[snap.key].focus();
+      if (this.activeOrderRef)
+        if (this.activeOrderRef.key === snap.key)
+          this.orderList.orders[snap.key].focus();
+
+      this.activeOrderRef = false;
 
     });
 
@@ -60,10 +58,10 @@ class OrderApp {
   build() {
 
     if (window.innerWidth < 601)
-      this.element.classList.remove('is-timelineVisible');
+      this.timeline.inactive(this.element);
 
     if (window.innerWidth > 1200)
-      this.element.classList.add('is-agendaVisible');
+      this.agenda.active(this.element);
 
     this.element.inner = document.createElement('div');
     this.element.inner.className = 'OrderApp-inner';
@@ -72,7 +70,7 @@ class OrderApp {
     this.element.header = this.buildHeaderElement();
 
     this.element.inner.appendChild(this.orderList.element);
-    this.element.inner.appendChild(this.orderTimeline.element);
+    this.element.inner.appendChild(this.timeline.element);
     this.element.inner.appendChild(this.agenda.element);
 
     this.actionButtons = document.createElement('div');
@@ -80,9 +78,6 @@ class OrderApp {
     this.element.inner.append(this.actionButtons);
 
     this.element.floatingActionButton = this.buildFloatingActionButton();
-
-    if (window.innerWidth < 720)
-      this.element.classList.toggle('is-timelineHidden');
 
   }
 
@@ -118,7 +113,7 @@ class OrderApp {
     element.nav.menu.agendaTrigger.link = document.createElement('a');
     element.nav.menu.agendaTrigger.link.className = 'waves-effect waves-light';
     element.nav.menu.agendaTrigger.link.innerHTML = '<i class="material-icons">import_contacts</i>';
-    element.nav.menu.agendaTrigger.link.addEventListener('click', () => this.element.classList.toggle('is-agendaVisible'));
+    element.nav.menu.agendaTrigger.link.addEventListener('click', () => this.agenda.toggle());
     element.nav.menu.agendaTrigger.appendChild(element.nav.menu.agendaTrigger.link);
 
     // timeline trigger
@@ -162,7 +157,7 @@ class OrderApp {
 
   addNewOrderToList() {
 
-    this.activeOrderKey = Order.create(this.ordersRef, this.activeOrdersViewRef).key;
+    this.activeOrderRef = Order.create(this.ordersRef, this.activeOrdersViewRef);
 
     try {
 

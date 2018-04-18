@@ -1,10 +1,12 @@
 class OrderList {
 
-  constructor(ordersRef, ordersViewRef = null, optionalClass = '') {
+  constructor(app, optionalClass = '', autoInit = true) {
 
-    this.ordersRef = ordersRef;
-    this.ordersViewRef = ordersViewRef;
+    this.app = app;
     this.optionalClass = optionalClass;
+
+    this.ordersRef = this.app.ordersRef;
+    this.ordersViewRef = this.app.ordersViewRef;
 
     this.element = document.createElement('div');
 
@@ -12,7 +14,7 @@ class OrderList {
 
     this.isLoaded = false;
 
-    if (this.ordersRef && this.ordersViewRef)
+    if (this.ordersRef && this.ordersViewRef && autoInit)
       this.init();
 
   }

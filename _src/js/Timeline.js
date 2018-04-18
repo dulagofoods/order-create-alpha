@@ -1,15 +1,17 @@
 class Timeline {
 
-  constructor(ordersRef, ordersViewRef = null, orderList = false, optionalClass = '') {
+  constructor(app = false, optionalClass = '', autoInit = true) {
 
-    this.ordersRef = ordersRef;
-    this.ordersViewRef = ordersViewRef;
-    this.orderList = orderList;
+    this.app = app;
     this.optionalClass = optionalClass;
 
     this.element = document.createElement('div');
 
-    if (this.ordersRef && this.ordersViewRef)
+    this.ordersRef = this.app.ordersRef;
+    this.ordersViewRef = this.app.ordersViewRef;
+    this.orderList = this.app.orderList;
+
+    if (this.ordersRef && this.ordersViewRef && autoInit)
       this.init();
 
   }
@@ -44,6 +46,36 @@ class Timeline {
     this.element.footer = document.createElement('div');
     this.element.footer.className = 'Timeline-footer';
     this.element.appendChild(this.element.footer);
+
+  }
+
+  toggle() {
+
+    if (this.isVisible)
+      this.inactive();
+    else
+      this.active();
+
+  }
+
+  active() {
+
+    if (this.app.element)
+      this.app.element.classList.add('is-agendaVisible');
+
+    this.isVisible = true;
+
+    if (!this.isLoaded)
+      this.init();
+
+  }
+
+  inactive() {
+
+    if (this.app.element)
+      this.app.element.classList.remove('is-agendaVisible');
+
+    this.isVisible = false;
 
   }
 

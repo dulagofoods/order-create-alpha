@@ -1,22 +1,31 @@
 class Agenda {
 
-  constructor(databaseRef = false, orderList = false, optionalClass) {
+  constructor(app = false, optionalClass, autoInit = true) {
 
-    this.databaseRef = databaseRef;
-    this.customersRef = this.databaseRef ? databaseRef.ref('customers') : false;
-    this.optionalClass = optionalClass;
+    if (app) {
 
-    this.orderList = orderList;
+      this.app = app;
+      this.optionalClass = optionalClass;
 
-    this.element = document.createElement('div');
-    this.customers = {};
+      this.element = document.createElement('div');
 
-    if (this.customersRef)
-      this.init();
+      this.customersRef = this.app.databaseRef.ref('customers');
+      this.orderList = this.app.orderList;
+
+      this.customers = {};
+      this.isLoaded = false;
+      this.isVisible = false;
+
+      if (this.customersRef && autoInit)
+        this.init();
+
+    }
 
   }
 
   init() {
+
+    this.isLoaded = true;
 
     this.build();
 
@@ -38,6 +47,36 @@ class Agenda {
     this.element.inner = document.createElement('div');
     this.element.inner.className = 'Agenda-inner';
     this.element.appendChild(this.element.inner);
+
+  }
+
+  toggle() {
+
+    if (this.isVisible)
+      this.inactive();
+    else
+      this.active();
+
+  }
+
+  active() {
+
+    if (this.app.element)
+      this.app.element.classList.add('is-agendaVisible');
+
+    this.isVisible = true;
+
+    if (!this.isLoaded)
+      this.init();
+
+  }
+
+  inactive() {
+
+    if (this.app.element)
+      this.app.element.classList.remove('is-agendaVisible');
+
+    this.isVisible = false;
 
   }
 
