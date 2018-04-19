@@ -31,7 +31,7 @@ class Agenda {
 
     this.customersRef.orderByChild('usageCounter').on('child_added', snap => {
 
-      const customer = new AgendaCustomer(snap.ref);
+      const customer = new AgendaCustomer(snap.ref, this);
       this.element.customersList.insertBefore(customer.element, this.element.customersList.firstChild);
       this.customers[snap.key] = customer;
 

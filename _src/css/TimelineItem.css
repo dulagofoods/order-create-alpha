@@ -1,5 +1,6 @@
 .TimelineItem {
     background-color: #fafafa;
+    border-left: solid 4px transparent;
     border-bottom: solid 1px #eeeeee;
     color: #212121;
     cursor: default;
@@ -32,6 +33,10 @@
 
 .TimelineItem:last-of-type {
     border-bottom: none;
+}
+
+.TimelineItem.is-opened {
+    border-left-color: #00C853;
 }
 
 .TimelineItem.is-deleting {
@@ -81,10 +86,13 @@
     flex-flow: column;
     -webkit-justify-content: center;
     justify-content: center;
-    max-width: 140px;
-    overflow: hidden;
     padding: 0 .5rem;
     width: 100%;
+}
+
+TimelineItem-customerName {
+    max-width: 140px;
+    overflow: hidden;
 }
 
 .TimelineItem-customerName span {
@@ -100,7 +108,6 @@
 button.TimelineItem-actionButton {
     background-color: transparent;
     border: none;
-    /*border-left: solid 1px #eeeeee;*/
     color: #9E9E9E;
     cursor: pointer;
     height: 60px;

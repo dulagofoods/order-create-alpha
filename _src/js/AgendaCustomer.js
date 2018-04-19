@@ -1,8 +1,11 @@
 class AgendaCustomer {
 
-  constructor(customerRef = false) {
+  constructor(customerRef = false, agenda = false) {
 
     this.customerRef = customerRef;
+    this.agenda = agenda;
+
+    this.orderList = this.agenda.orderList;
 
     this.element = document.createElement('div');
     this.data = false;
@@ -94,7 +97,6 @@ class AgendaCustomer {
         if (address.neighborhood)
           element.neighborhood.innerHTML = address.neighborhood;
 
-
       }
 
     });
@@ -114,19 +116,18 @@ class AgendaCustomer {
         this.customerRef.child('usageCounter').once('value', snap => snap.ref.set(snap.val() + 1));
         this.customerRef.child('lastOrder').set(moment().format());
         this.customerRef.child('orders/' + order.key).set(true);
+        this.orderList.open(order.key);
+        if (window.innerWidth < 1200)
+          this.agenda.inactive();
       }
 
       try {
-
         M.toast({
           html: 'Pedido Criado!',
           displayLength: 2000
         });
-
       } catch (e) {
-
         console.log('materialize error');
-
       }
 
     });

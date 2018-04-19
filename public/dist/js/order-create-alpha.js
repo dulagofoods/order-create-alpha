@@ -31,7 +31,7 @@ class Agenda {
 
     this.customersRef.orderByChild('usageCounter').on('child_added', snap => {
 
-      const customer = new AgendaCustomer(snap.ref);
+      const customer = new AgendaCustomer(snap.ref, this);
       this.element.customersList.insertBefore(customer.element, this.element.customersList.firstChild);
       this.customers[snap.key] = customer;
 
@@ -160,9 +160,12 @@ class Agenda {
 
 class AgendaCustomer {
 
-  constructor(customerRef = false) {
+  constructor(customerRef = false, agenda = false) {
 
     this.customerRef = customerRef;
+    this.agenda = agenda;
+
+    this.orderList = this.agenda.orderList;
 
     this.element = document.createElement('div');
     this.data = false;
@@ -254,7 +257,6 @@ class AgendaCustomer {
         if (address.neighborhood)
           element.neighborhood.innerHTML = address.neighborhood;
 
-
       }
 
     });
@@ -274,19 +276,18 @@ class AgendaCustomer {
         this.customerRef.child('usageCounter').once('value', snap => snap.ref.set(snap.val() + 1));
         this.customerRef.child('lastOrder').set(moment().format());
         this.customerRef.child('orders/' + order.key).set(true);
+        this.orderList.open(order.key);
+        if (window.innerWidth < 1200)
+          this.agenda.inactive();
       }
 
       try {
-
         M.toast({
           html: 'Pedido Criado!',
           displayLength: 2000
         });
-
       } catch (e) {
-
         console.log('materialize error');
-
       }
 
     });
@@ -607,12 +608,13 @@ class GridItem {
 }
 class Order {
 
-  constructor(orderRef, autoInit) {
+  constructor(orderRef = false, orderList = false, autoInit) {
 
     this.orderRef = orderRef;
-    this.orderKey = this.orderRef.key;
+    this.orderList = orderList;
 
     this.createdTime = null;
+    this.isInited = false;
     this.data = {};
 
     this.socket = socket;
@@ -626,36 +628,42 @@ class Order {
 
   init() {
 
-    this.customer = new OrderCustomer(this.orderRef);
-    this.items = new OrderItemList(this.orderRef);
-    this.billing = new OrderBilling(this.orderRef);
-    this.delivery = new OrderDelivery(this.orderRef);
+    if (!this.isInited) {
 
-    this.build();
+      this.isInited = true;
 
-    // action listener
-    this.orderRef.on('value', snap => {
+      this.customer = new OrderCustomer(this.orderRef);
+      this.items = new OrderItemList(this.orderRef);
+      this.billing = new OrderBilling(this.orderRef);
+      this.delivery = new OrderDelivery(this.orderRef);
 
-      this.data = snap.val();
-      this.isArchived = !!snap.val().isArchived;
-      this.isDeleted = !!snap.val().isDeleted;
+      this.build();
 
-      // is deleted
-      if (this.isDeleted) {
+      // action listener
+      this.orderRef.on('value', snap => {
 
-        this.data = null;
-        this.element.classList.add('is-deleted');
+        this.data = snap.val();
+        this.isArchived = !!snap.val().isArchived;
+        this.isDeleted = !!snap.val().isDeleted;
 
-      }
+        // is deleted
+        if (this.isDeleted) {
 
-    });
+          this.data = null;
+          this.element.classList.add('is-deleted');
+
+        }
+
+      });
+
+    }
 
   }
 
   build() {
 
     this.element.className = 'Order card grey lighten-5';
-    this.element.dataset.orderRefKey = this.orderKey;
+    this.element.dataset.orderRefKey = this.orderRef.key;
 
     this.element.contentElement = document.createElement('div');
     this.element.contentElement.className = 'Order-inner card-content';
@@ -679,7 +687,7 @@ class Order {
     this.element.appendChild(element);
 
     element.printButton = document.createElement('button');
-    element.printButton.className = 'waves-effect waves-green btn light-blue';
+    element.printButton.className = 'left waves-effect waves-green btn light-blue';
     element.printButton.innerHTML = '<i class="material-icons left">print</i>Imprimir';
     element.printButton.addEventListener('click', () => {
 
@@ -689,7 +697,7 @@ class Order {
     element.appendChild(element.printButton);
 
     element.saveButton = document.createElement('button');
-    element.saveButton.className = 'waves-effect waves-orange btn-flat orange-text';
+    element.saveButton.className = 'left waves-effect waves-orange btn-flat orange-text';
     element.saveButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">save</i>Salvar</span>' +
       '<span class="hide-on-large-only"><i class="material-icons">save</i></span>';
     element.saveButton.addEventListener('click', () => {
@@ -729,9 +737,8 @@ class Order {
     element.appendChild(element.saveButton);
 
     element.deleteButton = document.createElement('button');
-    element.deleteButton.className = 'right waves-effect waves-red btn-flat red-text';
-    element.deleteButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">delete</i>Excluir</span>' +
-      '<span class="hide-on-large-only"><i class="material-icons">delete</i></span>';
+    element.deleteButton.className = 'left waves-effect waves-red btn-flat red-text';
+    element.deleteButton.innerHTML = '<span><i class="material-icons">delete</i></span>';
     element.deleteButton.addEventListener('click', () => {
 
       if (window.confirm('Tem certeza?')) {
@@ -754,6 +761,13 @@ class Order {
 
     });
     element.appendChild(element.deleteButton);
+
+    element.closeButton = document.createElement('button');
+    element.closeButton.className = 'right waves-effect waves-red btn-flat red-text';
+    element.closeButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">close</i>Fechar</span>' +
+      '<span class="hide-on-large-only"><i class="material-icons">close</i></span>';
+    element.closeButton.addEventListener('click', () => this.orderList.close(this.orderRef.key));
+    element.appendChild(element.closeButton);
 
     return element;
 
@@ -910,6 +924,16 @@ class Order {
 
   }
 
+  destroy() {
+
+    this.orderRef.off();
+    this.isInited = false;
+
+    while (this.element.firstChild)
+      this.element.removeChild(this.element.firstChild);
+
+  }
+
 }
 
 class OrderApp {
@@ -944,7 +968,7 @@ class OrderApp {
 
       if (this.activeOrderRef)
         if (this.activeOrderRef.key === snap.key)
-          this.orderList.orders[snap.key].focus();
+          this.orderList.open(snap.key, true);
 
       this.activeOrderRef = false;
 
@@ -2189,6 +2213,7 @@ class OrderList {
 
     this.element = document.createElement('div');
     this.orders = {};
+    this.currentOrdersView = {};
     this.isLoaded = false;
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
@@ -2207,8 +2232,8 @@ class OrderList {
     // faz algo após a lista de dados ser baixada
     this.ordersViewRef.once('value', snap => {
 
-      this.buildView(!this.isLoaded);
-      this.isLoaded = true;
+      // this.buildView(!this.isLoaded);
+      // this.isLoaded = true;
 
     });
 
@@ -2252,20 +2277,24 @@ class OrderList {
 
     if (data) {
 
-      if (orderRef)
-        this.orders[orderRef.key] = new Order(orderRef, false);
+      if (!this.orders[orderRef.key]) {
 
-      this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
-      this.orders[orderRef.key].createdTime = moment(data.createdTime);
+        if (orderRef && !this.orders[orderRef.key])
+          this.orders[orderRef.key] = new Order(orderRef, this, false);
 
-      this.orders[orderRef.key].orderRef.child('isDeleted').on('value', snap => {
-        if (!!snap.val())
-          this.orders[orderRef.key].ordersViewItemRef.set(false);
-      });
+        this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
+        this.orders[orderRef.key].createdTime = moment(data.createdTime);
 
-      if (this.isLoaded) {
-        this.appendOrderToView(this.orders[orderRef.key], true);
-        this.orders[orderRef.key].init();
+        this.orders[orderRef.key].orderRef.child('isDeleted').on('value', snap => {
+          if (!!snap.val())
+            this.orders[orderRef.key].ordersViewItemRef.set(false);
+        });
+
+        if (this.isLoaded) {
+          this.appendOrderToView(this.orders[orderRef.key], true);
+          this.orders[orderRef.key].init();
+        }
+
       }
 
     }
@@ -2288,6 +2317,41 @@ class OrderList {
       this.element.inner.insertBefore(order.element, this.element.inner.firstChild);
     else
       this.element.inner.appendChild(order.element);
+
+  }
+
+  open(orderKey = '', getFocus = false) {
+
+    const self = this;
+
+    setTimeout(() => {
+
+      const order = self.orders[orderKey];
+
+      if (order && !self.currentOrdersView[orderKey]) {
+
+        self.element.inner.insertBefore(order.element, self.element.inner.firstChild);
+        self.currentOrdersView[orderKey] = order;
+        order.init();
+
+        if (getFocus)
+          order.focus();
+
+      }
+
+    }, 10);
+
+  }
+
+  close(orderKey = '') {
+
+    const order = this.orders[orderKey];
+
+    if (order && this.currentOrdersView[orderKey]) {
+      this.element.inner.removeChild(order.element);
+      delete this.currentOrdersView[orderKey];
+      order.destroy();
+    }
 
   }
 
@@ -3098,6 +3162,7 @@ class TimelineItem {
 
     this.orderRef = orderRef;
     this.orderList = orderList;
+    this.isOpened = false;
 
     this.element = document.createElement('div');
 
@@ -3136,23 +3201,46 @@ class TimelineItem {
 
     this.element.content.addEventListener('click', event => {
 
-      let scrollType = !event.shiftKey ? 'smooth' : 'instant';
+      const self = this;
 
-      try {
+      this.orderList.open(this.orderRef.key);
 
-        let orderElement = this.orderList.orders[this.orderRef.key].element;
+      setTimeout(() => {
 
-        orderElement.scrollIntoView({
-          behavior: scrollType
-        });
+        let scrollType = !event.shiftKey ? 'smooth' : 'instant';
 
-      } catch (e) {
-        console.log(e);
-      }
+        try {
+
+          let orderElement = self.orderList.orders[self.orderRef.key].element;
+
+          orderElement.scrollIntoView({
+            behavior: scrollType
+          });
+
+        } catch (e) {
+
+          console.log(e);
+
+        }
+
+      }, 10);
 
     });
 
     this.element.content.addEventListener('dblclick', event => console.log(event));
+
+    const self = this;
+
+    setInterval(() => {
+
+      if (self.orderList.currentOrdersView[self.orderRef.key])
+        self.element.classList.add('is-opened');
+      else
+        self.element.classList.remove('is-opened');
+
+      console.log('1');
+
+    }, 500);
 
   }
 
@@ -3237,6 +3325,7 @@ class TimelineItem {
     element.className = 'TimelineItem-actionButton TimelineItem-actionButton--archive';
     element.addEventListener('click', () => {
       this.orderRef.child('isArchived').once('value', snap => this.orderRef.child('isArchived').set(!snap.val()));
+      this.orderList.close(this.orderRef.key);
     });
     this.element.actions.appendChild(element);
 

@@ -30,7 +30,7 @@ class OrderApp {
 
       if (this.activeOrderRef)
         if (this.activeOrderRef.key === snap.key)
-          this.orderList.orders[snap.key].focus();
+          this.orderList.open(snap.key, true);
 
       this.activeOrderRef = false;
 

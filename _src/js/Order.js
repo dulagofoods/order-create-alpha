@@ -1,11 +1,12 @@
 class Order {
 
-  constructor(orderRef, autoInit) {
+  constructor(orderRef = false, orderList = false, autoInit) {
 
     this.orderRef = orderRef;
-    this.orderKey = this.orderRef.key;
+    this.orderList = orderList;
 
     this.createdTime = null;
+    this.isInited = false;
     this.data = {};
 
     this.socket = socket;
@@ -19,36 +20,42 @@ class Order {
 
   init() {
 
-    this.customer = new OrderCustomer(this.orderRef);
-    this.items = new OrderItemList(this.orderRef);
-    this.billing = new OrderBilling(this.orderRef);
-    this.delivery = new OrderDelivery(this.orderRef);
+    if (!this.isInited) {
 
-    this.build();
+      this.isInited = true;
 
-    // action listener
-    this.orderRef.on('value', snap => {
+      this.customer = new OrderCustomer(this.orderRef);
+      this.items = new OrderItemList(this.orderRef);
+      this.billing = new OrderBilling(this.orderRef);
+      this.delivery = new OrderDelivery(this.orderRef);
 
-      this.data = snap.val();
-      this.isArchived = !!snap.val().isArchived;
-      this.isDeleted = !!snap.val().isDeleted;
+      this.build();
 
-      // is deleted
-      if (this.isDeleted) {
+      // action listener
+      this.orderRef.on('value', snap => {
 
-        this.data = null;
-        this.element.classList.add('is-deleted');
+        this.data = snap.val();
+        this.isArchived = !!snap.val().isArchived;
+        this.isDeleted = !!snap.val().isDeleted;
 
-      }
+        // is deleted
+        if (this.isDeleted) {
 
-    });
+          this.data = null;
+          this.element.classList.add('is-deleted');
+
+        }
+
+      });
+
+    }
 
   }
 
   build() {
 
     this.element.className = 'Order card grey lighten-5';
-    this.element.dataset.orderRefKey = this.orderKey;
+    this.element.dataset.orderRefKey = this.orderRef.key;
 
     this.element.contentElement = document.createElement('div');
     this.element.contentElement.className = 'Order-inner card-content';
@@ -72,7 +79,7 @@ class Order {
     this.element.appendChild(element);
 
     element.printButton = document.createElement('button');
-    element.printButton.className = 'waves-effect waves-green btn light-blue';
+    element.printButton.className = 'left waves-effect waves-green btn light-blue';
     element.printButton.innerHTML = '<i class="material-icons left">print</i>Imprimir';
     element.printButton.addEventListener('click', () => {
 
@@ -82,7 +89,7 @@ class Order {
     element.appendChild(element.printButton);
 
     element.saveButton = document.createElement('button');
-    element.saveButton.className = 'waves-effect waves-orange btn-flat orange-text';
+    element.saveButton.className = 'left waves-effect waves-orange btn-flat orange-text';
     element.saveButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">save</i>Salvar</span>' +
       '<span class="hide-on-large-only"><i class="material-icons">save</i></span>';
     element.saveButton.addEventListener('click', () => {
@@ -122,9 +129,8 @@ class Order {
     element.appendChild(element.saveButton);
 
     element.deleteButton = document.createElement('button');
-    element.deleteButton.className = 'right waves-effect waves-red btn-flat red-text';
-    element.deleteButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">delete</i>Excluir</span>' +
-      '<span class="hide-on-large-only"><i class="material-icons">delete</i></span>';
+    element.deleteButton.className = 'left waves-effect waves-red btn-flat red-text';
+    element.deleteButton.innerHTML = '<span><i class="material-icons">delete</i></span>';
     element.deleteButton.addEventListener('click', () => {
 
       if (window.confirm('Tem certeza?')) {
@@ -147,6 +153,13 @@ class Order {
 
     });
     element.appendChild(element.deleteButton);
+
+    element.closeButton = document.createElement('button');
+    element.closeButton.className = 'right waves-effect waves-red btn-flat red-text';
+    element.closeButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">close</i>Fechar</span>' +
+      '<span class="hide-on-large-only"><i class="material-icons">close</i></span>';
+    element.closeButton.addEventListener('click', () => this.orderList.close(this.orderRef.key));
+    element.appendChild(element.closeButton);
 
     return element;
 
@@ -300,6 +313,16 @@ class Order {
     }
 
     return false;
+
+  }
+
+  destroy() {
+
+    this.orderRef.off();
+    this.isInited = false;
+
+    while (this.element.firstChild)
+      this.element.removeChild(this.element.firstChild);
 
   }
 

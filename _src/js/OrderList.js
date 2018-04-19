@@ -11,6 +11,7 @@ class OrderList {
 
     this.element = document.createElement('div');
     this.orders = {};
+    this.currentOrdersView = {};
     this.isLoaded = false;
 
     if (this.ordersRef && this.ordersViewRef && autoInit)
@@ -29,8 +30,8 @@ class OrderList {
     // faz algo após a lista de dados ser baixada
     this.ordersViewRef.once('value', snap => {
 
-      this.buildView(!this.isLoaded);
-      this.isLoaded = true;
+      // this.buildView(!this.isLoaded);
+      // this.isLoaded = true;
 
     });
 
@@ -74,20 +75,24 @@ class OrderList {
 
     if (data) {
 
-      if (orderRef)
-        this.orders[orderRef.key] = new Order(orderRef, false);
+      if (!this.orders[orderRef.key]) {
 
-      this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
-      this.orders[orderRef.key].createdTime = moment(data.createdTime);
+        if (orderRef && !this.orders[orderRef.key])
+          this.orders[orderRef.key] = new Order(orderRef, this, false);
 
-      this.orders[orderRef.key].orderRef.child('isDeleted').on('value', snap => {
-        if (!!snap.val())
-          this.orders[orderRef.key].ordersViewItemRef.set(false);
-      });
+        this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
+        this.orders[orderRef.key].createdTime = moment(data.createdTime);
 
-      if (this.isLoaded) {
-        this.appendOrderToView(this.orders[orderRef.key], true);
-        this.orders[orderRef.key].init();
+        this.orders[orderRef.key].orderRef.child('isDeleted').on('value', snap => {
+          if (!!snap.val())
+            this.orders[orderRef.key].ordersViewItemRef.set(false);
+        });
+
+        if (this.isLoaded) {
+          this.appendOrderToView(this.orders[orderRef.key], true);
+          this.orders[orderRef.key].init();
+        }
+
       }
 
     }
@@ -110,6 +115,41 @@ class OrderList {
       this.element.inner.insertBefore(order.element, this.element.inner.firstChild);
     else
       this.element.inner.appendChild(order.element);
+
+  }
+
+  open(orderKey = '', getFocus = false) {
+
+    const self = this;
+
+    setTimeout(() => {
+
+      const order = self.orders[orderKey];
+
+      if (order && !self.currentOrdersView[orderKey]) {
+
+        self.element.inner.insertBefore(order.element, self.element.inner.firstChild);
+        self.currentOrdersView[orderKey] = order;
+        order.init();
+
+        if (getFocus)
+          order.focus();
+
+      }
+
+    }, 10);
+
+  }
+
+  close(orderKey = '') {
+
+    const order = this.orders[orderKey];
+
+    if (order && this.currentOrdersView[orderKey]) {
+      this.element.inner.removeChild(order.element);
+      delete this.currentOrdersView[orderKey];
+      order.destroy();
+    }
 
   }
 

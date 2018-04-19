@@ -4,6 +4,7 @@ class TimelineItem {
 
     this.orderRef = orderRef;
     this.orderList = orderList;
+    this.isOpened = false;
 
     this.element = document.createElement('div');
 
@@ -42,23 +43,46 @@ class TimelineItem {
 
     this.element.content.addEventListener('click', event => {
 
-      let scrollType = !event.shiftKey ? 'smooth' : 'instant';
+      const self = this;
 
-      try {
+      this.orderList.open(this.orderRef.key);
 
-        let orderElement = this.orderList.orders[this.orderRef.key].element;
+      setTimeout(() => {
 
-        orderElement.scrollIntoView({
-          behavior: scrollType
-        });
+        let scrollType = !event.shiftKey ? 'smooth' : 'instant';
 
-      } catch (e) {
-        console.log(e);
-      }
+        try {
+
+          let orderElement = self.orderList.orders[self.orderRef.key].element;
+
+          orderElement.scrollIntoView({
+            behavior: scrollType
+          });
+
+        } catch (e) {
+
+          console.log(e);
+
+        }
+
+      }, 10);
 
     });
 
     this.element.content.addEventListener('dblclick', event => console.log(event));
+
+    const self = this;
+
+    setInterval(() => {
+
+      if (self.orderList.currentOrdersView[self.orderRef.key])
+        self.element.classList.add('is-opened');
+      else
+        self.element.classList.remove('is-opened');
+
+      console.log('1');
+
+    }, 500);
 
   }
 
@@ -143,6 +167,7 @@ class TimelineItem {
     element.className = 'TimelineItem-actionButton TimelineItem-actionButton--archive';
     element.addEventListener('click', () => {
       this.orderRef.child('isArchived').once('value', snap => this.orderRef.child('isArchived').set(!snap.val()));
+      this.orderList.close(this.orderRef.key);
     });
     this.element.actions.appendChild(element);
 
