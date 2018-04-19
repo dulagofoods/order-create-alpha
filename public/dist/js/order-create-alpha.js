@@ -1178,11 +1178,6 @@ class OrderCustomer {
 
   buildDeliveryTimeFieldElement() {
 
-    let newTime = '00:00';
-
-    if (moment())
-      newTime = moment().add(20, 'minutes').format('HH:mm');
-
     const element = document.createElement('div');
     element.className = 'OrderCustomer-deliveryTime input-field col s4';
     this.element.appendChild(element);
@@ -1192,15 +1187,10 @@ class OrderCustomer {
     element.input.id = this.orderRef.key + '-customerName';
     element.input.type = 'time';
     element.input.step = '300';
+    element.input.value = '';
     element.input.addEventListener('focus', () => {
 
-      let newTime = '00:00';
-
-      if (moment())
-        newTime = moment().add(20, 'minutes').format('HH:mm');
-
-      this.orderRef.child('deliveryTime').set(newTime);
-
+      this.orderRef.child('deliveryTime').set(moment().add(20, 'minutes').format('HH:mm'));
       element.input.select();
 
     });
@@ -1212,7 +1202,7 @@ class OrderCustomer {
     this.orderRef.child('deliveryTime').once('value', snap => {
 
       if (!snap.val())
-        this.orderRef.child('deliveryTime').set(newTime);
+        this.orderRef.child('deliveryTime').set(moment().add(20, 'minutes').format('HH:mm'));
 
     });
     this.orderRef.child('deliveryTime').on('value', snap => {
