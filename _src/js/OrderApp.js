@@ -51,6 +51,8 @@ class OrderApp {
 
   build() {
 
+    this.timeline.active(this.element);
+
     if (window.innerWidth < 601)
       this.timeline.inactive(this.element);
 
