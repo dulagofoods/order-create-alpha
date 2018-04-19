@@ -1181,7 +1181,7 @@ class OrderCustomer {
     let newTime = '00:00';
 
     if (moment())
-      newTime = moment().add(20, 'minutes').format('hh:mm');
+      newTime = moment().add(20, 'minutes').format('HH:mm');
 
     const element = document.createElement('div');
     element.className = 'OrderCustomer-deliveryTime input-field col s4';
