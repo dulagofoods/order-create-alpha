@@ -39,7 +39,8 @@
     border-left-color: #00C853;
 }
 
-.TimelineItem.is-deleting {
+.TimelineItem.is-deleting,
+.TimelineItem.is-deleting.is-archived {
     background-color: #EF5350;
     border-color: #EF5350;
     opacity: 0;
@@ -55,13 +56,13 @@
 
 .TimelineItem.is-archived {
     background-color: #212121;
-    border-color: #212121;
+    border-bottom-color: #212121;
     color: #bdbdbd;
 }
 
 .TimelineItem.is-archived:hover {
     background-color: #000000;
-    border-color: #000000;
+    border-bottom-color: #000000;
 }
 
 .TimelineItem-actions {

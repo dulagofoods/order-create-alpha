@@ -155,7 +155,7 @@ class Order {
     element.appendChild(element.deleteButton);
 
     element.closeButton = document.createElement('button');
-    element.closeButton.className = 'right waves-effect waves-red btn-flat red-text';
+    element.closeButton.className = 'right waves-effect waves-light btn-flat';
     element.closeButton.innerHTML = '<span class="hide-on-med-and-down"><i class="material-icons left">close</i>Fechar</span>' +
       '<span class="hide-on-large-only"><i class="material-icons">close</i></span>';
     element.closeButton.addEventListener('click', () => this.orderList.close(this.orderRef.key));
