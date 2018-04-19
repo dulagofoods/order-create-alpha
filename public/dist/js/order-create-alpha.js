@@ -2320,6 +2320,12 @@ class OrderList {
 
   }
 
+  isOpened(orderKey) {
+
+    return !!this.currentOrdersView[orderKey];
+
+  }
+
   open(orderKey = '', getFocus = false) {
 
     const self = this;
@@ -2328,7 +2334,7 @@ class OrderList {
 
       const order = self.orders[orderKey];
 
-      if (order && !self.currentOrdersView[orderKey]) {
+      if (order && !self.isOpened(orderKey)) {
 
         self.element.inner.insertBefore(order.element, self.element.inner.firstChild);
         self.currentOrdersView[orderKey] = order;
