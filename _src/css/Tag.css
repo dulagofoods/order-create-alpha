@@ -1,0 +1,54 @@
+.Tag {
+    -webkit-align-items: center;
+    align-items: center;
+    border-radius: 2px;
+    /*background-color: transparent !important;*/
+    border-width: 1px;
+    border-style: solid;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: center;
+    justify-content: center;
+    margin-right: 5px;
+    padding: 2px 5px 1px;
+    height: 19px;
+    text-align: center;
+}
+
+.Tag:after {
+    /*content: ', '*/
+}
+
+.Tag:last-of-type {
+    margin-right: 0;
+}
+
+.Tag:last-of-type:after {
+    content: ''
+}
+
+.Tag.transparent {
+    background: transparent;
+    border-color: transparent;
+}
+
+.Tag.flat {
+    padding: 2px 0 1px;
+}
+
+.Tag.pulse:before {
+    z-index: 9000;
+}
+
+.Tag span {
+    font-size: .75rem;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.Tag span .material-icons {
+    font-size: .75rem;
+}

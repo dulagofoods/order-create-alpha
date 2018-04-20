@@ -1,0 +1,14 @@
+.TagList {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    padding: 2px 0 1px;
+    max-width: 180px;
+    /*overflow: hidden;*/
+}
+
+.TagList.is-empty {
+    padding: 0;
+}

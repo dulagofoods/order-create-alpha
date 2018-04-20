@@ -80,8 +80,6 @@ class TimelineItem {
       else
         self.element.classList.remove('is-opened');
 
-      console.log('1');
-
     }, 500);
 
   }
@@ -102,9 +100,18 @@ class TimelineItem {
     this.element.appendChild(this.element.actions);
 
     this.element.content.customerName = this.buildCustomerNameElement();
+    this.element.content.tagList = this.buildTagListElement();
     this.element.content.createdTime = this.buildCreatedTimeElement();
     this.element.actions.printButton = this.buildPrintButtonElement();
     this.element.actions.deleteButton = this.buildArchiveButtonElement();
+
+  }
+
+  buildTagListElement() {
+
+    const tagList = new TagList(this.orderRef);
+    this.element.content.appendChild(tagList.element);
+    return tagList.element;
 
   }
 
