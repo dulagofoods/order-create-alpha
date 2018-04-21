@@ -3245,7 +3245,7 @@ class TagList {
             list.push(new Tag('pago', ['border-green', 'font-green']));
             break;
           case 'money':
-            if (payment.paidValue > payment.referenceValue) list.push(new Tag('troco', ['border-green', 'font-green']));
+            if (parseFloat(payment.paidValue) > parseFloat(payment.referenceValue)) list.push(new Tag('troco', ['border-green', 'font-green']));
             break;
         }
       });
