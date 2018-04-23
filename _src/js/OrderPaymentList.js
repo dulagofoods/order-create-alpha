@@ -6,12 +6,9 @@ class OrderPaymentList {
 
     this.orderBillingRef = this.orderRef.child('billing');
     this.orderPaymentsRef = this.orderBillingRef.child('payments');
-    this.orderPriceAmountRef = this.orderBillingRef.child('priceAmount');
 
     this.element = document.createElement('div');
     this.paymentList = [];
-
-    this.priceAmount = false;
 
     this.init();
 
@@ -22,9 +19,26 @@ class OrderPaymentList {
     this.build();
 
     this.orderPaymentsRef.on('child_added', snap => this.pushPaymentItem(snap.ref));
-    this.orderPaymentsRef.on('child_removed', snap => this.delete(snap.ref));
+    this.orderPaymentsRef.on('child_removed', snap => this.removePaymentItem(snap.ref));
 
-    this.orderPriceAmountRef.on('value', snap => this.priceAmount = snap.val());
+    // update 'isDefault' status of payments
+    this.orderPaymentsRef.on('value', snap => {
+
+      const self = this;
+
+      if (snap.val())
+        setTimeout(() => {
+
+          let arr = Object.keys(snap.val());
+
+          if (arr.length !== 1)
+            arr.forEach(paymentKey => self.paymentList[paymentKey].updateIsDefault(false));
+          else if (arr.length === 1)
+            self.paymentList[arr[0]].updateIsDefault(true);
+
+        }, 1);
+
+    })
 
   }
 
@@ -33,6 +47,7 @@ class OrderPaymentList {
     this.element.className = 'OrderPaymentList row';
 
     this.element.paymentList = this.buildPaymentListElement();
+    this.element.priceAssistant = this.buildPriceAssistantElement();
     this.element.actions = this.buildActionsElement();
 
   }
@@ -47,6 +62,51 @@ class OrderPaymentList {
 
   }
 
+  buildPriceAssistantElement() {
+
+    const self = this;
+
+    const element = document.createElement('span');
+    element.className = 'OrderPaymentList-priceAssistant font-orange';
+    this.element.appendChild(element);
+
+    function update(data = {}) {
+
+      if (data.priceAmount && data.payments) {
+
+        const priceAmount = Order.parseValue(data.priceAmount);
+        const payments = data.payments;
+
+        let paymentsPriceAmount = 0;
+
+        Object.values(payments).forEach(payment => paymentsPriceAmount += Order.parseValue(payment.referenceValue));
+
+        let overprice = paymentsPriceAmount - priceAmount;
+
+        if (overprice > 0) {
+          element.classList.add('is-active');
+          element.innerHTML = '<span>O Valor está R$' + overprice.toFixed(2) + ' acima</span>'
+        } else if (overprice < 0) {
+          element.classList.add('is-active');
+          element.innerHTML = '<span>O Valor está R$' + Math.abs(overprice).toFixed(2) + ' abaixo</span>'
+        } else {
+          element.classList.remove('is-active');
+          element.innerHTML = '';
+        }
+
+      } else {
+        element.classList.remove('is-active');
+        element.innerHTML = '';
+      }
+
+    }
+
+    setTimeout(() => self.orderBillingRef.on('value', snap => update(snap.val())), 10);
+
+    return element;
+
+  }
+
   buildActionsElement() {
 
     const element = document.createElement('div');
@@ -56,24 +116,10 @@ class OrderPaymentList {
     element.addItemButton = document.createElement('button');
     element.addItemButton.className = 'waves-effect waves-light btn-small green light-1';
     element.addItemButton.innerHTML = 'Adicionar Pagamento';
-    element.addItemButton.addEventListener('click', () => {
-
-      this.addItem('money');
-
-    });
+    element.addItemButton.addEventListener('click', () => OrderPaymentItem.create(this.orderBillingRef, 'money'));
     element.appendChild(element.addItemButton);
 
     return element;
-
-  }
-
-  addItem(method) {
-
-    this.orderBillingRef.child('payments').push({
-      method: method || '',
-      paidValue: this.priceAmount ? parseFloat(this.priceAmount).toFixed(2) : 0.00,
-      referenceValue: this.priceAmount ? parseFloat(this.priceAmount).toFixed(2) : 0.00
-    });
 
   }
 
@@ -81,29 +127,18 @@ class OrderPaymentList {
 
     if (orderPaymentItemRef) {
 
-      let paymentItem = new OrderPaymentItem(orderPaymentItemRef, this.orderBillingRef, !this.paymentList.length);
-      this.paymentList.push(paymentItem);
+      const paymentItem = new OrderPaymentItem(orderPaymentItemRef, this.orderRef);
       this.element.paymentList.appendChild(paymentItem.element);
-
-      // isDefault significa que o método de pagamento é unico e deve ter o valor fixo baseado do priceAmount
-      if (this.paymentList.length > 1)
-        this.paymentList.forEach(orderPaymentItem => orderPaymentItem.updateIsDefault(false));
+      this.paymentList[orderPaymentItemRef.key] = paymentItem;
 
     }
 
   }
 
-  delete(orderPaymentItemRef) {
+  removePaymentItem(orderPaymentItemRef) {
 
-    for (let i = this.paymentList.length; i--; ) {
-
-      if (this.paymentList[i].orderPaymentItemRef.key === orderPaymentItemRef.key)
-        this.paymentList.splice(i, 1);
-
-    }
-
-    if (this.paymentList.length === 1)
-      this.paymentList[0].updateIsDefault(true);
+    if (this.paymentList[orderPaymentItemRef.key])
+      delete this.paymentList[orderPaymentItemRef.key];
 
   }
 

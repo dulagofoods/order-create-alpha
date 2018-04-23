@@ -45,6 +45,14 @@
 
   if (allowed) {
 
+    ordersRef.on('child_added', snap => {
+      snap.ref.child('billing/payments').on('child_added', snap => {
+        setTimeout(() => {
+          snap.ref.child('isManuallyChanged').set(true)
+        }, 5);
+      })
+    })
+
   }
 
 </script>

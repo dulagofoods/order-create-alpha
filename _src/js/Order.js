@@ -222,6 +222,32 @@ class Order {
 
   }
 
+  destroy() {
+
+    this.orderRef.off();
+    this.isInited = false;
+
+    while (this.element.firstChild)
+      this.element.removeChild(this.element.firstChild);
+
+  }
+
+  static parseValue(value = 0, toString = false) {
+
+    try {
+      value = parseFloat(value);
+      value = isNaN(value) ? parseFloat(0) : value;
+    } catch (e) {
+      value = parseFloat(0);
+    }
+
+    if (toString)
+      return parseFloat(value).toFixed(2);
+    else
+      return parseFloat(value);
+
+  }
+
   static print(orderRef, socket) {
 
     if (socket) {
@@ -278,12 +304,7 @@ class Order {
       });
 
       // add default payments
-      orderRef.child('billing/payments').push({
-        isDefault: true,
-        method: 'money',
-        paidValue: 0.00,
-        referenceValue: 0.00
-      });
+      OrderPaymentItem.create(orderRef.child('billing'));
 
       if (ordersViewRef)
         setTimeout(() => ordersViewRef.child(orderRef.key).set({
@@ -313,16 +334,6 @@ class Order {
     }
 
     return false;
-
-  }
-
-  destroy() {
-
-    this.orderRef.off();
-    this.isInited = false;
-
-    while (this.element.firstChild)
-      this.element.removeChild(this.element.firstChild);
 
   }
 

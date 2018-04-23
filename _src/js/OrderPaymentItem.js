@@ -1,14 +1,22 @@
 class OrderPaymentItem {
 
-  constructor(orderPaymentItemRef, orderRef, isDefault = false) {
+  constructor(orderPaymentItemRef, orderRef) {
 
     this.orderPaymentItemRef = orderPaymentItemRef;
     this.orderRef = orderRef;
-    this.isDefault = isDefault;
 
+    this.paidValueRef = this.orderPaymentItemRef.child('paidValue');
+    this.referenceValueRef = this.orderPaymentItemRef.child('referenceValue');
+    this.isDefaultRef = this.orderPaymentItemRef.child('isDefault');
+    this.isManuallyChangedRef = this.orderPaymentItemRef.child('isManuallyChanged');
+    this.methodRef = this.orderPaymentItemRef.child('method');
     this.orderBillingRef = this.orderRef.child('billing');
+    this.orderPriceAmountRef = this.orderBillingRef.child('priceAmount');
 
     this.element = document.createElement('div');
+    this.isDeleted = false;
+    this.data = {};
+    this.priceAmount = null;
 
     this.methodOptions = [
       {
@@ -49,45 +57,23 @@ class OrderPaymentItem {
 
     this.build();
 
-    this.priceAmount = false;
+    this.updateIsDefault(this.data.isDefault);
 
-    // update is default
-    this.updateIsDefault(this.isDefault);
-
-    // main listener
     this.orderPaymentItemRef.on('value', snap => {
 
-      // is deleted
-      if (snap.val() == null) {
-
+      if (snap.val() === null)
         this.element.classList.add('is-deleted');
-
-      } else {
-
-        // controladores de dados (usado quando envolve mais de um campo (ex: method + referenceValue))
-        this.paidValueDataChangeController(snap.val());
-        this.referenceValueDataChangeController(snap.val());
-
-      }
+      else
+        this.dataChangeController(snap.val());
 
     });
 
-    // priceAmount listener (monitorar o valor total)
-    this.orderBillingRef.child('priceAmount').on('value', snap => {
+    this.orderPriceAmountRef.on('value', snap => {
 
       this.priceAmount = snap.val();
-
-      this.orderPaymentItemRef.once('value', snap => {
-
-        this.referenceValueDataChangeController(snap.val());
-
-      });
+      this.orderPaymentItemRef.once('value', () => this.dataChangeController());
 
     });
-
-    // adapts the UI for each payment method
-    this.orderPaymentItemRef.child('method').on('value', () => this.methodDataChangeController());
-    this.orderPaymentItemRef.child('isDefault').on('value', () => this.methodDataChangeController());
 
   }
 
@@ -96,10 +82,10 @@ class OrderPaymentItem {
     this.element.className = 'OrderPaymentItem row';
     this.element.dataset.orderPaymentItemRefKey = this.orderPaymentItemRef.key;
 
-    this.element.method = this.buildMethodSelectElement();
-    this.element.referenceValue = this.buildReferenceValueFieldElement();
-    this.element.paidValue = this.buildPaidValueFieldElement();
-    this.element.deletePayment = this.buildDeletePaymentButtonElement();
+    this.element.methodSelect = this.buildMethodSelectElement();
+    this.element.referenceValueField = this.buildReferenceValueFieldElement();
+    this.element.paidValueField = this.buildPaidValueFieldElement();
+    this.element.deletePaymentField = this.buildDeletePaymentButtonElement();
 
   }
 
@@ -110,7 +96,6 @@ class OrderPaymentItem {
     this.element.appendChild(element);
 
     element.select = document.createElement('select');
-    // element.select.className = 'browser-default';
     element.appendChild(element.select);
 
     element.select.defaultOption = document.createElement('option');
@@ -181,11 +166,10 @@ class OrderPaymentItem {
     element.input = document.createElement('input');
     element.input.type = 'number';
     element.input.id = this.orderPaymentItemRef.key + '-paidValueField';
-    element.input.addEventListener('focus', () => {
-      element.input.select();
-    });
-    element.input.addEventListener('change', () => this.updatePaidValue(element.input.value));
-    this.orderPaymentItemRef.child('paidValue').on('value', snap => element.input.value = snap.val());
+    element.input.addEventListener('focus', () => element.input.select());
+    element.input.addEventListener('input', () => this.updateIsManuallyChanged(true));
+    element.input.addEventListener('change', () => this.updatePaidValue(element.input.value, true));
+    this.paidValueRef.on('value', snap => element.input.value = Order.parseValue(snap.val(), true));
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
@@ -193,6 +177,19 @@ class OrderPaymentItem {
     element.label.className = 'active';
     element.label.innerHTML = 'Pago';
     element.appendChild(element.label);
+
+    this.methodRef.on('value', snap => {
+      if (snap.val() === 'money') {
+        element.input.disabled = false;
+        element.input.step = 10.00;
+        element.label.innerHTML = 'Troco p';
+      } else {
+        element.isManuallyChanged = false;
+        element.input.disabled = true;
+        element.input.step = 1.00;
+        element.label.innerHTML = 'Pago';
+      }
+    });
 
     return element;
 
@@ -207,15 +204,11 @@ class OrderPaymentItem {
     element.input = document.createElement('input');
     element.input.type = 'number';
     element.input.id = this.orderPaymentItemRef.key + '-referenceValueField';
-    element.input.addEventListener('focus', () => {
-      element.input.select();
-    });
-    element.input.addEventListener('change', () => this.updateReferenceValue(element.input.value));
-    this.orderPaymentItemRef.child('referenceValue').on('value', snap => {
-
-      element.input.value = snap.val();
-
-    });
+    element.input.addEventListener('focus', () => element.input.select());
+    element.input.addEventListener('input', () => this.updateIsManuallyChanged(true));
+    element.input.addEventListener('change', () => this.updateReferenceValue(element.input.value, true));
+    this.referenceValueRef.on('value', snap => element.input.value = Order.parseValue(snap.val(), true));
+    this.isDefaultRef.on('value', snap => element.input.disabled = !!snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
@@ -236,11 +229,7 @@ class OrderPaymentItem {
     element.buttonElement = document.createElement('a');
     element.buttonElement.className = 'waves-effect btn-floating btn-small white';
     element.buttonElement.innerHTML = '<i class="material-icons red-text">remove</i>';
-    element.buttonElement.addEventListener('click', () => {
-
-      this.delete();
-
-    });
+    element.buttonElement.addEventListener('click', () => this.delete());
     element.appendChild(element.buttonElement);
 
     this.element.appendChild(element);
@@ -249,95 +238,100 @@ class OrderPaymentItem {
 
   }
 
-  // adapts the UI for each payment method
-  methodDataChangeController() {
+  dataChangeController(data = false) {
 
-    this.orderPaymentItemRef.child('method').once('value', snap => {
+    if (data)
+      this.setData(data);
 
-      switch (snap.val()) {
-        case 'money': {
-          this.element.referenceValue.input.disabled = this.isDefault;
-          this.element.paidValue.input.disabled = false;
-          this.element.paidValue.input.step = 10.00;
-          this.element.paidValue.label.innerHTML = 'Troco p';
-        }
-          break;
-        default: {
-          this.element.referenceValue.input.disabled = this.isDefault;
-          this.element.paidValue.input.disabled = true;
-          this.element.paidValue.input.step = 1.00;
-          this.element.paidValue.label.innerHTML = 'Pago';
-        }
+    if (this.priceAmount !== null && !this.isDeleted) {
+
+      if (this.data.isDefault) {
+
+        this.updateReferenceValue(this.priceAmount, true);
+
+        if (this.data.method === 'money')
+          this.updatePaidValue(this.priceAmount, this.priceAmount > this.data.paidValue);
+        else
+          this.updatePaidValue(this.priceAmount, true);
+
+      } else if (this.data.isManuallyChanged) {
+
+        this.updateReferenceValue(this.priceAmount, this.data.referenceValue > this.priceAmount);
+
+        if (this.data.referenceValue > this.data.paidValue || this.data.method !== 'money')
+          this.updatePaidValue(this.data.referenceValue, true);
+
+      } else {
+
+        this.updateReferenceValue(this.priceAmount);
+        this.updatePaidValue(this.priceAmount);
+
       }
 
-    });
+    }
+
 
   }
 
-  paidValueDataChangeController(data) {
+  setData(data) {
 
-    if (parseFloat(data.referenceValue) > parseFloat(data.paidValue))
-      this.updatePaidValue(data.referenceValue);
-
-    if (data.method !== 'money')
-      this.updatePaidValue(data.referenceValue);
-
-  }
-
-  referenceValueDataChangeController(data) {
-
-    try {
-      if (this.priceAmount) {
-        if (this.isDefault)
-          this.updateReferenceValue(this.priceAmount);
-        else if (parseFloat(data.referenceValue) > parseFloat(this.priceAmount))
-          this.updateReferenceValue(this.priceAmount);
-      }
-    } catch (e) {
-      console.log('eitaa..');
+    this.data = {
+      method: data.method || 'money',
+      paidValue: Order.parseValue(data.paidValue),
+      referenceValue: Order.parseValue(data.referenceValue),
+      isDefault: data.isDefault || false,
+      isManuallyChanged: data.isManuallyChanged || false
     }
 
   }
 
-  updatePaidValue(value) {
+  updatePaidValue(value, isForced) {
 
-    try {
-      value = parseFloat(value).toFixed(2);
-    } catch (e) {
-      value = parseFloat(0).toFixed(2);
-    } finally {
-      value = isNaN(value) ? parseFloat(0).toFixed(2) : value;
-    }
+    value = Order.parseValue(value);
 
-    this.orderPaymentItemRef.child('paidValue').set(value);
+    if (!this.data.isManuallyChanged || isForced || value === 0)
+      this.paidValueRef.set(value);
 
   }
 
-  updateReferenceValue(value) {
+  updateReferenceValue(value, isForced) {
 
-    try {
-      value = parseFloat(value).toFixed(2);
-    } catch (e) {
-      value = parseFloat(0).toFixed(2);
-    } finally {
-      value = isNaN(value) ? parseFloat(0).toFixed(2) : value;
-    }
+    value = Order.parseValue(value);
 
-    this.orderPaymentItemRef.child('referenceValue').set(value);
+    if (!this.data.isManuallyChanged || isForced || value === 0)
+      this.referenceValueRef.set(value);
 
   }
 
-  updateIsDefault(state) {
+  updateIsDefault(state = false) {
 
-    this.isDefault = !!state;
+    this.isDefaultRef.set(state);
 
-    this.orderPaymentItemRef.child('isDefault').set(this.isDefault);
+  }
+
+  updateIsManuallyChanged(state = false) {
+
+    this.isManuallyChangedRef.set(state);
 
   }
 
   delete() {
 
     this.orderPaymentItemRef.set(null);
+    this.isDeleted = true;
+
+  }
+
+  static create(orderBillingRef = false, method = 'money', priceAmount = 0) {
+
+    if (orderBillingRef)
+      return orderBillingRef.child('payments').push({
+        method: method,
+        paidValue: Order.parseValue(priceAmount),
+        referenceValue: Order.parseValue(priceAmount)
+      }).ref;
+
+    return false;
 
   }
 

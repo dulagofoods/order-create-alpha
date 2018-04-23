@@ -58,14 +58,10 @@ class OrderPriceAmount {
     element.input.min = '0.00';
     element.input.step = '1';
     element.input.disabled = true;
-    element.input.addEventListener('blur', () => element.input.value = OrderPriceAmount.parseValue(element.input.value));
-    element.input.addEventListener('change', () => {
-
-      element.input.value = OrderPriceAmount.parseValue(element.input.value);
-      this.orderPriceAmountRef.set(OrderPriceAmount.parseValue(element.input.value));
-
-    });
-    this.orderPriceAmountRef.on('value', snap => element.input.value = OrderPriceAmount.parseValue(snap.val()));
+    element.input.addEventListener('focus', () => element.input.select());
+    element.input.addEventListener('blur', () => element.input.value = Order.parseValue(element.input.value, true));
+    element.input.addEventListener('change', () => this.orderPriceAmountRef.set(Order.parseValue(element.input.value)));
+    this.orderPriceAmountRef.on('value', snap => element.input.value = Order.parseValue(snap.val(), true));
     this.orderPriceAmountUnlockedRef.on('value', snap => element.input.disabled = !snap.val());
     element.appendChild(element.input);
 
@@ -132,7 +128,7 @@ class OrderPriceAmount {
 
   setPriceAmount(priceAmount = 0) {
 
-    this.priceAmount = OrderPriceAmount.parseValue(priceAmount);
+    this.priceAmount = Order.parseValue(priceAmount);
     this.orderPriceAmountRef.set(this.priceAmount);
 
   }
@@ -155,19 +151,6 @@ class OrderPriceAmount {
     let priceAmount = 0;
     Object.values(priceList).forEach(itemPrice => priceAmount += itemPrice.itemPrice * itemPrice.quantity);
     return priceAmount;
-
-  }
-
-  static parseValue(value) {
-
-    let parsedValue = 0.00;
-
-    try {
-      parsedValue = parseFloat(value).toFixed(2);
-      return parsedValue;
-    } catch (e) {
-      return parsedValue;
-    }
 
   }
 

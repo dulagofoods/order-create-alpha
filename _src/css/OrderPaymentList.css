@@ -1,0 +1,7 @@
+.OrderPaymentList-priceAssistant {
+    font-size: 12px;
+}
+
+.OrderPaymentList-priceAssistant.is-active {
+    margin: 0 10px;
+}

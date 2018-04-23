@@ -323,7 +323,13 @@
   margin-bottom: 0;
   padding: 0 .5rem;
 }
+.OrderPaymentList-priceAssistant {
+  font-size: 12px;
+}
 
+.OrderPaymentList-priceAssistant.is-active {
+  margin: 0 10px;
+}
 .OrderPriceAmount {
   -webkit-align-items: center;
   align-items: center;
