@@ -232,22 +232,6 @@ class Order {
 
   }
 
-  static parseValue(value = 0, toString = false) {
-
-    try {
-      value = parseFloat(value);
-      value = isNaN(value) ? parseFloat(0) : value;
-    } catch (e) {
-      value = parseFloat(0);
-    }
-
-    if (toString)
-      return parseFloat(value).toFixed(2);
-    else
-      return parseFloat(value);
-
-  }
-
   static print(orderRef, socket) {
 
     if (socket) {
@@ -334,6 +318,22 @@ class Order {
     }
 
     return false;
+
+  }
+
+  static parseValue(value = 0, toString = false) {
+
+    try {
+      value = parseFloat(value);
+      value = isNaN(value) ? parseFloat(0) : value;
+    } catch (e) {
+      value = parseFloat(0);
+    }
+
+    if (toString)
+      return parseFloat(value).toFixed(2);
+    else
+      return parseFloat(value);
 
   }
 
