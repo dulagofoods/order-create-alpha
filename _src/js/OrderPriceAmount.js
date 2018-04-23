@@ -3,13 +3,16 @@ class OrderPriceAmount {
   constructor(orderRef) {
 
     this.orderRef = orderRef;
-    this.orderBillingRef = orderRef.child('billing');
+
+    this.orderItemsRef = this.orderRef.child('items');
+    this.orderBillingRef = this.orderRef.child('billing');
+    this.orderPriceAmountRef = this.orderBillingRef.child('priceAmount');
+    this.orderPriceAmountUnlockedRef = this.orderBillingRef.child('priceAmountUnlocked');
 
     this.element = document.createElement('div');
-
-    this.priceList = [];
     this.priceAmount = 0.00;
-    this.priceAmountUnlocked = false;
+    this.priceAmountUnlocked = null;
+    this.isDeleted = false;
 
     this.init();
 
@@ -19,30 +22,17 @@ class OrderPriceAmount {
 
     this.build();
 
-    this.orderRef.child('items').on('child_added', snap => {
+    this.orderRef.child('isDeleted').on('value', snap => {
 
-      if (!this.priceAmountUnlocked)
-        this.updatePriceAmount(snap.ref, snap.val());
+      this.isDeleted = !!snap.val();
 
-    });
-
-    this.orderRef.child('items').on('child_changed', snap => {
-
-      if (!this.priceAmountUnlocked)
-        this.updatePriceAmount(snap.ref, snap.val());
-
-    });
-
-    this.orderRef.child('items').on('child_removed', snap => {
-
-      if (!this.priceAmountUnlocked)
-        this.updatePriceAmount(snap.ref, null);
-
-    });
-
-    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
-
-      this.priceAmountUnlocked = !!snap.val();
+      if (!this.isDeleted) {
+        this.orderPriceAmountUnlockedRef.on('value', snap => this.setPriceAmountUnlocked(!!snap.val()));
+        this.orderItemsRef.on('value', snap => this.update(snap.val()));
+      } else {
+        this.orderPriceAmountUnlockedRef.off();
+        this.orderItemsRef.off();
+      }
 
     });
 
@@ -52,8 +42,8 @@ class OrderPriceAmount {
 
     this.element.className = 'OrderPriceAmount row';
 
-    this.inputField = this.buildInputFieldElement();
-    this.switcher = this.buildSwitcherElement();
+    this.element.inputField = this.buildInputFieldElement();
+    this.element.switcher = this.buildSwitcherElement();
 
   }
 
@@ -68,36 +58,20 @@ class OrderPriceAmount {
     element.input.min = '0.00';
     element.input.step = '1';
     element.input.disabled = true;
-    element.input.addEventListener('blur', event => {
+    element.input.addEventListener('blur', () => element.input.value = OrderPriceAmount.parseValue(element.input.value));
+    element.input.addEventListener('change', () => {
 
-      element.input.value = parseFloat(element.input.value).toFixed(2);
-
-    });
-    element.input.addEventListener('change', event => {
-
-      element.input.value = parseFloat(element.input.value).toFixed(2);
-      this.orderBillingRef.child('priceAmount').set(parseFloat(element.input.value).toFixed(2));
+      element.input.value = OrderPriceAmount.parseValue(element.input.value);
+      this.orderPriceAmountRef.set(OrderPriceAmount.parseValue(element.input.value));
 
     });
-    this.orderBillingRef.child('priceAmount').on('value', snap => {
-
-      try {
-        element.input.value = parseFloat(snap.val()).toFixed(2);
-      } catch (e) {
-        element.input.value = snap.val();
-      }
-
-    });
-    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
-
-      element.input.disabled = !snap.val();
-
-    });
+    this.orderPriceAmountRef.on('value', snap => element.input.value = OrderPriceAmount.parseValue(snap.val()));
+    this.orderPriceAmountUnlockedRef.on('value', snap => element.input.disabled = !snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');
     element.label.className = 'active';
-    this.orderBillingRef.child('priceAmount').on('value', snap => {
+    this.orderPriceAmountRef.on('value', snap => {
 
       element.label.className = snap.val() !== null ? 'active' : '';
 
@@ -122,19 +96,8 @@ class OrderPriceAmount {
 
     element.input = document.createElement('input');
     element.input.type = 'checkbox';
-    element.input.addEventListener('change', event => {
-
-      this.orderBillingRef.child('priceAmountUnlocked').set(element.input.checked);
-
-      if (!element.input.checked)
-        this.refreshPriceAmount();
-
-    });
-    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => {
-
-      element.input.checked = !!snap.val();
-
-    });
+    element.input.addEventListener('change', () => this.orderBillingRef.child('priceAmountUnlocked').set(element.input.checked));
+    this.orderBillingRef.child('priceAmountUnlocked').on('value', snap => element.input.checked = !!snap.val());
     element.label.appendChild(element.input);
 
     element.label.span = document.createElement('span');
@@ -150,53 +113,61 @@ class OrderPriceAmount {
 
   }
 
-  updatePriceAmount(orderItemRef, data) {
+  update(orderItems) {
 
-    if (data)
-      this.priceList[orderItemRef.key] = {
-        itemPrice: data.itemPrice || 0,
-        quantity: data.quantity || 0
-      };
-    else
-      this.priceList[orderItemRef.key] = null;
+    if (!this.priceAmountUnlocked && !!orderItems) {
 
+      let priceList = [];
 
-    this.refreshPriceAmount();
+      Object.values(orderItems).forEach(item => priceList.push({
+        itemPrice: item.itemPrice || 0,
+        quantity: item.quantity || 0
+      }));
+
+      this.setPriceAmount(OrderPriceAmount.recalculate(priceList));
+
+    }
 
   }
 
-  refreshPriceAmount() {
+  setPriceAmount(priceAmount = 0) {
+
+    this.priceAmount = OrderPriceAmount.parseValue(priceAmount);
+    this.orderPriceAmountRef.set(this.priceAmount);
+
+  }
+
+  setPriceAmountUnlocked(unlocked = false) {
+
+    if (this.priceAmountUnlocked === true) {
+      this.priceAmountUnlocked = unlocked;
+      if (!unlocked)
+        this.orderItemsRef.once('value', snap => this.update(snap.val()));
+    } else {
+      this.priceAmountUnlocked = unlocked;
+    }
+
+
+  }
+
+  static recalculate(priceList) {
 
     let priceAmount = 0;
-
-    let priceListArray = Object.values(this.priceList);
-    priceListArray.forEach(orderItem => {
-
-      if (orderItem != null)
-        priceAmount += orderItem.itemPrice * orderItem.quantity;
-
-    });
-
-    this.setPriceAmount(priceAmount);
+    Object.values(priceList).forEach(itemPrice => priceAmount += itemPrice.itemPrice * itemPrice.quantity);
+    return priceAmount;
 
   }
 
-  setPriceAmount(priceAmount) {
+  static parseValue(value) {
 
-    const self = this;
+    let parsedValue = 0.00;
 
-    this.priceAmount = priceAmount;
-
-    // isso evita que seja criado novamente o objeto no firebase
-    this.orderRef.once('value', snap => {
-
-      if (snap.val() != null)
-        this.orderBillingRef.child('priceAmountUnlocked').once('value', snap => {
-          if (!snap.val())
-            setTimeout(() => self.orderBillingRef.child('priceAmount').set(self.priceAmount), 1);
-        });
-
-    });
+    try {
+      parsedValue = parseFloat(value).toFixed(2);
+      return parsedValue;
+    } catch (e) {
+      return parsedValue;
+    }
 
   }
 

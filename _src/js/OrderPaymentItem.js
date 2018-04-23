@@ -1,10 +1,12 @@
 class OrderPaymentItem {
 
-  constructor(orderPaymentItemRef, orderBillingRef, isDefault) {
+  constructor(orderPaymentItemRef, orderRef, isDefault = false) {
 
     this.orderPaymentItemRef = orderPaymentItemRef;
-    this.orderBillingRef = orderBillingRef;
-    this.isDefault = !!isDefault;
+    this.orderRef = orderRef;
+    this.isDefault = isDefault;
+
+    this.orderBillingRef = this.orderRef.child('billing');
 
     this.element = document.createElement('div');
 

@@ -3,7 +3,10 @@ class OrderPaymentList {
   constructor(orderRef) {
 
     this.orderRef = orderRef;
+
     this.orderBillingRef = this.orderRef.child('billing');
+    this.orderPaymentsRef = this.orderBillingRef.child('payments');
+    this.orderPriceAmountRef = this.orderBillingRef.child('priceAmount');
 
     this.element = document.createElement('div');
     this.paymentList = [];
@@ -18,20 +21,10 @@ class OrderPaymentList {
 
     this.build();
 
-    this.orderBillingRef.child('payments').on('child_added', snap => {
+    this.orderPaymentsRef.on('child_added', snap => this.pushPaymentItem(snap.ref));
+    this.orderPaymentsRef.on('child_removed', snap => this.delete(snap.ref));
 
-      this.pushPaymentItem(snap.ref);
-
-    });
-
-    this.orderBillingRef.child('payments').on('child_removed', snap => {
-
-      this.delete(snap.ref);
-
-    });
-
-    // atualiza o priceAmount
-    this.orderBillingRef.child('priceAmount').on('value', snap => this.priceAmount = snap.val());
+    this.orderPriceAmountRef.on('value', snap => this.priceAmount = snap.val());
 
   }
 

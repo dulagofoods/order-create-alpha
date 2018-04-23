@@ -147,7 +147,7 @@ class OrderDelivery {
             "R Benedito José de Andrade": "/dist/images/districts/LPROMO.png",
             "R Yuzo Ochiai": "/dist/images/districts/LPROMO.png",
             "R Piracicaba": "/dist/images/districts/LPROMO.png",
-            "R José Mendes Vilela": "/dist/images/districts/LPROMO.png",
+            "R João Mendes Vilela": "/dist/images/districts/LPROMO.png",
             "R Joversino de Assis Teixeira": "/dist/images/districts/LPROMO.png",
             "R Vicente Inácio Filho": "/dist/images/districts/LPROMO.png",
             "R Irenice Guardiana Patrocinio": "/dist/images/districts/LPROMO.png",
