@@ -16,7 +16,8 @@ class OrderCustomer {
     this.element.className = 'OrderCustomer row';
 
     this.element.customerName = this.buildCustomerNameFieldElement();
-    this.element.deliveryTime = this.buildDeliveryTimeFieldElement();
+    this.element.customerContact = this.buildCustomerContactFieldElement();
+    // this.element.deliveryTime = this.buildDeliveryTimeFieldElement();
 
   }
 
@@ -59,50 +60,36 @@ class OrderCustomer {
 
   }
 
-  buildDeliveryTimeFieldElement() {
+  buildCustomerContactFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderCustomer-deliveryTime input-field col s4';
+    element.className = 'OrderCustomer-customerContact input-field col s4';
     this.element.appendChild(element);
 
-    // input
     element.input = document.createElement('input');
-    element.input.id = this.orderRef.key + '-customerName';
-    element.input.type = 'time';
-    element.input.step = '300';
-    element.input.value = '';
-    element.input.addEventListener('focus', () => {
-
-      this.orderRef.child('deliveryTime').set(moment().add(20, 'minutes').format('HH:mm'));
-      element.input.select();
-
-    });
+    element.input.className = 'validate';
+    element.input.id = this.orderRef.key + '-customerContact';
+    element.input.type = 'tel';
     element.input.addEventListener('input', () => {
 
-      this.orderRef.child('deliveryTime').set(element.input.value);
+      this.customerRef.child('customerContact').set(element.input.value);
 
     });
-    this.orderRef.child('deliveryTime').once('value', snap => {
+    this.customerRef.child('customerContact').on('value', snap => {
 
-      if (!snap.val())
-        this.orderRef.child('deliveryTime').set(moment().add(20, 'minutes').format('HH:mm'));
-
-    });
-    this.orderRef.child('deliveryTime').on('value', snap => {
-
-      element.input.value = snap.val();
+      if (snap.val() !== element.input.value)
+        element.input.value = snap.val();
 
     });
     element.appendChild(element.input);
 
-    // label
     element.label = document.createElement('label');
-    element.label.className = 'active';
+    this.customerRef.child('customerContact').on('value', snap => {
+      if (snap.val()) element.label.classList = 'active';
+    });
     element.label.htmlFor = element.input.id;
-    element.label.innerHTML = 'Entrega';
+    element.label.innerHTML = 'Telefone';
     element.appendChild(element.label);
-
-    M.updateTextFields();
 
     return element;
 

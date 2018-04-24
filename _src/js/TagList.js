@@ -87,7 +87,7 @@ class TagList {
     if (deliveryTime) {
 
       let optionalClass = ['border-green', 'green', 'font-white'];
-      let diff = moment(deliveryTime, 'HH:mm').diff(moment());
+      let diff = moment(deliveryTime.time, 'HH:mm').diff(moment());
 
       if (!isArchived) {
         if (diff < 1)
@@ -98,7 +98,7 @@ class TagList {
           optionalClass = ['border-red', 'red', 'font-white', 'pulse'];
       }
 
-      return new Tag(deliveryTime, optionalClass);
+      return new Tag(deliveryTime.time, optionalClass);
 
     }
 

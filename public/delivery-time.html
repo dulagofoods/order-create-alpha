@@ -6,6 +6,11 @@
       content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
 <script src="dist/js/villa.min.js"></script>
 <link rel="stylesheet" href="dist/css/villa.min.css"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,500,700" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css" media="screen,projection"/>
+<link rel="stylesheet" href="dist/css/materialize.custom.css">
+<link rel="stylesheet" href="dist/css/order-create-alpha.css">
 <!--[if lt IE 9]>
 <link rel="stylesheet" type="text/css" href="dist/css/material-colors.css"/>
 <link rel="stylesheet" type="text/css" href="dist/css/villa-cross.min.css"/>
@@ -14,7 +19,37 @@
 <script src="dist/js/classList.min.js"></script>
 <![endif]-->
 
+<style>
+
+  .OrderDeliveryTime {
+    -webkit-align-items: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  }
+
+</style>
+
 <body class="grey-200">
+
+<div id="app"></div>
+
+<script type="text/javascript" src="dist/js/materialize.js"></script>
+<script>
+
+  M.AutoInit(document.body);
+
+</script>
+<script src="dist/js/moment-with-locales.js"></script>
+<script>
+
+  moment.locale('pt-br');
+  console.log(moment().format());
+
+</script>
 
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-database.js"></script>
@@ -35,23 +70,21 @@
   const databaseRef = firebase.database();
   const ordersRef = databaseRef.ref('orders');
   const ordersViewsRef = databaseRef.ref('ordersViews');
+  const activeOrdersView = ordersViewsRef.child(moment().format('YYYY-MM-DD'));
 
 </script>
+<script src="dist/js/order-create-alpha.js"></script>
+
 <script>
 
-  // MANTER SEMPRE VAZIO PARA EVITAR DESTRUIÇÃO DE DADOS ACIDENTAL
+  activeOrdersView.on('child_added', snap => {
+    const orderTagList = new OrderDeliveryTime(ordersRef.child(snap.key));
+    document.getElementById('app').insertBefore(orderTagList.element, document.getElementById('app').firstChild);
+  });
 
-  let allowed = confirm('CUIDADO! Deseja continuar?');
+</script>
 
-  if (allowed) {
-
-    ordersRef.on('child_added', snap => {
-
-      console.log(snap.val());
-
-    })
-
-  }
+<script>
 
 </script>
 

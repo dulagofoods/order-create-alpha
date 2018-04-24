@@ -25,6 +25,7 @@ class Order {
       this.isInited = true;
 
       this.customer = new OrderCustomer(this.orderRef);
+      this.deliveryTime = new OrderDeliveryTime(this.orderRef);
       this.items = new OrderItemList(this.orderRef);
       this.billing = new OrderBilling(this.orderRef);
       this.delivery = new OrderDelivery(this.orderRef);
@@ -62,6 +63,7 @@ class Order {
     this.element.appendChild(this.element.contentElement);
 
     this.element.contentElement.appendChild(this.customer.element);
+    this.element.contentElement.appendChild(this.deliveryTime.element);
     this.element.contentElement.appendChild(this.items.element);
     this.element.contentElement.appendChild(this.billing.element);
     this.element.contentElement.appendChild(this.delivery.element);
@@ -103,7 +105,7 @@ class Order {
 
           data = {
             customerName: data.customer.customerName,
-            customerContact: '',
+            customerContact: data.customer.customerContact,
             defaultAddress: data.address || {
               street: '',
               houseNumber: '',
