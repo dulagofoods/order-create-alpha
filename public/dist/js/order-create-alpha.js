@@ -1042,12 +1042,12 @@ class OrderApp {
 
   build() {
 
-    // this.timeline.active(this.element);
+    this.timeline.active(this.element);
 
     if (window.innerWidth < 601)
       this.timeline.inactive(this.element);
 
-    // if (window.innerWidth > 1200)
+    if (window.innerWidth > 1200)
       this.agenda.active(this.element);
 
     this.element.inner = document.createElement('div');
