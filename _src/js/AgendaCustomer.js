@@ -108,7 +108,7 @@ class AgendaCustomer {
   buildCreateOrderButtonElement() {
 
     const element = document.createElement('a');
-    element.className = 'btn-small waves-effect waves-light light-blue';
+    element.className = 'btn-icon';
     element.addEventListener('click', () => {
 
       let order = Order.create(false, false, {customer: this});
@@ -135,7 +135,7 @@ class AgendaCustomer {
 
     element.icon = document.createElement('i');
     element.icon.className = 'material-icons';
-    element.icon.innerHTML = 'content_copy';
+    element.icon.innerHTML = 'forward';
     element.appendChild(element.icon);
 
     return element;

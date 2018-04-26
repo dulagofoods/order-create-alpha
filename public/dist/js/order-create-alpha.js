@@ -268,7 +268,7 @@ class AgendaCustomer {
   buildCreateOrderButtonElement() {
 
     const element = document.createElement('a');
-    element.className = 'btn-small waves-effect waves-light light-blue';
+    element.className = 'btn-icon';
     element.addEventListener('click', () => {
 
       let order = Order.create(false, false, {customer: this});
@@ -295,7 +295,7 @@ class AgendaCustomer {
 
     element.icon = document.createElement('i');
     element.icon.className = 'material-icons';
-    element.icon.innerHTML = 'content_copy';
+    element.icon.innerHTML = 'forward';
     element.appendChild(element.icon);
 
     return element;
@@ -1002,12 +1002,12 @@ class OrderApp {
 
   build() {
 
-    this.timeline.active(this.element);
+    // this.timeline.active(this.element);
 
     if (window.innerWidth < 601)
       this.timeline.inactive(this.element);
 
-    if (window.innerWidth > 1200)
+    // if (window.innerWidth > 1200)
       this.agenda.active(this.element);
 
     this.element.inner = document.createElement('div');
@@ -1519,7 +1519,7 @@ class OrderDelivery {
     element.input.type = 'number';
     element.input.id = this.orderRef.key + '-addressHouseNumber';
     element.input.addEventListener('input', () => this.orderRef.child('address/houseNumber').set(element.input.value));
-    this.orderRef.child('address/houseNumber').on('value', snap => element.input.value = snap.val());
+    this.orderRef.child('address/houseNumber').on('value', snap => console.log(snap.val()));
     element.appendChild(element.input);
 
     element.label = document.createElement('label');

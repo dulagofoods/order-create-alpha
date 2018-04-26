@@ -255,7 +255,7 @@ class OrderDelivery {
     element.input.type = 'number';
     element.input.id = this.orderRef.key + '-addressHouseNumber';
     element.input.addEventListener('input', () => this.orderRef.child('address/houseNumber').set(element.input.value));
-    this.orderRef.child('address/houseNumber').on('value', snap => element.input.value = snap.val());
+    this.orderRef.child('address/houseNumber').on('value', snap => console.log(snap.val()));
     element.appendChild(element.input);
 
     element.label = document.createElement('label');

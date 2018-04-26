@@ -24,6 +24,7 @@
     justify-content: space-between;
     min-height: 72px;
     padding: 14px 12px;
+    position: relative;
 }
 
 .AgendaCustomer-content {
@@ -75,4 +76,87 @@
     flex-flow: column;
     -webkit-justify-content: center;
     justify-content: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    margin-right: 16px;
+    margin-top: 16px;
+}
+
+.AgendaCustomer-actions > .btn-icon:last-child {
+    margin-right: 0;
+}
+
+.AgendaCustomer .btn-icon {
+    -webkit-align-items: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-justify-content: center;
+    justify-content: center;
+    color: #757575;
+    height: 20px;
+    margin: 0 10px;
+    cursor: pointer;
+    position: relative;
+    width: 20px;
+    -webkit-transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -moz-transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -ms-transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -o-transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.AgendaCustomer .btn-icon:hover {
+    color: #212121;
+}
+
+.AgendaCustomer .btn-icon:before {
+    content: '';
+    background: none;
+    border-radius: 50%;
+    display: block;
+    position: absolute;
+    opacity: 0;
+    -webkit-transform: scale(0);
+    -moz-transform: scale(0);
+    -ms-transform: scale(0);
+    -o-transform: scale(0);
+    transform: scale(0);
+    -webkit-transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -moz-transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -ms-transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    -o-transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    transition: all .15s cubic-bezier(0.4, 0.0, 0.2, 1);
+    height: 40px;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    width: 40px;
+}
+
+.AgendaCustomer .btn-icon:active:before,
+.AgendaCustomer .btn-icon:focus:before,
+.AgendaCustomer .btn-icon:hover:before {
+    content: '';
+    background-color: rgba(32, 33, 36, 0.059);
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -ms-transform: scale(1);
+    -o-transform: scale(1);
+    transform: scale(1);
+    opacity: 1;
+}
+
+.AgendaCustomer .btn-icon:active:before,
+.AgendaCustomer .btn-icon:focus:before {
+    background-color: rgba(32, 33, 36, 0.122);
+}
+
+.AgendaCustomer .btn-icon i.material-icons {
+    font-size: 20px;
 }
