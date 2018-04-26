@@ -37,6 +37,17 @@ class Agenda {
 
     });
 
+    this.customersRef.on('child_removed', snap => {
+
+      if (this.customers[snap.key]) {
+
+        this.element.customersList.removeChild(this.customers[snap.key].element);
+        delete this.customers[snap.key];
+
+      }
+
+    });
+
   }
 
   build() {
@@ -101,12 +112,17 @@ class Agenda {
 
     if (queryString.length > 1) {
 
+      const isNumber = !isNaN(queryString);
+
       queryString = queryString.toLowerCase();
 
       let dataArray = Object.values(this.customers);
 
       let query = dataArray.filter(customer => {
-        return customer.data.customerName.toLowerCase().includes(queryString);
+        if (isNumber)
+          return customer.data.customerContact.toString().toLowerCase().includes(queryString)
+        else
+          return customer.data.customerName.toLowerCase().includes(queryString);
       });
 
       while (this.element.customersList.firstChild)
@@ -204,6 +220,7 @@ class AgendaCustomer {
     this.element.actions.className = 'AgendaCustomer-actions';
     this.element.inner.appendChild(this.element.actions);
 
+    this.element.deleteCustomerButton = this.buildDeleteCustomerButtonElement();
     this.element.createOrderButton = this.buildCreateOrderButtonElement();
 
   }
@@ -265,6 +282,29 @@ class AgendaCustomer {
 
   }
 
+  buildDeleteCustomerButtonElement() {
+
+    const element = document.createElement('a');
+    element.className = 'btn-icon';
+    element.addEventListener('click', () => {
+
+      let allow = confirm('O cliente sera excluido permanentemente, deseja continuar?');
+
+      if (allow)
+        this.customerRef.set(null);
+
+    });
+    this.element.actions.appendChild(element);
+
+    element.icon = document.createElement('i');
+    element.icon.className = 'material-icons';
+    element.icon.innerHTML = 'delete';
+    element.appendChild(element.icon);
+
+    return element;
+
+  }
+
   buildCreateOrderButtonElement() {
 
     const element = document.createElement('a');
@@ -295,7 +335,7 @@ class AgendaCustomer {
 
     element.icon = document.createElement('i');
     element.icon.className = 'material-icons';
-    element.icon.innerHTML = 'forward';
+    element.icon.innerHTML = 'note_add';
     element.appendChild(element.icon);
 
     return element;
@@ -1519,7 +1559,7 @@ class OrderDelivery {
     element.input.type = 'number';
     element.input.id = this.orderRef.key + '-addressHouseNumber';
     element.input.addEventListener('input', () => this.orderRef.child('address/houseNumber').set(element.input.value));
-    this.orderRef.child('address/houseNumber').on('value', snap => console.log(snap.val()));
+    this.orderRef.child('address/houseNumber').on('value', snap => element.input.value = snap.val());
     element.appendChild(element.input);
 
     element.label = document.createElement('label');

@@ -44,6 +44,7 @@ class AgendaCustomer {
     this.element.actions.className = 'AgendaCustomer-actions';
     this.element.inner.appendChild(this.element.actions);
 
+    this.element.deleteCustomerButton = this.buildDeleteCustomerButtonElement();
     this.element.createOrderButton = this.buildCreateOrderButtonElement();
 
   }
@@ -105,6 +106,29 @@ class AgendaCustomer {
 
   }
 
+  buildDeleteCustomerButtonElement() {
+
+    const element = document.createElement('a');
+    element.className = 'btn-icon';
+    element.addEventListener('click', () => {
+
+      let allow = confirm('O cliente sera excluido permanentemente, deseja continuar?');
+
+      if (allow)
+        this.customerRef.set(null);
+
+    });
+    this.element.actions.appendChild(element);
+
+    element.icon = document.createElement('i');
+    element.icon.className = 'material-icons';
+    element.icon.innerHTML = 'delete';
+    element.appendChild(element.icon);
+
+    return element;
+
+  }
+
   buildCreateOrderButtonElement() {
 
     const element = document.createElement('a');
@@ -135,7 +159,7 @@ class AgendaCustomer {
 
     element.icon = document.createElement('i');
     element.icon.className = 'material-icons';
-    element.icon.innerHTML = 'forward';
+    element.icon.innerHTML = 'note_add';
     element.appendChild(element.icon);
 
     return element;

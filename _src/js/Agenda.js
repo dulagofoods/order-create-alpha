@@ -37,6 +37,17 @@ class Agenda {
 
     });
 
+    this.customersRef.on('child_removed', snap => {
+
+      if (this.customers[snap.key]) {
+
+        this.element.customersList.removeChild(this.customers[snap.key].element);
+        delete this.customers[snap.key];
+
+      }
+
+    });
+
   }
 
   build() {
@@ -101,12 +112,17 @@ class Agenda {
 
     if (queryString.length > 1) {
 
+      const isNumber = !isNaN(queryString);
+
       queryString = queryString.toLowerCase();
 
       let dataArray = Object.values(this.customers);
 
       let query = dataArray.filter(customer => {
-        return customer.data.customerName.toLowerCase().includes(queryString);
+        if (isNumber)
+          return customer.data.customerContact.toString().toLowerCase().includes(queryString)
+        else
+          return customer.data.customerName.toLowerCase().includes(queryString);
       });
 
       while (this.element.customersList.firstChild)

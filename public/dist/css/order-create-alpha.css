@@ -1,5 +1,5 @@
 .Agenda {
-  background-color: #e0e0e0;
+  background-color: #ffffff;
   border-right: 1px solid #bdbdbd;
   height: 100%;
   position: relative;
@@ -23,6 +23,8 @@
 
 
 .AgendaCustomer {
+  border-bottom: solid 1px #f0f0f0;
+  cursor: pointer;
   display: block;
   width: 100%;
   -webkit-transition: background .3s ease-in-out;
@@ -47,7 +49,7 @@
   -webkit-justify-content: space-between;
   justify-content: space-between;
   min-height: 72px;
-  padding: 14px 12px;
+  padding: 10px 12px;
   position: relative;
 }
 
@@ -64,6 +66,7 @@
 .AgendaCustomer-customerName {
   margin-bottom: 1pt;
   max-width: 240px;
+  min-height: 20px;
 }
 
 .AgendaCustomer-customerName span {
@@ -89,22 +92,30 @@
 }
 
 .AgendaCustomer-actions {
-  -webkit-align-items: center;
-  align-items: center;
   display: -webkit-box;
   display: -moz-box;
   display: -ms-flexbox;
   display: -webkit-flex;
   display: flex;
-  -webkit-flex-flow: column;
-  flex-flow: column;
+  -webkit-align-items: center;
+  align-items: center;
+  -webkit-flex-flow: row nowrap;
+  flex-flow: row nowrap;
   -webkit-justify-content: center;
   justify-content: center;
   position: absolute;
   right: 0;
   top: 0;
   margin-right: 16px;
-  margin-top: 16px;
+  margin-top: 12px;
+}
+
+.AgendaCustomer:hover .AgendaCustomer-actions {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
 }
 
 .AgendaCustomer-actions > .btn-icon:last-child {
