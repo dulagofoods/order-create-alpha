@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="">
+<meta charset="UTF-8">
+<title>Du Lago OrderApp</title>
+<meta name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+<script src="dist/js/villa.min.js"></script>
+<link rel="stylesheet" href="dist/css/villa.min.css"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,500,700" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css" media="screen,projection"/>
+<link rel="stylesheet" href="dist/css/materialize.custom.css">
+<link rel="stylesheet" href="dist/css/order-create-alpha.css">
+<!--[if lt IE 9]>
+<link rel="stylesheet" type="text/css" href="dist/css/material-colors.css"/>
+<link rel="stylesheet" type="text/css" href="dist/css/villa-cross.min.css"/>
+<script src="dist/js/html5shiv.js"></script>
+<script src="dist/js/html5shiv-printshiv.js"></script>
+<script src="dist/js/classList.min.js"></script>
+<![endif]-->
+
+<style>
+
+  .OrderDeliveryTime {
+    -webkit-align-items: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+  }
+
+  .AutoComplete {
+
+  }
+
+  .AutoComplete .dropdown-content {
+    transform: scaleX(.5) scaleY(0);
+    -webkit-transition: all .1s ease-in-out;
+    -moz-transition: all .1s ease-in-out;
+    -ms-transition: all .1s ease-in-out;
+    -o-transition: all .1s ease-in-out;
+    transition: all .1s ease-in-out;
+  }
+
+  .AutoComplete li span {
+    font-weight: 700;
+  }
+
+  .AutoComplete li span .highlight {
+    background-color: pink;
+    color: #444;
+    font-weight: 400;
+  }
+
+</style>
+
+<body class="grey-200">
+
+<div id="app">
+
+  <div class="input-field AutoComplete" id="input-field">
+
+    <input type="text" id="input">
+    <label for="input" id="label">Nome</label>
+
+  </div>
+
+</div>
+
+<script type="text/javascript" src="dist/js/materialize.js"></script>
+<script>
+
+  M.AutoInit(document.body);
+
+</script>
+<script src="dist/js/moment-with-locales.js"></script>
+<script>
+
+  moment.locale('pt-br');
+  console.log(moment().format());
+
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-database.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCd0gxcfc-VmRZ_zOfteYNJdIV_rJuVyUw",
+    authDomain: "dulago-app.firebaseapp.com",
+    databaseURL: "https://dulago-app.firebaseio.com",
+    projectId: "dulago-app",
+    storageBucket: "dulago-app.appspot.com",
+    messagingSenderId: "384067076512"
+  };
+  firebase.initializeApp(config);
+</script>
+<script>
+
+  const databaseRef = firebase.database();
+  const customersRef = databaseRef.ref('customers');
+  const ordersRef = databaseRef.ref('orders');
+  const ordersViewsRef = databaseRef.ref('ordersViews');
+  const activeOrdersView = ordersViewsRef.child(moment().format('YYYY-MM-DD'));
+
+</script>
+<script src="dist/js/order-create-alpha.js"></script>
+
+<script>
+
+  const inputField = document.getElementById('input-field');
+  const input = document.getElementById('input');
+  const label = document.getElementById('label');
+  const dropdown = document.createElement('ul');
+  let hold = false;
+  const data = {};
+  let currentQuery = [];
+  let currentQueryString = '';
+
+  customersRef.on('child_added', snap => data[snap.key] = new AutoCompleteItem(snap.val(), dropdown));
+  customersRef.on('child_changed', snap => data[snap.key].update(snap.val()));
+
+  dropdown.className = 'dropdown-content';
+  inputField.insertBefore(dropdown, label);
+
+  input.addEventListener('input', () => {
+
+    if (input.value.length > currentQueryString) {
+      currentQuery = currentQuery.filter(customer => customer.data.customerName.toLowerCase().includes(input.value));
+    } else {
+      currentQuery = Object.values(data)
+        .sort((a, b) => {
+          if (a.data.customerName > b.data.customerName)
+            return -1;
+          if (a.data.customerName < b.data.customerName)
+            return 1;
+          return 0;
+        })
+        .filter(customer => customer.data.customerName.toLowerCase().includes(input.value));
+    }
+
+    currentQueryString = input.value;
+    activeDropdown(currentQuery, currentQueryString);
+
+  });
+  input.addEventListener('blur', event => closeDropdown());
+  dropdown.addEventListener('mouseover', () => hold = true);
+  dropdown.addEventListener('mouseout', () => hold = false);
+
+  function activeDropdown(contentList = [], queryString = '') {
+
+    console.log(contentList.length, input.value.length);
+
+    if (contentList.length && input.value.length > 0) {
+
+      contentList = contentList.slice(0, 10);
+
+      dropdown.style.top = input.offsetHeight + 'px';
+      dropdown.style.left = window.getComputedStyle(inputField, null).getPropertyValue('padding-left');
+      dropdown.style.display = 'block';
+      dropdown.style.width = input.offsetWidth + 'px';
+      dropdown.style.height = contentList.length > 4 ? '300px' : (contentList.length * 50) + 'px';
+      dropdown.style.opacity = '1';
+      dropdown.style.transformOrigin = '0px 0px 0px';
+      dropdown.style.transform = 'scaleX(1) scaleY(1)';
+
+
+      while (dropdown.firstChild)
+        dropdown.removeChild(dropdown.firstChild);
+
+      contentList.forEach(item => {
+        dropdown.insertBefore(item.element, dropdown.firstChild);
+        item.highlight(queryString)
+      });
+
+    } else {
+      closeDropdown(true);
+    }
+
+  }
+
+  function closeDropdown(force) {
+
+    if (!hold)
+      setTimeout(() => dropdown.style = null, 100);
+    else if (force)
+      dropdown.style = null
+
+  }
+
+</script>
+
+<script>
+
+  class AutoCompleteItem {
+
+    constructor(data = data) {
+
+      this.data = data;
+
+      this.element = document.createElement('li');
+
+      this.init();
+
+    }
+
+    init() {
+
+      this.build();
+
+      this.element.addEventListener('click', () => {
+        console.log(this.data);
+        input.value = this.data.customerName;
+        closeDropdown(true);
+      })
+
+    }
+
+
+    build() {
+
+      this.element.span = document.createElement('span');
+      this.element.span.innerHTML = this.data.customerName;
+      this.element.appendChild(this.element.span);
+
+    }
+
+    update(data) {
+
+      this.data = data;
+      this.build();
+
+    }
+
+    highlight(string) {
+
+      console.log(string);
+
+      this.element.span.innerHTML = string
+        ? this.data.customerName.replace(new RegExp('(' + string + ')', 'ig'), '<span class=highlight>$1</span>')
+        : this.data.customerName;
+
+    }
+
+  }
+
+</script>
+
+</body>
+
+</html>

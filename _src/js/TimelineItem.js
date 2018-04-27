@@ -194,6 +194,7 @@ class TimelineItem {
   }
 
   archive() {
+    this.orderList.close(this.orderRef.key);
     this.element.classList.add('is-archived');
   }
 

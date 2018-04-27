@@ -3274,12 +3274,12 @@ class TagList {
     this.build();
     this.orderRef.on('value', snap => {
 
-      this.update(snap.val())
+      this.update(snap.val());
 
       if (this.updateInterval)
         clearInterval(this.updateInterval);
 
-      this.updateInterval = setInterval(() => snap.ref.once('value', snap => self.update(snap.val())), 30000);
+      this.updateInterval = setInterval(() => snap.ref.once('value', snap => self.update(snap.val())), 15000);
 
     });
 
@@ -3697,6 +3697,7 @@ class TimelineItem {
   }
 
   archive() {
+    this.orderList.close(this.orderRef.key);
     this.element.classList.add('is-archived');
   }
 
