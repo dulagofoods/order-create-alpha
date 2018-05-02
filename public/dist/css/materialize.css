@@ -7746,7 +7746,7 @@ input[type=range].focused:focus:not(.active)::-ms-thumb {
  * Constants:
  *      STROKEWIDTH = 3px
  *      ARCSIZE     = 270 degrees (amount of circle the arc takes up)
- *      ARCTIME     = 1333ms (time it takes to expand and contract arc)
+ *      ARCTIME     = 1333ms (time it takes to showDropdown and contract arc)
  *      ARCSTARTROT = 216 degrees (how much the start location of the arc
  *                                should rotate each time, 216 gives us a
  *                                5 pointed star shape (it's 360/5 * 3).

@@ -5,6 +5,8 @@ class Order {
     this.orderRef = orderRef;
     this.orderList = orderList;
 
+    this.databaseRef = this.orderList.databaseRef;
+
     this.createdTime = null;
     this.isInited = false;
     this.data = {};

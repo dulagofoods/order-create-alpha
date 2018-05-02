@@ -6,6 +6,7 @@ class OrderList {
     this.optionalClass = optionalClass;
 
     // define database instances
+    this.databaseRef = this.app.databaseRef;
     this.ordersRef = this.app.ordersRef;
     this.ordersViewRef = this.app.ordersViewRef || this.app.activeOrdersViewRef;
 
