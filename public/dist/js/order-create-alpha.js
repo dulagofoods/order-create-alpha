@@ -1190,19 +1190,15 @@ class Order {
 
   }
 
-  updateCustomer(item) {
+  static setCustomer(orderRef, customer) {
 
-    const data = item.customer.data;
-    const key = item.customer.customerRef.key;
-
-
-    this.orderRef.update({
+    orderRef.update({
       customer: {
-        customerRefKey: key,
-        customerName: data.customerName,
-        customerContact: data.customerContact
+        customerRefKey: customer.customerRef.key,
+        customerName: customer.data.customerName,
+        customerContact: customer.data.customerContact
       },
-      address: data.defaultAddress
+      address: customer.data.defaultAddress
     });
 
   }
@@ -1251,7 +1247,7 @@ class Order {
         customer: {
           customerName: ''
         },
-        delivery: false,
+        delivery: true,
         isArchived: false,
         isDeleted: false
       }).ref;
@@ -1548,7 +1544,10 @@ class OrderCustomer {
 
   buildCustomerNameFieldElement() {
 
-    const autocomplete = new CustomerAutoComplete(this.order, false, this.order.updateCustomer);
+    const autocomplete = new CustomerAutoComplete(this.order, false, item => {
+      console.log(item);
+      Order.setCustomer(this.orderRef, item.customer);
+    });
 
     const element = autocomplete.element;
     element.classList.add('OrderCustomer-customerNameField', 'col', 's8');

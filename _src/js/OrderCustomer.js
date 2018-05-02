@@ -24,7 +24,10 @@ class OrderCustomer {
 
   buildCustomerNameFieldElement() {
 
-    const autocomplete = new CustomerAutoComplete(this.order, false, this.order.updateCustomer);
+    const autocomplete = new CustomerAutoComplete(this.order, false, item => {
+      console.log(item);
+      Order.setCustomer(this.orderRef, item.customer);
+    });
 
     const element = autocomplete.element;
     element.classList.add('OrderCustomer-customerNameField', 'col', 's8');
