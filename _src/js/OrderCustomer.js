@@ -1,8 +1,10 @@
 class OrderCustomer {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
+
+    this.orderRef = this.order.orderRef;
     this.customerRef = this.orderRef.child('customer');
 
     this.element = document.createElement('div');
@@ -17,21 +19,18 @@ class OrderCustomer {
 
     this.element.customerName = this.buildCustomerNameFieldElement();
     this.element.customerContact = this.buildCustomerContactFieldElement();
-    // this.element.deliveryTime = this.buildDeliveryTimeFieldElement();
 
   }
 
   buildCustomerNameFieldElement() {
 
-    const element = document.createElement('div');
-    element.className = 'OrderCustomer-customerNameField input-field col s8';
+    const autocomplete = new CustomerAutoComplete(this.order, false, this.order.updateCustomer);
+
+    const element = autocomplete.element;
+    element.classList.add('OrderCustomer-customerNameField', 'col', 's8');
     this.element.appendChild(element);
 
-    // input
-    element.input = document.createElement('input');
     element.input.className = 'validate';
-    element.input.id = this.orderRef.key + '-customerName';
-    element.input.type = 'text';
     element.input.addEventListener('input', () => {
 
       this.customerRef.child('customerName').set(element.input.value);
@@ -45,12 +44,10 @@ class OrderCustomer {
     });
     element.appendChild(element.input);
 
-    // label
-    element.label = document.createElement('label');
     this.customerRef.child('customerName').on('value', snap => {
-      if (snap.val()) element.label.classList = 'active';
+      if (snap.val())
+        element.label.classList = 'active';
     });
-    element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Nome';
     element.appendChild(element.label);
 

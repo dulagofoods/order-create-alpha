@@ -12,6 +12,7 @@ class OrderApp {
     this.activeOrdersViewRef = this.ordersViewsRef.child(moment().format('YYYY-MM-DD'));
 
     // define components instances
+    this.customerList = new CustomerList(this.databaseRef);
     this.orderList = new OrderList(this, 'OrderApp-list', true);
     this.timeline = new Timeline(this, 'OrderApp-timeline', true);
     this.agenda = new Agenda(this, 'OrderApp-agenda', false);

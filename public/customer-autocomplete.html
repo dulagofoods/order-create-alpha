@@ -31,27 +31,7 @@
     display: flex;
   }
 
-  .AutoComplete {
 
-  }
-
-  .AutoComplete .dropdown-content {
-    transform: scaleX(.5) scaleY(0);
-    -webkit-transition: all .1s ease-in-out;
-    -moz-transition: all .1s ease-in-out;
-    -ms-transition: all .1s ease-in-out;
-    -o-transition: all .1s ease-in-out;
-    transition: all .1s ease-in-out;
-  }
-
-  .AutoComplete li span {
-    font-weight: 700;
-  }
-
-  .AutoComplete li span .highlight {
-    color: #444;
-    font-weight: 400;
-  }
 
 </style>
 
@@ -92,8 +72,6 @@
 <script>
 
   const databaseRef = firebase.database();
-  const customersRef = databaseRef.ref('customers');
-  const ordersRef = databaseRef.ref('orders');
   const ordersViewsRef = databaseRef.ref('ordersViews');
   const activeOrdersView = ordersViewsRef.child(moment().format('YYYY-MM-DD'));
 
@@ -101,275 +79,17 @@
 <script src="dist/js/order-create-alpha.js"></script>
 
 <script>
-  /*
-    let hold = false;
 
-    input.addEventListener('blur', event => closeDropdown());
-    dropdown.addEventListener('mouseover', () => hold = true);
-    dropdown.addEventListener('mouseout', () => hold = false);
-
-  */
-</script>
-
-<script>
-
-  class CustomerList {
-
-    constructor(databaseRef = false) {
-
-      this.databaseRef = databaseRef;
-
-      this.list = {};
-      this.minStringLength = 2;
-
-      if (databaseRef)
-        this.init();
-
-    }
-
-    init() {
-
-      customersRef.on('child_added', snap => this.addItem(snap.key, snap.ref));
-      customersRef.on('child_removed', snap => this.removeItem(snap.key));
-
-    }
-
-    query(customerName = '', list = this.list) {
-
-      customerName = customerName.toLowerCase();
-
-      if (customerName.length >= this.minStringLength)
-        return Object.values(list)
-          .filter(customer => customer.data.customerName.toLowerCase().includes(customerName))
-          .sort((a, b) => {
-            if (a.data.customerName < b.data.customerName)
-              return -1;
-            if (a.data.customerName > b.data.customerName)
-              return 1;
-            return 0;
-          });
-
-      return [];
-
-    }
-
-    addItem(key, orderRef) {
-
-      this.list[key] = new Customer(orderRef);
-
-    }
-
-    removeItem(key) {
-
-      delete this.list[key];
-
-    }
-
+  function test(item) {
+    if (item.customer)
+      console.log(item.customer.data.customerName, 'uhuuull');
   }
-
-</script>
-
-<script>
-
-  class Customer {
-
-    constructor(customerRef = false) {
-
-      this.customerRef = customerRef;
-
-      this.data = null;
-
-      if (this.customerRef)
-        this.init();
-
-    }
-
-    init() {
-
-      this.customerRef.on('value', snap => this.update(snap.val()))
-
-    }
-
-    update(data) {
-
-      this.data = data;
-
-    }
-
-  }
-
-</script>
-
-<script>
-
-  class CustomerAutoComplete {
-
-    constructor(order = false, customerList = false, element = document.createElement('div')) {
-
-      this.order = order;
-      this.customerList = customerList;
-      this.element = element;
-
-      this.orderRef = this.order.orderRef;
-
-      this.expandTimeout = false;
-      this.hold = false;
-
-      this.init();
-
-    }
-
-    init() {
-
-      this.build();
-
-      this.element.input.addEventListener('input', () => this.query());
-      this.element.input.addEventListener('blur', () => this.closeDropdown(0));
-
-      this.element.dropdown.addEventListener('mouseover', () => this.hold = true);
-      this.element.dropdown.addEventListener('mouseout', () => this.hold = false);
-
-    }
-
-    build() {
-
-      this.element.classList.add('AutoComplete', 'input-field');
-
-      this.element.input = document.createElement('input');
-      this.element.input.type = 'text';
-      this.element.input.id = this.orderRef.key + '-customerName';
-      this.element.appendChild(this.element.input);
-
-      this.element.dropdown = document.createElement('ul');
-      this.element.dropdown.className = 'dropdown-content';
-      this.element.appendChild(this.element.dropdown);
-
-      this.element.label = document.createElement('label');
-      this.element.label.htmlFor = this.element.input.id;
-      this.element.label.innerHTML = 'Nome';
-      this.element.appendChild(this.element.label);
-
-    }
-
-    showDropdown(customerList) {
-
-      if (this.expandTimeout)
-        clearTimeout(this.expandTimeout);
-
-      const dropdown = this.element.dropdown;
-      const rect = this.element.getBoundingClientRect();
-
-      dropdown.style.bottom = 'auto';
-      dropdown.style.top = 'auto';
-      dropdown.style.left = window.getComputedStyle(this.element, null).getPropertyValue('padding-left');
-      dropdown.style.display = 'block';
-      dropdown.style.width = this.element.input.offsetWidth + 'px';
-      dropdown.style.height = customerList.length > 6 ? '300px' : (customerList.length * 50) + 'px';
-      dropdown.style.opacity = '1';
-      dropdown.style.transformOrigin = '0px 0px 0px';
-      dropdown.style.transform = 'scaleX(1) scaleY(1)';
-
-      this.destroyDropdown();
-
-      customerList.forEach(customer => {
-        let item = new CustomerAutoCompleteItem(customer, this);
-        dropdown.insertBefore(item.element, dropdown.firstChild);
-        item.highlight(this.element.input.value);
-      });
-
-      if (rect.bottom + dropdown.offsetHeight > window.innerHeight)
-        dropdown.style.bottom = 0;
-      else
-        dropdown.style.top = this.element.input.offsetHeight + 'px';
-
-    }
-
-    closeDropdown(time = 300, isForced = false) {
-
-      if (this.expandTimeout)
-        clearTimeout(this.expandTimeout);
-
-      this.expandTimeout = setTimeout(() => {
-        if (!this.hold || isForced) {
-          this.destroyDropdown();
-          this.element.dropdown.style = null;
-        }
-      }, time);
-
-    }
-
-    destroyDropdown() {
-
-      while (this.element.dropdown.firstChild)
-        this.element.dropdown.removeChild(this.element.dropdown.firstChild);
-
-    }
-
-    query() {
-
-      const result = this.customerList.query(this.element.input.value);
-
-      if (result.length)
-        this.showDropdown(result);
-      else
-        this.closeDropdown();
-    }
-
-    select(customer) {
-
-      console.log(customer);
-      this.element.input.value = customer.data.customerName;
-      this.closeDropdown(10, true);
-
-    }
-
-  }
-
-</script>
-
-<script>
-
-  class CustomerAutoCompleteItem {
-
-    constructor(customer = {}, autocomplete) {
-
-      this.customer = customer;
-      this.autocomplete = autocomplete;
-
-      this.element = document.createElement('li');
-
-      this.build();
-
-    }
-
-    build() {
-
-      this.element.span = document.createElement('span');
-      this.element.span.innerHTML = this.customer.data.customerName;
-      this.element.addEventListener('click', () => this.autocomplete.select(this.customer));
-      this.element.appendChild(this.element.span);
-
-    }
-
-    highlight(string) {
-
-      this.element.span.innerHTML = string
-        ? this.customer.data.customerName.replace(new RegExp('(' + string + ')', 'ig'), '<span class=highlight>$1</span>')
-        : this.customer.data.customerName;
-
-    }
-
-  }
-
-</script>
-
-<script>
 
   const customerList = new CustomerList(databaseRef);
 
   activeOrdersView.on('child_added', snap => {
 
-    let autoComplete = new CustomerAutoComplete({orderRef: snap.ref}, customerList);
+    let autoComplete = new CustomerAutoComplete({orderRef: snap.ref}, customerList, undefined, test);
     document.getElementById('app').appendChild(autoComplete.element);
 
   });

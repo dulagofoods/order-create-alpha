@@ -1,9 +1,10 @@
 class OrderPriceAmount {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
 
+    this.orderRef = this.order.orderRef;
     this.orderItemsRef = this.orderRef.child('items');
     this.orderBillingRef = this.orderRef.child('billing');
     this.orderPriceAmountRef = this.orderBillingRef.child('priceAmount');

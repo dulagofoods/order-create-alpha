@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="dist/css/villa.min.css"/>
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,500,700" rel="stylesheet">
-<link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css"  media="screen,projection"/>
+<link type="text/css" rel="stylesheet" href="dist/css/materialize.min.css" media="screen,projection"/>
 <link rel="stylesheet" href="dist/css/materialize.custom.css">
 <link rel="stylesheet" href="dist/css/order-create-alpha.css">
 <!--[if lt IE 9]>
@@ -68,7 +68,7 @@
   .OrderApp-header .nav-wrapper {
     padding-left: 14px;
   }
-  
+
   @media (min-width: 601px) {
 
     .OrderApp-header {
@@ -249,13 +249,16 @@
 <script>
 
   let socket = io.connect('http://127.0.0.1:8080');
-  socket.on('connect_error', (error) => {
+  socket.on('connect_error', error => {
     socket.close();
     console.error('erro de conexão no servidor de impressão local, conexão rejeitada');
     console.info('tentando conexão remota..');
     socket = io.connect('http://192.168.1.80:8080');
     socket.on('connect', () => console.info('conectado com sucesso em servidor de impressão remoto'));
-    socket.on('connect_error', () => console.error('erro na conexão com servidor remoto'));
+    socket.on('connect_error', error => {
+      socket.close();
+      console.error('erro na conexão com servidor remoto')
+    });
   });
 
 </script>

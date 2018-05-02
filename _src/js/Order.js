@@ -1,17 +1,16 @@
 class Order {
 
-  constructor(orderRef = false, orderList = false, autoInit) {
+  constructor(orderRef = false, app, autoInit) {
 
     this.orderRef = orderRef;
-    this.orderList = orderList;
 
-    this.databaseRef = this.orderList.databaseRef;
+    this.app = app;
+    this.orderList = this.app.orderList;
+    this.socket = this.app.socket;
 
     this.createdTime = null;
     this.isInited = false;
     this.data = {};
-
-    this.socket = socket;
 
     this.element = document.createElement('div');
 
@@ -26,11 +25,11 @@ class Order {
 
       this.isInited = true;
 
-      this.customer = new OrderCustomer(this.orderRef);
-      this.deliveryTime = new OrderDeliveryTime(this.orderRef);
-      this.items = new OrderItemList(this.orderRef);
-      this.billing = new OrderBilling(this.orderRef);
-      this.delivery = new OrderDelivery(this.orderRef);
+      this.customer = new OrderCustomer(this);
+      this.deliveryTime = new OrderDeliveryTime(this);
+      this.items = new OrderItemList(this);
+      this.billing = new OrderBilling(this);
+      this.delivery = new OrderDelivery(this);
 
       this.build();
 
@@ -106,8 +105,8 @@ class Order {
         try {
 
           data = {
-            customerName: data.customer.customerName,
-            customerContact: data.customer.customerContact,
+            customerName: data.customer.customerName || '',
+            customerContact: data.customer.customerContact || '',
             defaultAddress: data.address || {
               street: '',
               houseNumber: '',
@@ -233,6 +232,23 @@ class Order {
 
     while (this.element.firstChild)
       this.element.removeChild(this.element.firstChild);
+
+  }
+
+  updateCustomer(item) {
+
+    const data = item.customer.data;
+    const key = item.customer.customerRef.key;
+
+
+    this.orderRef.update({
+      customer: {
+        customerRefKey: key,
+        customerName: data.customerName,
+        customerContact: data.customerContact
+      },
+      address: data.defaultAddress
+    });
 
   }
 

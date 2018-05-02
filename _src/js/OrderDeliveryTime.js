@@ -1,9 +1,10 @@
 class OrderDeliveryTime {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
 
+    this.orderRef = this.order.orderRef;
     this.orderDeliveryTimeRef = this.orderRef.child('deliveryTime');
 
     this.element = document.createElement('div');

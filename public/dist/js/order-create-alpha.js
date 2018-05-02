@@ -367,6 +367,313 @@ class AgendaCustomer {
   }
 
 }
+class Customer {
+
+  constructor(customerRef = false) {
+
+    this.customerRef = customerRef;
+
+    this.data = null;
+
+    if (this.customerRef)
+      this.init();
+
+  }
+
+  init() {
+
+    this.customerRef.on('value', snap => this.update(snap.val()))
+
+  }
+
+  update(data) {
+
+    this.data = data;
+
+  }
+
+}
+class CustomerAutoComplete {
+
+  constructor(order = false, element, fallback = false) {
+
+    this.order = order;
+    this.element = element || document.createElement('div');
+    this.fallback = fallback;
+
+    this.orderRef = this.order.orderRef;
+
+    this.customerList = this.order.app.customerList;
+
+    // ui variables
+    this.currentView = [];
+    this.focusedItemIndex = -1;
+    this.isActive = false;
+    this.expandTimeout = false;
+    this.hold = false;
+
+    this.init();
+
+  }
+
+  init() {
+
+    this.build();
+
+    this.element.input.addEventListener('input', () => {
+      this.query();
+    });
+    this.element.input.addEventListener('blur', () => this.closeDropdown(0));
+
+    this.element.dropdown.addEventListener('mouseover', () => this.hold = true);
+    this.element.dropdown.addEventListener('mouseout', () => this.hold = false);
+
+    this.element.input.addEventListener('keydown', event => {
+
+      if (!this.isActive) {
+
+        if (event.keyCode === M.keys.ARROW_DOWN)
+          this.query();
+
+      } else if (this.currentView.length > 0) {
+
+        if (event.keyCode === M.keys.ARROW_UP)
+          this.focusedItemIndex = this.focusedItemIndex > 0 ? this.focusedItemIndex - 1 : 0;
+        else if (event.keyCode === M.keys.ARROW_DOWN)
+          this.focusedItemIndex = this.focusedItemIndex === this.currentView.length - 1 ? this.focusedItemIndex : this.focusedItemIndex + 1;
+        else if (event.keyCode === M.keys.ENTER && this.focusedItemIndex > -1)
+          this.setFocusToItem(this.currentView[this.focusedItemIndex], true);
+
+        this.setFocusToItem(this.currentView[this.focusedItemIndex]);
+
+      }
+
+    });
+
+  }
+
+  build() {
+
+    this.element.classList.add('AutoComplete', 'input-field');
+
+    this.element.input = document.createElement('input');
+    this.element.input.type = 'text';
+    this.element.input.id = this.orderRef.key + '-customerName';
+    this.element.appendChild(this.element.input);
+
+    this.element.dropdown = document.createElement('ul');
+    this.element.dropdown.className = 'dropdown-content';
+    this.element.appendChild(this.element.dropdown);
+
+    this.element.label = document.createElement('label');
+    this.element.label.htmlFor = this.element.input.id;
+    this.element.label.innerHTML = 'Nome';
+    this.element.appendChild(this.element.label);
+
+  }
+
+  showDropdown(customerList, activeItem = -1) {
+
+    this.isActive = true;
+    this.focusedItemIndex = activeItem;
+    this.currentView = [];
+
+    if (this.expandTimeout)
+      clearTimeout(this.expandTimeout);
+
+    const dropdown = this.element.dropdown;
+    const rect = this.element.getBoundingClientRect();
+
+    dropdown.style.left = window.getComputedStyle(this.element, null).getPropertyValue('padding-left');
+    dropdown.style.display = 'block';
+    dropdown.style.width = this.element.input.offsetWidth + 'px';
+    dropdown.style.height = customerList.length > 6 ? '300px' : (customerList.length * 50) + 'px';
+    dropdown.style.opacity = '1';
+    dropdown.style.transformOrigin = '0px 0px 0px';
+    dropdown.style.transform = 'scaleX(1) scaleY(1)';
+
+    this.destroyDropdown();
+
+    customerList.forEach(customer => {
+      let item = new CustomerAutoCompleteItem(customer, this);
+      dropdown.appendChild(item.element);
+      item.highlight(this.element.input.value);
+      this.currentView.push(item);
+    });
+
+    setTimeout(() => {
+      if (rect.bottom + dropdown.offsetHeight > window.innerHeight) {
+        dropdown.style.top = 'auto';
+        dropdown.style.bottom = 0;
+      } else {
+        dropdown.style.bottom = 'auto';
+        dropdown.style.top = this.element.input.offsetHeight + 'px';
+      }
+    }, 100);
+
+  }
+
+  closeDropdown(time = 300, isForced = false) {
+
+    if (this.expandTimeout)
+      clearTimeout(this.expandTimeout);
+
+    this.expandTimeout = setTimeout(() => {
+      if (!this.hold || isForced) {
+        this.isActive = false;
+        this.destroyDropdown();
+        this.element.dropdown.style = null;
+      }
+    }, time);
+
+  }
+
+  destroyDropdown() {
+
+    this.isActive = true;
+
+    while (this.element.dropdown.firstChild)
+      this.element.dropdown.removeChild(this.element.dropdown.firstChild);
+
+  }
+
+  query() {
+
+    const result = this.customerList.query(this.element.input.value);
+
+    if (result.length)
+      this.showDropdown(result);
+    else
+      this.closeDropdown();
+
+  }
+
+  setFocusToItem(item, select = false) {
+
+    if (item) {
+
+      this.currentView.forEach(item => item.blur());
+      item.focus();
+
+      if (select)
+        this.select(item);
+
+    }
+
+  }
+
+  select(item) {
+
+    this.element.input.value = item.customer.data.customerName;
+    this.closeDropdown(10, true);
+
+    if (this.fallback)
+      this.fallback(item);
+
+  }
+
+}
+class CustomerAutoCompleteItem {
+
+  constructor(customer = {}, autocomplete) {
+
+    this.customer = customer;
+    this.autocomplete = autocomplete;
+
+    this.element = document.createElement('li');
+    this.isActive = false;
+
+    this.build();
+
+  }
+
+  build() {
+
+    this.element.span = document.createElement('span');
+    this.element.span.innerHTML = this.customer.data.customerName;
+    this.element.addEventListener('click', () => this.autocomplete.select(this));
+    this.element.appendChild(this.element.span);
+
+  }
+
+  highlight(string) {
+
+    this.element.span.innerHTML = string
+      ? this.customer.data.customerName.replace(new RegExp('(' + string + ')', 'ig'), '<span class=highlight>$1</span>')
+      : this.customer.data.customerName;
+
+  }
+
+  focus() {
+
+    this.hasFocus = true;
+    this.element.classList.add('has-focus');
+
+  }
+
+  blur() {
+
+    this.hasFocus = false;
+    this.element.classList.remove('has-focus');
+
+  }
+
+}
+class CustomerList {
+
+  constructor(databaseRef = false) {
+
+    this.databaseRef = databaseRef;
+
+    this.customersRef = this.databaseRef.ref('customers');
+
+    this.list = {};
+    this.minStringLength = 2;
+
+    if (databaseRef)
+      this.init();
+
+  }
+
+  init() {
+
+    this.customersRef.on('child_added', snap => this.addItem(snap.key, snap.ref));
+    this.customersRef.on('child_removed', snap => this.removeItem(snap.key));
+
+  }
+
+  query(customerName = '', list = this.list) {
+
+    customerName = customerName.toLowerCase();
+
+    if (customerName.length >= this.minStringLength)
+      return Object.values(list)
+        .filter(customer => customer.data.customerName.toLowerCase().includes(customerName))
+        .sort((a, b) => {
+          if (a.data.customerName < b.data.customerName)
+            return -1;
+          if (a.data.customerName > b.data.customerName)
+            return 1;
+          return 0;
+        });
+
+    return [];
+
+  }
+
+  addItem(key, orderRef) {
+
+    this.list[key] = new Customer(orderRef);
+
+  }
+
+  removeItem(key) {
+
+    delete this.list[key];
+
+  }
+
+}
 class Grid {
 
   constructor(element) {
@@ -648,18 +955,17 @@ class GridItem {
 }
 class Order {
 
-  constructor(orderRef = false, orderList = false, autoInit) {
+  constructor(orderRef = false, app, autoInit) {
 
     this.orderRef = orderRef;
-    this.orderList = orderList;
 
-    this.databaseRef = this.orderList.databaseRef;
+    this.app = app;
+    this.orderList = this.app.orderList;
+    this.socket = this.app.socket;
 
     this.createdTime = null;
     this.isInited = false;
     this.data = {};
-
-    this.socket = socket;
 
     this.element = document.createElement('div');
 
@@ -674,11 +980,11 @@ class Order {
 
       this.isInited = true;
 
-      this.customer = new OrderCustomer(this.orderRef);
-      this.deliveryTime = new OrderDeliveryTime(this.orderRef);
-      this.items = new OrderItemList(this.orderRef);
-      this.billing = new OrderBilling(this.orderRef);
-      this.delivery = new OrderDelivery(this.orderRef);
+      this.customer = new OrderCustomer(this);
+      this.deliveryTime = new OrderDeliveryTime(this);
+      this.items = new OrderItemList(this);
+      this.billing = new OrderBilling(this);
+      this.delivery = new OrderDelivery(this);
 
       this.build();
 
@@ -754,8 +1060,8 @@ class Order {
         try {
 
           data = {
-            customerName: data.customer.customerName,
-            customerContact: data.customer.customerContact,
+            customerName: data.customer.customerName || '',
+            customerContact: data.customer.customerContact || '',
             defaultAddress: data.address || {
               street: '',
               houseNumber: '',
@@ -884,6 +1190,23 @@ class Order {
 
   }
 
+  updateCustomer(item) {
+
+    const data = item.customer.data;
+    const key = item.customer.customerRef.key;
+
+
+    this.orderRef.update({
+      customer: {
+        customerRefKey: key,
+        customerName: data.customerName,
+        customerContact: data.customerContact
+      },
+      address: data.defaultAddress
+    });
+
+  }
+
   static print(orderRef, socket) {
 
     if (socket) {
@@ -1005,6 +1328,7 @@ class OrderApp {
     this.activeOrdersViewRef = this.ordersViewsRef.child(moment().format('YYYY-MM-DD'));
 
     // define components instances
+    this.customerList = new CustomerList(this.databaseRef);
     this.orderList = new OrderList(this, 'OrderApp-list', true);
     this.timeline = new Timeline(this, 'OrderApp-timeline', true);
     this.agenda = new Agenda(this, 'OrderApp-agenda', false);
@@ -1167,9 +1491,11 @@ class OrderApp {
 
 class OrderBilling {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
+
+    this.orderRef = this.order.orderRef;
 
     this.element = document.createElement('div');
 
@@ -1179,8 +1505,8 @@ class OrderBilling {
 
   init() {
 
-    this.priceAmount = new OrderPriceAmount(this.orderRef);
-    this.paymentList = new OrderPaymentList(this.orderRef);
+    this.priceAmount = new OrderPriceAmount(this.order);
+    this.paymentList = new OrderPaymentList(this.order);
 
     this.build();
 
@@ -1198,9 +1524,11 @@ class OrderBilling {
 }
 class OrderCustomer {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
+
+    this.orderRef = this.order.orderRef;
     this.customerRef = this.orderRef.child('customer');
 
     this.element = document.createElement('div');
@@ -1215,21 +1543,18 @@ class OrderCustomer {
 
     this.element.customerName = this.buildCustomerNameFieldElement();
     this.element.customerContact = this.buildCustomerContactFieldElement();
-    // this.element.deliveryTime = this.buildDeliveryTimeFieldElement();
 
   }
 
   buildCustomerNameFieldElement() {
 
-    const element = document.createElement('div');
-    element.className = 'OrderCustomer-customerNameField input-field col s8';
+    const autocomplete = new CustomerAutoComplete(this.order, false, this.order.updateCustomer);
+
+    const element = autocomplete.element;
+    element.classList.add('OrderCustomer-customerNameField', 'col', 's8');
     this.element.appendChild(element);
 
-    // input
-    element.input = document.createElement('input');
     element.input.className = 'validate';
-    element.input.id = this.orderRef.key + '-customerName';
-    element.input.type = 'text';
     element.input.addEventListener('input', () => {
 
       this.customerRef.child('customerName').set(element.input.value);
@@ -1243,12 +1568,10 @@ class OrderCustomer {
     });
     element.appendChild(element.input);
 
-    // label
-    element.label = document.createElement('label');
     this.customerRef.child('customerName').on('value', snap => {
-      if (snap.val()) element.label.classList = 'active';
+      if (snap.val())
+        element.label.classList = 'active';
     });
-    element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Nome';
     element.appendChild(element.label);
 
@@ -1306,9 +1629,11 @@ class OrderCustomer {
 }
 class OrderDelivery {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
+
+    this.orderRef = this.order.orderRef;
 
     this.element = document.createElement('div');
 
@@ -1727,10 +2052,11 @@ class OrderDelivery {
 
 class OrderDeliveryTime {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
 
+    this.orderRef = this.order.orderRef;
     this.orderDeliveryTimeRef = this.orderRef.child('deliveryTime');
 
     this.element = document.createElement('div');
@@ -2249,9 +2575,11 @@ class OrderItem {
 }
 class OrderItemList {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
+
+    this.orderRef = this.order.orderRef;
 
     this.element = document.createElement('div');
     this.itemList = [];
@@ -2271,17 +2599,8 @@ class OrderItemList {
 
     });
 
-    this.orderRef.child('items').on('child_added', snap => {
-
-      this.pushItem(snap.ref);
-
-    });
-
-    this.orderRef.child('items').on('child_removed', snap => {
-
-      this.delete(snap.ref);
-
-    });
+    this.orderRef.child('items').on('child_added', snap => this.pushItem(snap.ref));
+    this.orderRef.child('items').on('child_removed', snap => this.delete(snap.ref));
 
   }
 
@@ -2325,7 +2644,7 @@ class OrderItemList {
 
     this.orderRef.child('items').push({
       itemName: itemName || '',
-      itemPrice: itemPrice ||  0.00,
+      itemPrice: itemPrice || 0.00,
       quantity: 1
     });
 
@@ -2358,7 +2677,7 @@ class OrderItemList {
 
   delete(orderItemRef) {
 
-    for (let i = this.itemList.length; i--; ) {
+    for (let i = this.itemList.length; i--;) {
 
       if (this.itemList[i].orderItemRef.key === orderItemRef.key)
         this.itemList.splice(i, 1);
@@ -2449,7 +2768,7 @@ class OrderList {
       if (!this.orders[orderRef.key]) {
 
         if (orderRef && !this.orders[orderRef.key])
-          this.orders[orderRef.key] = new Order(orderRef, this, false);
+          this.orders[orderRef.key] = new Order(orderRef, this.app, false);
 
         this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
         this.orders[orderRef.key].createdTime = moment(data.createdTime);
@@ -2872,10 +3191,11 @@ class OrderPaymentItem {
 }
 class OrderPaymentList {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
 
+    this.orderRef = this.order.orderRef;
     this.orderBillingRef = this.orderRef.child('billing');
     this.orderPaymentsRef = this.orderBillingRef.child('payments');
 
@@ -3017,10 +3337,11 @@ class OrderPaymentList {
 }
 class OrderPriceAmount {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
 
+    this.orderRef = this.order.orderRef;
     this.orderItemsRef = this.orderRef.child('items');
     this.orderBillingRef = this.orderRef.child('billing');
     this.orderPriceAmountRef = this.orderBillingRef.child('priceAmount');

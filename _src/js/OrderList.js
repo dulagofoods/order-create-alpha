@@ -79,7 +79,7 @@ class OrderList {
       if (!this.orders[orderRef.key]) {
 
         if (orderRef && !this.orders[orderRef.key])
-          this.orders[orderRef.key] = new Order(orderRef, this, false);
+          this.orders[orderRef.key] = new Order(orderRef, this.app, false);
 
         this.orders[orderRef.key].ordersViewItemRef = this.ordersViewRef.child(orderRef.key);
         this.orders[orderRef.key].createdTime = moment(data.createdTime);

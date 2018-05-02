@@ -1,8 +1,10 @@
 class OrderItemList {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
+
+    this.orderRef = this.order.orderRef;
 
     this.element = document.createElement('div');
     this.itemList = [];
@@ -22,17 +24,8 @@ class OrderItemList {
 
     });
 
-    this.orderRef.child('items').on('child_added', snap => {
-
-      this.pushItem(snap.ref);
-
-    });
-
-    this.orderRef.child('items').on('child_removed', snap => {
-
-      this.delete(snap.ref);
-
-    });
+    this.orderRef.child('items').on('child_added', snap => this.pushItem(snap.ref));
+    this.orderRef.child('items').on('child_removed', snap => this.delete(snap.ref));
 
   }
 
@@ -76,7 +69,7 @@ class OrderItemList {
 
     this.orderRef.child('items').push({
       itemName: itemName || '',
-      itemPrice: itemPrice ||  0.00,
+      itemPrice: itemPrice || 0.00,
       quantity: 1
     });
 
@@ -109,7 +102,7 @@ class OrderItemList {
 
   delete(orderItemRef) {
 
-    for (let i = this.itemList.length; i--; ) {
+    for (let i = this.itemList.length; i--;) {
 
       if (this.itemList[i].orderItemRef.key === orderItemRef.key)
         this.itemList.splice(i, 1);

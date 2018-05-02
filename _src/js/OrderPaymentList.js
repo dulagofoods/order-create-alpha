@@ -1,9 +1,10 @@
 class OrderPaymentList {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
 
+    this.orderRef = this.order.orderRef;
     this.orderBillingRef = this.orderRef.child('billing');
     this.orderPaymentsRef = this.orderBillingRef.child('payments');
 

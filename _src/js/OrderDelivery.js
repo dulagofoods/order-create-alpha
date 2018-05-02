@@ -1,8 +1,10 @@
 class OrderDelivery {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
+
+    this.orderRef = this.order.orderRef;
 
     this.element = document.createElement('div');
 

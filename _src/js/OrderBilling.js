@@ -1,8 +1,10 @@
 class OrderBilling {
 
-  constructor(orderRef) {
+  constructor(order) {
 
-    this.orderRef = orderRef;
+    this.order = order;
+
+    this.orderRef = this.order.orderRef;
 
     this.element = document.createElement('div');
 
@@ -12,8 +14,8 @@ class OrderBilling {
 
   init() {
 
-    this.priceAmount = new OrderPriceAmount(this.orderRef);
-    this.paymentList = new OrderPaymentList(this.orderRef);
+    this.priceAmount = new OrderPriceAmount(this.order);
+    this.paymentList = new OrderPaymentList(this.order);
 
     this.build();
 

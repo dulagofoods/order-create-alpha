@@ -1,0 +1,26 @@
+.AutoComplete {
+
+}
+
+.AutoComplete .dropdown-content {
+    transform: scaleX(.5) scaleY(0);
+    -webkit-transition: all .1s ease-in-out;
+    -moz-transition: all .1s ease-in-out;
+    -ms-transition: all .1s ease-in-out;
+    -o-transition: all .1s ease-in-out;
+    transition: all .1s ease-in-out;
+}
+
+.AutoComplete li.has-focus,
+.AutoComplete li:hover {
+    background-color: #eeeeee;
+}
+
+.AutoComplete li span {
+    font-weight: 700;
+}
+
+.AutoComplete li span .highlight {
+    color: #444;
+    font-weight: 400;
+}
