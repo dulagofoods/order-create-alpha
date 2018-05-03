@@ -25,7 +25,6 @@ class OrderCustomer {
   buildCustomerNameFieldElement() {
 
     const autocomplete = new CustomerAutoComplete(this.order, false, item => {
-      console.log(item);
       Order.setCustomer(this.orderRef, item.customer);
     });
 
