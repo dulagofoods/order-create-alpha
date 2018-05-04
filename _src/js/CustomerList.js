@@ -21,17 +21,17 @@ class CustomerList {
 
   }
 
-  query(customerName = '', list = this.list) {
+  query(queryString = '', property = 'customerName', list = this.list) {
 
-    customerName = customerName.toLowerCase();
+    queryString = queryString.toLowerCase();
 
-    if (customerName.length >= this.minStringLength)
+    if (queryString.length >= this.minStringLength)
       return Object.values(list)
-        .filter(customer => customer.data.customerName.toLowerCase().includes(customerName))
+        .filter(customer => customer.data[property] ? customer.data[property].toLowerCase().includes(queryString) : false)
         .sort((a, b) => {
-          if (a.data.customerName < b.data.customerName)
+          if (a.data[property] < b.data[property])
             return -1;
-          if (a.data.customerName > b.data.customerName)
+          if (a.data[property] > b.data[property])
             return 1;
           return 0;
         });

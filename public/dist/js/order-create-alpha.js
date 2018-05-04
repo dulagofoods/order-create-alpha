@@ -395,9 +395,10 @@ class Customer {
 }
 class CustomerAutoComplete {
 
-  constructor(orderRefKey, customerList = false, fallback = false, element = document.createElement('div')) {
+  constructor(orderRefKey = '', property = 'customerName', customerList = false, fallback = false, element = document.createElement('div')) {
 
     this.orderRefKey = orderRefKey;
+    this.property = property;
     this.customerList = customerList;
     this.element = element;
     this.fallback = fallback;
@@ -455,7 +456,7 @@ class CustomerAutoComplete {
 
     this.element.input = document.createElement('input');
     this.element.input.type = 'text';
-    this.element.input.id = this.orderRefKey + '-customerName';
+    this.element.input.id = this.orderRefKey + '-' + this.property;
     this.element.appendChild(this.element.input);
 
     this.element.dropdown = document.createElement('ul');
@@ -536,7 +537,7 @@ class CustomerAutoComplete {
 
   query() {
 
-    const result = this.customerList.query(this.element.input.value);
+    const result = this.customerList.query(this.element.input.value, this.property);
 
     if (result.length)
       this.showDropdown(result);
@@ -641,17 +642,17 @@ class CustomerList {
 
   }
 
-  query(customerName = '', list = this.list) {
+  query(queryString = '', property = 'customerName', list = this.list) {
 
-    customerName = customerName.toLowerCase();
+    queryString = queryString.toLowerCase();
 
-    if (customerName.length >= this.minStringLength)
+    if (queryString.length >= this.minStringLength)
       return Object.values(list)
-        .filter(customer => customer.data.customerName.toLowerCase().includes(customerName))
+        .filter(customer => customer.data[property] ? customer.data[property].toLowerCase().includes(queryString) : false)
         .sort((a, b) => {
-          if (a.data.customerName < b.data.customerName)
+          if (a.data[property] < b.data[property])
             return -1;
-          if (a.data.customerName > b.data.customerName)
+          if (a.data[property] > b.data[property])
             return 1;
           return 0;
         });
@@ -1543,13 +1544,13 @@ class OrderCustomer {
 
   buildCustomerNameFieldElement() {
 
-    const element = document.createElement('div');
-    element.classList.add('OrderCustomer-customerNameField', 'col', 's8');
-    this.element.appendChild(element);
-
-    const autocomplete = new CustomerAutoComplete(this.orderRef.key, orderApp.customerList, item => {
+    const autocomplete = new CustomerAutoComplete(this.orderRef.key, 'customerName', orderApp.customerList, item => {
       Order.setCustomer(this.orderRef, item.customer);
-    }, element);
+    });
+
+    const element = autocomplete.element;
+    element.classList.add('OrderCustomer-customerNameField', 'col', 's7');
+    this.element.appendChild(element);
 
     element.input.className = 'validate';
     element.input.addEventListener('input', () => {
@@ -1580,13 +1581,15 @@ class OrderCustomer {
 
   buildCustomerContactFieldElement() {
 
-    const element = document.createElement('div');
-    element.className = 'OrderCustomer-customerContact input-field col s4';
+    const autocomplete = new CustomerAutoComplete(this.orderRef.key, 'customerContact', orderApp.customerList, item => {
+      Order.setCustomer(this.orderRef, item.customer);
+    });
+
+    const element = autocomplete.element;
+    element.classList.add('OrderCustomer-customerContact', 'input-field', 'col', 's5');
     this.element.appendChild(element);
 
-    element.input = document.createElement('input');
     element.input.className = 'validate';
-    element.input.id = this.orderRef.key + '-customerContact';
     element.input.type = 'tel';
     element.input.addEventListener('input', () => {
 
@@ -1601,11 +1604,9 @@ class OrderCustomer {
     });
     element.appendChild(element.input);
 
-    element.label = document.createElement('label');
     this.customerRef.child('customerContact').on('value', snap => {
       if (snap.val()) element.label.classList = 'active';
     });
-    element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Telefone';
     element.appendChild(element.label);
 

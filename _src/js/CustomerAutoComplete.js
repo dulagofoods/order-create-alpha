@@ -1,8 +1,9 @@
 class CustomerAutoComplete {
 
-  constructor(orderRefKey, customerList = false, fallback = false, element = document.createElement('div')) {
+  constructor(orderRefKey = '', property = 'customerName', customerList = false, fallback = false, element = document.createElement('div')) {
 
     this.orderRefKey = orderRefKey;
+    this.property = property;
     this.customerList = customerList;
     this.element = element;
     this.fallback = fallback;
@@ -60,7 +61,7 @@ class CustomerAutoComplete {
 
     this.element.input = document.createElement('input');
     this.element.input.type = 'text';
-    this.element.input.id = this.orderRefKey + '-customerName';
+    this.element.input.id = this.orderRefKey + '-' + this.property;
     this.element.appendChild(this.element.input);
 
     this.element.dropdown = document.createElement('ul');
@@ -141,7 +142,7 @@ class CustomerAutoComplete {
 
   query() {
 
-    const result = this.customerList.query(this.element.input.value);
+    const result = this.customerList.query(this.element.input.value, this.property);
 
     if (result.length)
       this.showDropdown(result);

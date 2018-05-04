@@ -24,13 +24,13 @@ class OrderCustomer {
 
   buildCustomerNameFieldElement() {
 
-    const element = document.createElement('div');
-    element.classList.add('OrderCustomer-customerNameField', 'col', 's8');
-    this.element.appendChild(element);
-
-    const autocomplete = new CustomerAutoComplete(this.orderRef.key, orderApp.customerList, item => {
+    const autocomplete = new CustomerAutoComplete(this.orderRef.key, 'customerName', orderApp.customerList, item => {
       Order.setCustomer(this.orderRef, item.customer);
-    }, element);
+    });
+
+    const element = autocomplete.element;
+    element.classList.add('OrderCustomer-customerNameField', 'col', 's7');
+    this.element.appendChild(element);
 
     element.input.className = 'validate';
     element.input.addEventListener('input', () => {
@@ -61,13 +61,15 @@ class OrderCustomer {
 
   buildCustomerContactFieldElement() {
 
-    const element = document.createElement('div');
-    element.className = 'OrderCustomer-customerContact input-field col s4';
+    const autocomplete = new CustomerAutoComplete(this.orderRef.key, 'customerContact', orderApp.customerList, item => {
+      Order.setCustomer(this.orderRef, item.customer);
+    });
+
+    const element = autocomplete.element;
+    element.classList.add('OrderCustomer-customerContact', 'input-field', 'col', 's5');
     this.element.appendChild(element);
 
-    element.input = document.createElement('input');
     element.input.className = 'validate';
-    element.input.id = this.orderRef.key + '-customerContact';
     element.input.type = 'tel';
     element.input.addEventListener('input', () => {
 
@@ -82,11 +84,9 @@ class OrderCustomer {
     });
     element.appendChild(element.input);
 
-    element.label = document.createElement('label');
     this.customerRef.child('customerContact').on('value', snap => {
       if (snap.val()) element.label.classList = 'active';
     });
-    element.label.htmlFor = element.input.id;
     element.label.innerHTML = 'Telefone';
     element.appendChild(element.label);
 
