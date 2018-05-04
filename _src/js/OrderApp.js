@@ -13,7 +13,7 @@ class OrderApp {
 
     // define components instances
     this.customerList = new CustomerList(this.databaseRef);
-    this.orderList = new OrderList(this, 'OrderApp-list', true);
+    this.orderList = new OrderList(this, 'OrderApp-orderList', true);
     this.timeline = new Timeline(this, 'OrderApp-timeline', true);
     this.agenda = new Agenda(this, 'OrderApp-agenda', false);
 

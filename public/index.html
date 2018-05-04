@@ -96,8 +96,18 @@
     padding-right: 23px;
   }
 
-  .OrderApp-list {
+  .OrderApp-orderList {
     margin: 0 auto;
+    padding-top: 54px;
+    padding-bottom: 80px;
+  }
+
+  @media (min-width: 601px) {
+
+    .OrderApp-orderList {
+      padding-top: 64px;
+    }
+
   }
 
   .OrderApp-agenda {
@@ -247,10 +257,10 @@
 </script>
 <script src="dist/js/socket.io.js"></script>
 <script>
-
   let socket = io.connect('http://127.0.0.1:8080');
   socket.on('connect_error', error => {
     socket.close();
+/*
     console.error('erro de conexão no servidor de impressão local, conexão rejeitada');
     console.info('tentando conexão remota..');
     socket = io.connect('http://192.168.1.80:8080');
@@ -258,8 +268,8 @@
     socket.on('connect_error', error => {
       console.error('erro na conexão com servidor remoto')
     });
+*/
   });
-
 </script>
 
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>

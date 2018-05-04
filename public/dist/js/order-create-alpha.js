@@ -395,15 +395,12 @@ class Customer {
 }
 class CustomerAutoComplete {
 
-  constructor(order = false, element, fallback = false) {
+  constructor(orderRefKey, customerList = false, fallback = false, element = document.createElement('div')) {
 
-    this.order = order;
-    this.element = element || document.createElement('div');
+    this.orderRefKey = orderRefKey;
+    this.customerList = customerList;
+    this.element = element;
     this.fallback = fallback;
-
-    this.orderRef = this.order.orderRef;
-
-    this.customerList = this.order.app.customerList;
 
     // ui variables
     this.currentView = [];
@@ -458,7 +455,7 @@ class CustomerAutoComplete {
 
     this.element.input = document.createElement('input');
     this.element.input.type = 'text';
-    this.element.input.id = this.orderRef.key + '-customerName';
+    this.element.input.id = this.orderRefKey + '-customerName';
     this.element.appendChild(this.element.input);
 
     this.element.dropdown = document.createElement('ul');
@@ -581,7 +578,7 @@ class CustomerAutoCompleteItem {
     this.autocomplete = autocomplete;
 
     this.element = document.createElement('li');
-    this.isActive = false;
+    this.hasFocus = false;
 
     this.build();
 
@@ -597,6 +594,8 @@ class CustomerAutoCompleteItem {
   }
 
   highlight(string) {
+
+    string = string.replace(/[^\w\s]/gi, '');
 
     this.element.span.innerHTML = string
       ? this.customer.data.customerName.replace(new RegExp('(' + string + ')', 'ig'), '<span class=highlight>$1</span>')
@@ -1325,7 +1324,7 @@ class OrderApp {
 
     // define components instances
     this.customerList = new CustomerList(this.databaseRef);
-    this.orderList = new OrderList(this, 'OrderApp-list', true);
+    this.orderList = new OrderList(this, 'OrderApp-orderList', true);
     this.timeline = new Timeline(this, 'OrderApp-timeline', true);
     this.agenda = new Agenda(this, 'OrderApp-agenda', false);
 
@@ -1544,14 +1543,13 @@ class OrderCustomer {
 
   buildCustomerNameFieldElement() {
 
-    const autocomplete = new CustomerAutoComplete(this.order, false, item => {
-      console.log(item);
-      Order.setCustomer(this.orderRef, item.customer);
-    });
-
-    const element = autocomplete.element;
+    const element = document.createElement('div');
     element.classList.add('OrderCustomer-customerNameField', 'col', 's8');
     this.element.appendChild(element);
+
+    const autocomplete = new CustomerAutoComplete(this.orderRef.key, orderApp.customerList, item => {
+      Order.setCustomer(this.orderRef, item.customer);
+    }, element);
 
     element.input.className = 'validate';
     element.input.addEventListener('input', () => {

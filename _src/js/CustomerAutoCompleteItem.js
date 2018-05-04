@@ -6,7 +6,7 @@ class CustomerAutoCompleteItem {
     this.autocomplete = autocomplete;
 
     this.element = document.createElement('li');
-    this.isActive = false;
+    this.hasFocus = false;
 
     this.build();
 
@@ -22,6 +22,8 @@ class CustomerAutoCompleteItem {
   }
 
   highlight(string) {
+
+    string = string.replace(/[^\w\s]/gi, '');
 
     this.element.span.innerHTML = string
       ? this.customer.data.customerName.replace(new RegExp('(' + string + ')', 'ig'), '<span class=highlight>$1</span>')

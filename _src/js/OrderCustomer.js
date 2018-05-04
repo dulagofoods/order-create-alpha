@@ -24,13 +24,13 @@ class OrderCustomer {
 
   buildCustomerNameFieldElement() {
 
-    const autocomplete = new CustomerAutoComplete(this.order, false, item => {
-      Order.setCustomer(this.orderRef, item.customer);
-    });
-
-    const element = autocomplete.element;
+    const element = document.createElement('div');
     element.classList.add('OrderCustomer-customerNameField', 'col', 's8');
     this.element.appendChild(element);
+
+    const autocomplete = new CustomerAutoComplete(this.orderRef.key, orderApp.customerList, item => {
+      Order.setCustomer(this.orderRef, item.customer);
+    }, element);
 
     element.input.className = 'validate';
     element.input.addEventListener('input', () => {

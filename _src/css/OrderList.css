@@ -17,7 +17,7 @@
     display: flex;
     -webkit-flex-flow: column;
     flex-flow: column;
-    padding: 1rem 1rem 8rem;
+    padding: 1rem;
 }
 
 @media (min-width: 601px) {

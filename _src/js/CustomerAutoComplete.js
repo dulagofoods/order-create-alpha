@@ -1,14 +1,11 @@
 class CustomerAutoComplete {
 
-  constructor(order = false, element, fallback = false) {
+  constructor(orderRefKey, customerList = false, fallback = false, element = document.createElement('div')) {
 
-    this.order = order;
-    this.element = element || document.createElement('div');
+    this.orderRefKey = orderRefKey;
+    this.customerList = customerList;
+    this.element = element;
     this.fallback = fallback;
-
-    this.orderRef = this.order.orderRef;
-
-    this.customerList = this.order.app.customerList;
 
     // ui variables
     this.currentView = [];
@@ -63,7 +60,7 @@ class CustomerAutoComplete {
 
     this.element.input = document.createElement('input');
     this.element.input.type = 'text';
-    this.element.input.id = this.orderRef.key + '-customerName';
+    this.element.input.id = this.orderRefKey + '-customerName';
     this.element.appendChild(this.element.input);
 
     this.element.dropdown = document.createElement('ul');
