@@ -91,10 +91,24 @@ class CustomerAutoComplete {
     dropdown.style.left = window.getComputedStyle(this.element, null).getPropertyValue('padding-left');
     dropdown.style.display = 'block';
     dropdown.style.width = this.element.input.offsetWidth + 'px';
-    dropdown.style.height = customerList.length > 5 ? (60 * 5) + 'px' : (customerList.length * 60) + 'px';
     dropdown.style.opacity = '1';
     dropdown.style.transformOrigin = '0px 0px 0px';
     dropdown.style.transform = 'scaleX(1) scaleY(1)';
+    dropdown.style.top = 'auto';
+    dropdown.style.bottom = 'auto';
+
+    let height = customerList.length * 60;
+
+    if (customerList.length > 2 && window.innerHeight < 400)
+      height = 60 * 2.5;
+    else if (customerList.length > 3 && window.innerHeight < 500)
+      height = 60 * 3;
+    else if (customerList.length > 4 && window.innerHeight < 600)
+      height = 60 * 4;
+    else if (customerList.length > 5)
+      height = 60 * 5;
+
+    dropdown.style.height = height + 'px';
 
     this.destroyDropdown();
 
@@ -105,14 +119,16 @@ class CustomerAutoComplete {
       this.currentView.push(item);
     });
 
-    setTimeout(() => {
-      if (rect.bottom + dropdown.offsetHeight > window.innerHeight) {
-        dropdown.style.top = 'auto';
+    if (this.element.dropdown.delay)
+      clearTimeout(this.element.dropdown.delay);
+
+    this.element.dropdown.delay = setTimeout(() => {
+
+      if (rect.bottom + dropdown.offsetHeight > window.innerHeight)
         dropdown.style.bottom = 0;
-      } else {
-        dropdown.style.bottom = 'auto';
+      else
         dropdown.style.top = this.element.input.offsetHeight + 'px';
-      }
+
     }, 100);
 
   }

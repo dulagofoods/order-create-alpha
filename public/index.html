@@ -261,7 +261,7 @@
     socket.on('connect', () => console.info('conectado com sucesso em servidor de impressão remoto'));
     socket.on('connect_error', error => {
       console.error('erro na conexão com servidor remoto');
-      socket.close();
+      // socket.close();
     });
 
   });
