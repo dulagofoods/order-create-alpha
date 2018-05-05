@@ -68,6 +68,7 @@ class CustomerAutoComplete {
     this.element.dropdown.className = 'dropdown-content';
     this.element.appendChild(this.element.dropdown);
 
+
     this.element.label = document.createElement('label');
     this.element.label.htmlFor = this.element.input.id;
     this.element.label.innerHTML = 'Nome';
@@ -90,7 +91,7 @@ class CustomerAutoComplete {
     dropdown.style.left = window.getComputedStyle(this.element, null).getPropertyValue('padding-left');
     dropdown.style.display = 'block';
     dropdown.style.width = this.element.input.offsetWidth + 'px';
-    dropdown.style.height = customerList.length > 6 ? '300px' : (customerList.length * 50) + 'px';
+    dropdown.style.height = customerList.length > 5 ? (60 * 5) + 'px' : (customerList.length * 60) + 'px';
     dropdown.style.opacity = '1';
     dropdown.style.transformOrigin = '0px 0px 0px';
     dropdown.style.transform = 'scaleX(1) scaleY(1)';
@@ -167,7 +168,7 @@ class CustomerAutoComplete {
 
   select(item) {
 
-    this.element.input.value = item.customer.data.customerName;
+    this.element.input.value = item.customer.data[this.property];
     this.closeDropdown(10, true);
 
     if (this.fallback)

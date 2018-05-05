@@ -24,15 +24,12 @@ class OrderCustomer {
 
   buildCustomerNameFieldElement() {
 
-    const autocomplete = new CustomerAutoComplete(this.orderRef.key, 'customerName', orderApp.customerList, item => {
+    const element = new CustomerAutoComplete(this.orderRef.key, 'customerName', orderApp.customerList, item => {
       Order.setCustomer(this.orderRef, item.customer);
-    });
-
-    const element = autocomplete.element;
+    }).element;
     element.classList.add('OrderCustomer-customerNameField', 'col', 's7');
     this.element.appendChild(element);
 
-    element.input.className = 'validate';
     element.input.addEventListener('input', () => {
 
       this.customerRef.child('customerName').set(element.input.value);
@@ -44,14 +41,12 @@ class OrderCustomer {
         element.input.value = snap.val();
 
     });
-    element.appendChild(element.input);
 
+    element.label.innerHTML = 'Nome';
     this.customerRef.child('customerName').on('value', snap => {
       if (snap.val())
         element.label.classList = 'active';
     });
-    element.label.innerHTML = 'Nome';
-    element.appendChild(element.label);
 
     M.updateTextFields();
 
@@ -69,7 +64,6 @@ class OrderCustomer {
     element.classList.add('OrderCustomer-customerContact', 'input-field', 'col', 's5');
     this.element.appendChild(element);
 
-    element.input.className = 'validate';
     element.input.type = 'tel';
     element.input.addEventListener('input', () => {
 
@@ -82,13 +76,11 @@ class OrderCustomer {
         element.input.value = snap.val();
 
     });
-    element.appendChild(element.input);
 
+    element.label.innerHTML = 'Telefone';
     this.customerRef.child('customerContact').on('value', snap => {
       if (snap.val()) element.label.classList = 'active';
     });
-    element.label.innerHTML = 'Telefone';
-    element.appendChild(element.label);
 
     return element;
 

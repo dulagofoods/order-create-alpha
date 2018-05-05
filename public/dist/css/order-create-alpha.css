@@ -206,16 +206,49 @@
   transition: all .1s ease-in-out;
 }
 
-.AutoComplete li.has-focus,
-.AutoComplete li:hover {
+.AutoComplete .dropdown-content li {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-flow: column;
+  flex-flow: column;
+  -webkit-justify-content: center;
+  justify-content: center;
+  height: 60px;
+  overflow-x: hidden;
+  padding: 0 15px;
+}
+
+.AutoComplete .dropdown-content li.has-focus,
+.AutoComplete .dropdown-content li:hover {
   background-color: #eeeeee;
 }
 
-.AutoComplete li span {
+.AutoComplete .dropdown-content li span {
   font-weight: 700;
 }
 
-.AutoComplete li span .highlight {
+.AutoComplete .dropdown-content li > span {
+  display: inline;
+  white-space: nowrap;
+  padding: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.AutoComplete .dropdown-content li > span.name {
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+.AutoComplete .dropdown-content li > span.address {
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.AutoComplete .dropdown-content li span.highlight {
   color: #444;
   font-weight: 400;
 }

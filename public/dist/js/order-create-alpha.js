@@ -463,6 +463,7 @@ class CustomerAutoComplete {
     this.element.dropdown.className = 'dropdown-content';
     this.element.appendChild(this.element.dropdown);
 
+
     this.element.label = document.createElement('label');
     this.element.label.htmlFor = this.element.input.id;
     this.element.label.innerHTML = 'Nome';
@@ -485,7 +486,7 @@ class CustomerAutoComplete {
     dropdown.style.left = window.getComputedStyle(this.element, null).getPropertyValue('padding-left');
     dropdown.style.display = 'block';
     dropdown.style.width = this.element.input.offsetWidth + 'px';
-    dropdown.style.height = customerList.length > 6 ? '300px' : (customerList.length * 50) + 'px';
+    dropdown.style.height = customerList.length > 5 ? (60 * 5) + 'px' : (customerList.length * 60) + 'px';
     dropdown.style.opacity = '1';
     dropdown.style.transformOrigin = '0px 0px 0px';
     dropdown.style.transform = 'scaleX(1) scaleY(1)';
@@ -562,7 +563,7 @@ class CustomerAutoComplete {
 
   select(item) {
 
-    this.element.input.value = item.customer.data.customerName;
+    this.element.input.value = item.customer.data[this.property];
     this.closeDropdown(10, true);
 
     if (this.fallback)
@@ -587,10 +588,17 @@ class CustomerAutoCompleteItem {
 
   build() {
 
-    this.element.span = document.createElement('span');
-    this.element.span.innerHTML = this.customer.data.customerName;
+    this.element.name = document.createElement('span');
+    this.element.name.className = 'name';
+    this.element.name.innerHTML = this.customer.data.customerName;
     this.element.addEventListener('click', () => this.autocomplete.select(this));
-    this.element.appendChild(this.element.span);
+    this.element.appendChild(this.element.name);
+
+    this.element.address = document.createElement('span');
+    this.element.address.className = 'address';
+    this.element.address.innerHTML = CustomerAutoCompleteItem.buildAddressString(this.customer.data.defaultAddress);
+    this.element.addEventListener('click', () => this.autocomplete.select(this));
+    this.element.appendChild(this.element.address);
 
   }
 
@@ -598,7 +606,7 @@ class CustomerAutoCompleteItem {
 
     string = string.replace(/[^\w\s]/gi, '');
 
-    this.element.span.innerHTML = string
+    this.element.name.innerHTML = string
       ? this.customer.data.customerName.replace(new RegExp('(' + string + ')', 'ig'), '<span class=highlight>$1</span>')
       : this.customer.data.customerName;
 
@@ -615,6 +623,23 @@ class CustomerAutoCompleteItem {
 
     this.hasFocus = false;
     this.element.classList.remove('has-focus');
+
+  }
+
+  static buildAddressString(address) {
+
+    let string = '';
+
+    if (address) {
+
+        string += address.street;
+        string += string.length ? ', ' + address.houseNumber : address.houseNumber;
+        string += string.length ? ', ' + address.neighborhood : address.neighborhood;
+        string += string.length ? ', ' + address.reference : address.reference;
+
+    }
+
+    return string;
 
   }
 
@@ -1544,15 +1569,12 @@ class OrderCustomer {
 
   buildCustomerNameFieldElement() {
 
-    const autocomplete = new CustomerAutoComplete(this.orderRef.key, 'customerName', orderApp.customerList, item => {
+    const element = new CustomerAutoComplete(this.orderRef.key, 'customerName', orderApp.customerList, item => {
       Order.setCustomer(this.orderRef, item.customer);
-    });
-
-    const element = autocomplete.element;
+    }).element;
     element.classList.add('OrderCustomer-customerNameField', 'col', 's7');
     this.element.appendChild(element);
 
-    element.input.className = 'validate';
     element.input.addEventListener('input', () => {
 
       this.customerRef.child('customerName').set(element.input.value);
@@ -1564,14 +1586,12 @@ class OrderCustomer {
         element.input.value = snap.val();
 
     });
-    element.appendChild(element.input);
 
+    element.label.innerHTML = 'Nome';
     this.customerRef.child('customerName').on('value', snap => {
       if (snap.val())
         element.label.classList = 'active';
     });
-    element.label.innerHTML = 'Nome';
-    element.appendChild(element.label);
 
     M.updateTextFields();
 
@@ -1589,7 +1609,6 @@ class OrderCustomer {
     element.classList.add('OrderCustomer-customerContact', 'input-field', 'col', 's5');
     this.element.appendChild(element);
 
-    element.input.className = 'validate';
     element.input.type = 'tel';
     element.input.addEventListener('input', () => {
 
@@ -1602,13 +1621,11 @@ class OrderCustomer {
         element.input.value = snap.val();
 
     });
-    element.appendChild(element.input);
 
+    element.label.innerHTML = 'Telefone';
     this.customerRef.child('customerContact').on('value', snap => {
       if (snap.val()) element.label.classList = 'active';
     });
-    element.label.innerHTML = 'Telefone';
-    element.appendChild(element.label);
 
     return element;
 
