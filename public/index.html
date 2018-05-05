@@ -241,6 +241,7 @@
   M.AutoInit(document.body);
 
 </script>
+<script src="dist/js/clipboard.min.js"></script>
 <script src="dist/js/moment-with-locales.js"></script>
 <script>
 
@@ -259,7 +260,8 @@
     socket = io.connect('http://192.168.1.80:8080');
     socket.on('connect', () => console.info('conectado com sucesso em servidor de impressão remoto'));
     socket.on('connect_error', error => {
-      console.error('erro na conexão com servidor remoto')
+      console.error('erro na conexão com servidor remoto');
+      socket.close();
     });
 
   });

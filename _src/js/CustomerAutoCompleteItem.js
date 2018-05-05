@@ -58,10 +58,17 @@ class CustomerAutoCompleteItem {
 
     if (address) {
 
+      if (address.street) {
         string += address.street;
-        string += string.length ? ', ' + address.houseNumber : address.houseNumber;
+        if (address.houseNumber)
+          string += string.length ? ', ' + address.houseNumber : address.houseNumber;
+      }
+
+      if (address.neighborhood)
         string += string.length ? ', ' + address.neighborhood : address.neighborhood;
-        string += string.length ? ', ' + address.reference : address.reference;
+
+      if (address.addressReference)
+        string += string.length ? ', ' + address.addressReference : address.addressReference;
 
     }
 

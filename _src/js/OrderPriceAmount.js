@@ -45,13 +45,14 @@ class OrderPriceAmount {
 
     this.element.inputField = this.buildInputFieldElement();
     this.element.switcher = this.buildSwitcherElement();
+    this.element.copyButton = this.buildCopyButtonElement();
 
   }
 
   buildInputFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'input-field col s6';
+    element.className = 'input-field col s4';
 
     element.input = document.createElement('input');
     element.input.id = this.orderRef.key + '-priceAmountInput';
@@ -105,6 +106,24 @@ class OrderPriceAmount {
     element.label.appendChild(element.label.text);
 
     this.element.appendChild(element);
+
+    return element;
+
+  }
+
+  buildCopyButtonElement() {
+
+    const element = document.createElement('button');
+    new ClipboardJS(element);
+    element.className = 'btn-flat col s2';
+    element.dataset.clipboardText = '';
+    element.innerHTML = '<i class="material-icons">content_copy</i>'
+    this.element.appendChild(element);
+
+    this.orderPriceAmountRef.on('value', snap => {
+      let price = 'R$' + Order.parseValue(snap.val(), true).replace('.', ',');
+      element.dataset.clipboardText = 'O valor total do pedido é de *' + price + '*, precisa de troco?'
+    });
 
     return element;
 
