@@ -688,17 +688,19 @@
   justify-content: center;
   padding: 0 .5rem;
   width: 100%;
+  max-width: 210px;
 }
 
-TimelineItem-customerName {
-  max-width: 140px;
+.TimelineItem-customerName {
   overflow: hidden;
+  width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .TimelineItem-customerName span {
   font-weight: 700;
   font-size: 1rem;
-  white-space: nowrap;
 }
 
 .TimelineItem-createdTime span {
