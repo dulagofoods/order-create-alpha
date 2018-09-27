@@ -7,6 +7,7 @@
     display: flex;
     -webkit-flex-flow: column;
     flex-flow: column;
+    margin-top: .5em;
     margin-bottom: 1em;
     width: 100%;
     max-width: 500px;
@@ -39,6 +40,18 @@
     display: none;
 }
 
+.Order-inner {
+    -webkit-align-items: center;
+    align-items: center;
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+}
+
 .Order-inner > .row {
     margin-bottom: 16px;
 }
@@ -49,5 +62,31 @@
 
 .Order-printStatus {
     margin: 0 10px;
+    font-size: 12px;
+}
+
+.Order-card {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: column;
+    flex-flow: column;
+    width: 100%;
+    margin-top: -1px;
+}
+
+.Order-customerInfo {
+    display: -webkit-box;
+    display: -moz-box;
+    display: -ms-flexbox;
+    display: -webkit-flex;
+    display: flex;
+    padding: 4px 6px 3px;
+    width: 100%;
+}
+
+.Order-customerInfo span {
     font-size: 12px;
 }

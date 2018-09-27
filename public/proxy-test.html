@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<meta charset="UTF-8">
+<title>Proxy Test</title>
+
+<body>
+
+<script>
+
+  /*
+  Exemplo do método 'onChange'.. Serve para ouvir alterações em objetos
+  https://codeburst.io/understanding-javascript-proxies-by-examining-on-change-library-f252eddf76c2
+   */
+
+  const onChange = (objToWatch, onChangeFunction) => {
+    const handler = {
+      get(target, property, receiver) {
+        onChangeFunction();
+        const value = Reflect.get(target, property, receiver);
+        if (typeof value === 'object') {
+          return new Proxy(value, handler);
+        }
+        return value;
+      },
+      set(target, property, value, receiver) {
+        onChangeFunction();
+        return Reflect.set(target, property, value);
+      },
+      deleteProperty(target, property) {
+        onChangeFunction();
+        return Reflect.deleteProperty(target, property);
+      }
+
+    };
+    return new Proxy(objToWatch, handler);
+  };
+
+  const logger = () => console.log('I was called');
+  const obj = {a: 'a'};
+  const proxy = onChange(obj, logger);
+  console.log(proxy.a); // logger called here in get trap
+  proxy.b = 'b'; // logger called here as well in set trap
+  delete proxy.a; // logger called here in deleteProperty trap
+
+</script>
+
+<script>
+
+
+</script>
+
+</body>
+
+</html>

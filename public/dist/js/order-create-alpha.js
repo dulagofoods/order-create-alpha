@@ -1089,7 +1089,7 @@ class Order {
     element.printButton.innerHTML = '<i class="material-icons left">print</i>Imprimir';
     element.printButton.addEventListener('click', () => {
 
-      Order.print(this.orderRef, this.socket);
+      Order.print(this.orderRef, socket);
 
     });
     element.appendChild(element.printButton);
@@ -1276,11 +1276,10 @@ class Order {
 
   }
 
-  static create(ordersRef = false, ordersViewRef = false, options = {}) {
+  static create(ordersRef = databaseRef.ref('orders'), ordersViewRef = false, options = {}) {
 
-    if (ordersRef || databaseRef) {
+    if (ordersRef) {
 
-      ordersRef = ordersRef ? ordersRef : databaseRef.ref('orders');
       ordersViewRef = ordersViewRef ? ordersViewRef : databaseRef.ref('ordersViews').child(moment().format('YYYY-MM-DD'));
 
       let createdTime = moment().toISOString();
@@ -1417,8 +1416,7 @@ class OrderApp {
     if (window.innerWidth < 601)
       this.timeline.inactive(this.element);
 
-    if (window.innerWidth > 1200)
-      this.agenda.active(this.element);
+    //   this.agenda.active(this.element);
 
     this.element.inner = document.createElement('div');
     this.element.inner.className = 'OrderApp-inner';

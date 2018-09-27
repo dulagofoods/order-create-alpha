@@ -86,7 +86,7 @@ class Order {
     element.printButton.innerHTML = '<i class="material-icons left">print</i>Imprimir';
     element.printButton.addEventListener('click', () => {
 
-      Order.print(this.orderRef, this.socket);
+      Order.print(this.orderRef, socket);
 
     });
     element.appendChild(element.printButton);
@@ -273,11 +273,10 @@ class Order {
 
   }
 
-  static create(ordersRef = false, ordersViewRef = false, options = {}) {
+  static create(ordersRef = databaseRef.ref('orders'), ordersViewRef = false, options = {}) {
 
-    if (ordersRef || databaseRef) {
+    if (ordersRef) {
 
-      ordersRef = ordersRef ? ordersRef : databaseRef.ref('orders');
       ordersViewRef = ordersViewRef ? ordersViewRef : databaseRef.ref('ordersViews').child(moment().format('YYYY-MM-DD'));
 
       let createdTime = moment().toISOString();

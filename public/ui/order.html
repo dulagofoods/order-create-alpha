@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="">
+<meta charset="UTF-8">
+<title>Du Lago OrderApp</title>
+<meta name="viewport"
+      content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+<script src="../dist/js/villa.min.js"></script>
+<link rel="stylesheet" href="../dist/css/villa.min.css"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css?family=Roboto+Condensed:300,400,500,700" rel="stylesheet">
+<link type="text/css" rel="stylesheet" href="../dist/css/materialize.min.css" media="screen,projection"/>
+<link rel="stylesheet" href="../dist/css/materialize.custom.css">
+<link rel="stylesheet" href="../dist/css/order-create-alpha.css">
+<!--[if lt IE 9]>
+<link rel="stylesheet" type="text/css" href="../dist/css/material-colors.css"/>
+<link rel="stylesheet" type="text/css" href="../dist/css/villa-cross.min.css"/>
+<script src="../dist/js/html5shiv.js"></script>
+<script src="../dist/js/html5shiv-printshiv.js"></script>
+<script src="../dist/js/classList.min.js"></script>
+<![endif]-->
+
+<body class="grey-200">
+
+<div class="OrderList-inner">
+    <div class="Order" data-order-ref-key="-LKwBTyjXQfE7V-5thS_">
+        <div class="Order-inner">
+            <div class="Order-customerInfo">
+                <span class="CustomerName">Débora Silva</span>
+            </div>
+            <div class="Order-card card grey lighten-5">
+                <div class="card-content">
+                    <div class="OrderCustomer row">
+                        <div class="AutoComplete input-field OrderCustomer-customerNameField col s7"><input type="text"
+                                                                                                            id="-LKwBTyjXQfE7V-5thS_-customerName">
+                            <ul class="dropdown-content"></ul>
+                            <label for="-LKwBTyjXQfE7V-5thS_-customerName" class="active">Nome</label></div>
+                        <div class="AutoComplete input-field OrderCustomer-customerContact col s5"><input type="tel"
+                                                                                                          id="-LKwBTyjXQfE7V-5thS_-customerContact">
+                            <ul class="dropdown-content"></ul>
+                            <label for="-LKwBTyjXQfE7V-5thS_-customerContact">Telefone</label></div>
+                    </div>
+                    <div class="OrderDeliveryTime row">
+                        <div class="OrderDeliveryTime-time input-field col s3"><input id="-LKwBTyjXQfE7V-5thS_-customerName"
+                                                                                      type="time" step="300"><label
+                                class="active" for="-LKwBTyjXQfE7V-5thS_-customerName">Entrega</label></div>
+                        <div class="OrderDeliveryTime-actions col s8">
+                            <button class="btn-flat"><span>+20</span></button>
+                            <button class="btn-flat"><span>+30</span></button>
+                            <button class="btn-flat"><i class="material-icons">clear</i></button>
+                        </div>
+                    </div>
+                    <div class="OrderItemList row">
+                        <div class="OrderItemList-list">
+                            <div class="OrderItem row" data-order-item-key="-LKwBTyjXQfE7V-5thSa">
+                                <div class="OrderItem-main">
+                                    <div class="input-field col s5"><input class="autocomplete" type="text"
+                                                                           id="-LKwBTyjXQfE7V-5thSa-itemName"
+                                                                           data-target="autocomplete-options-0b56b44d-56ac-7ecf-e2d5-473e76e07034">
+                                        <ul id="autocomplete-options-0b56b44d-56ac-7ecf-e2d5-473e76e07034"
+                                            class="autocomplete-content dropdown-content" tabindex="0"></ul>
+                                        <label for="-LKwBTyjXQfE7V-5thSa-itemName" class="active">Produto</label></div>
+                                    <div class="input-field col s2"><input type="number" min="1"
+                                                                           id="-LKwBTyjXQfE7V-5thSaitemQuantity"><label
+                                            for="-LKwBTyjXQfE7V-5thSaitemQuantity" class="active">Qtde</label></div>
+                                    <div class="input-field col s3"><input type="number" min="0" step="1"
+                                                                           id="-LKwBTyjXQfE7V-5thSaitemPrice"><label
+                                            for="-LKwBTyjXQfE7V-5thSaitemPrice" class="active">Preço</label></div>
+                                    <div class="OrderItem-actions col s2"><a
+                                            class="waves-effect waves-light btn-floating btn-small red"><i
+                                            class="material-icons">remove</i></a></div>
+                                </div>
+                                <div class="OrderItem-note is-active">
+                                    <div class="input-field col s10"><textarea class="materialize-textarea"
+                                                                               placeholder="observação"></textarea></div>
+                                    <a href="#">remover observação</a></div>
+                            </div>
+                        </div>
+                        <div class="OrderItems-actions">
+                            <button class="waves-effect waves-light btn-small orange light-1">Adicionar Produto</button>
+                        </div>
+                    </div>
+                    <div class="OrderBilling row">
+                        <div class="OrderPriceAmount row">
+                            <div class="input-field col s4"><input id="-LKwBTyjXQfE7V-5thS_-priceAmountInput" type="number"
+                                                                   min="0.00" step="1" disabled=""><label class="active"
+                                                                                                          for="-LKwBTyjXQfE7V-5thS_-priceAmountInput">Total</label>
+                            </div>
+                            <div class="switch col s6"><label><input type="checkbox"><span class="lever"></span>alterar</label>
+                            </div>
+                            <button class="btn-flat col s2"
+                                    data-clipboard-text="O valor total do pedido é de *R$7,00*, precisa de troco?"><i
+                                    class="material-icons">content_copy</i></button>
+                        </div>
+                        <div class="OrderPaymentList row">
+                            <div class="OrderItemList-list">
+                                <div class="OrderPaymentItem row" data-order-payment-item-ref-key="-LKwD2vHoKXn_1vvFzAd">
+                                    <div class="OrderPaymentItem-method input-field col s4">
+                                        <div class="select-wrapper"><input class="select-dropdown dropdown-trigger" type="text"
+                                                                           readonly="true"
+                                                                           data-target="select-options-c0f3fc55-393a-5da0-4d81-10302d604d83">
+                                            <ul id="select-options-c0f3fc55-393a-5da0-4d81-10302d604d83"
+                                                class="dropdown-content select-dropdown" tabindex="0">
+                                                <li class="disabled" id="select-options-c0f3fc55-393a-5da0-4d81-10302d604d830"
+                                                    tabindex="0"><span>Métodos</span></li>
+                                                <li id="select-options-c0f3fc55-393a-5da0-4d81-10302d604d831" tabindex="0">
+                                                    <span>Cartão</span></li>
+                                                <li id="select-options-c0f3fc55-393a-5da0-4d81-10302d604d832" tabindex="0"
+                                                    class="selected"><span>Dinheiro</span></li>
+                                                <li id="select-options-c0f3fc55-393a-5da0-4d81-10302d604d833" tabindex="0">
+                                                    <span>Pago</span></li>
+                                                <li id="select-options-c0f3fc55-393a-5da0-4d81-10302d604d834" tabindex="0">
+                                                    <span>Cortesia</span></li>
+                                            </ul>
+                                            <svg class="caret" height="24" viewBox="0 0 24 24" width="24"
+                                                 xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M7 10l5 5 5-5z"></path>
+                                                <path d="M0 0h24v24H0z" fill="none"></path>
+                                            </svg>
+                                            <select tabindex="-1">
+                                                <option value="" disabled="">Métodos</option>
+                                                <option value="card">Cartão</option>
+                                                <option value="money" selected="true">Dinheiro</option>
+                                                <option value="paid">Pago</option>
+                                                <option value="gift">Cortesia</option>
+                                            </select></div>
+                                        <label>Pagamento</label></div>
+                                    <div class="OrderPaymentItem-referenceValue input-field col s3"><input type="number"
+                                                                                                           id="-LKwD2vHoKXn_1vvFzAd-referenceValueField"
+                                                                                                           disabled=""><label
+                                            for="-LKwD2vHoKXn_1vvFzAd-referenceValueField" class="active">Valor</label></div>
+                                    <div class="OrderPaymentItem-paidValue input-field col s3"><input type="number"
+                                                                                                      id="-LKwD2vHoKXn_1vvFzAd-paidValueField"
+                                                                                                      step="10"><label
+                                            for="-LKwD2vHoKXn_1vvFzAd-paidValueField" class="active">Troco p</label></div>
+                                    <div class="OrderItem-actions col s2"><a
+                                            class="waves-effect btn-floating btn-small white"><i
+                                            class="material-icons red-text">remove</i></a></div>
+                                </div>
+                            </div>
+                            <span class="OrderPaymentList-priceAssistant font-orange"></span>
+                            <div class="OrderPaymentList-actions">
+                                <button class="waves-effect waves-light btn-small green light-1">Adicionar Pagamento</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="OrderDelivery row is-active">
+                        <div class="OrderDelivery-action switch col s12"><label>retirada<input type="checkbox"><span
+                                class="lever"></span>entrega</label></div>
+                        <div class="OrderDelivery-addressForm row">
+                            <div class="input-field col s9"><input class="autocomplete" type="text"
+                                                                   id="-LKwBTyjXQfE7V-5thS_-addressStreet"
+                                                                   data-target="autocomplete-options-ba976c6d-37d3-b6b2-c670-0bbc5ac3d56e">
+                                <ul id="autocomplete-options-ba976c6d-37d3-b6b2-c670-0bbc5ac3d56e"
+                                    class="autocomplete-content dropdown-content" tabindex="0"></ul>
+                                <label for="-LKwBTyjXQfE7V-5thS_-addressStreet" class="active">Rua</label></div>
+                            <div class="input-field col s3"><input type="number"
+                                                                   id="-LKwBTyjXQfE7V-5thS_-addressHouseNumber"><label
+                                    for="-LKwBTyjXQfE7V-5thS_-addressHouseNumber" class="active">Número</label></div>
+                            <div class="input-field col s12"><input class="autocomplete" type="text"
+                                                                    id="-LKwBTyjXQfE7V-5thS_-addressNeighborhood"
+                                                                    data-target="autocomplete-options-5b6c697f-92cc-8aa7-efca-92c65a9b9b76">
+                                <ul id="autocomplete-options-5b6c697f-92cc-8aa7-efca-92c65a9b9b76"
+                                    class="autocomplete-content dropdown-content" tabindex="0"></ul>
+                                <label for="-LKwBTyjXQfE7V-5thS_-addressNeighborhood" class="active">Bairro</label></div>
+                            <div class="input-field col s12"><input type="text"
+                                                                    id="-LKwBTyjXQfE7V-5thS_-addressReference"><label
+                                    for="-LKwBTyjXQfE7V-5thS_-addressReference">Complemento ou Referência</label></div>
+                        </div>
+                    </div>
+                    <span class="Order-printStatus font-green">impresso há 11 horas (1 vez)</span></div>
+                <div class="card-action">
+                    <button class="left waves-effect waves-green btn light-blue"><i class="material-icons left">print</i>Imprimir
+                    </button>
+                    <button class="left waves-effect waves-orange btn-flat orange-text"><span class="hide-on-med-and-down"><i
+                            class="material-icons left">save</i>Salvar</span><span class="hide-on-large-only"><i
+                            class="material-icons">save</i></span></button>
+                    <button class="left waves-effect waves-red btn-flat red-text"><span><i
+                            class="material-icons">delete</i></span></button>
+                    <button class="right waves-effect waves-light btn-flat"><span class="hide-on-med-and-down"><i
+                            class="material-icons left">close</i>Fechar</span><span class="hide-on-large-only"><i
+                            class="material-icons">close</i></span></button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript" src="../dist/js/materialize.js"></script>
+<script>
+
+  M.AutoInit(document.body);
+
+</script>
+<script src="../dist/js/clipboard.min.js"></script>
+<script src="../dist/js/moment-with-locales.js"></script>
+<script>
+
+  moment.locale('pt-br');
+  console.log(moment().format());
+
+</script>
+
+</body>
+
+</html>

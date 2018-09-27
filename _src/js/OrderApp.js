@@ -57,8 +57,7 @@ class OrderApp {
     if (window.innerWidth < 601)
       this.timeline.inactive(this.element);
 
-    if (window.innerWidth > 1200)
-      this.agenda.active(this.element);
+    //   this.agenda.active(this.element);
 
     this.element.inner = document.createElement('div');
     this.element.inner.className = 'OrderApp-inner';
