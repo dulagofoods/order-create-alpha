@@ -32,7 +32,7 @@ class OrderDeliveryTime {
   buildTimeFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderDeliveryTime-time input-field col s3';
+    element.className = 'OrderDeliveryTime-time input-field col s4';
     this.element.appendChild(element);
 
     // input

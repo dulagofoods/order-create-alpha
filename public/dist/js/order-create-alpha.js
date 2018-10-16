@@ -1081,7 +1081,7 @@ class Order {
   buildActionsElement() {
 
     const element = document.createElement('div');
-    element.className = 'Order-inner card-action';
+    element.className = 'Order-action card-action';
     this.element.appendChild(element);
 
     element.printButton = document.createElement('button');
@@ -1188,7 +1188,7 @@ class Order {
         if (element.updateInterval)
           clearInterval(element.updateInterval);
 
-        function updateText() {
+        let updateText = function() {
 
           if (printouts)
             element.innerHTML = 'impresso' +
@@ -1198,7 +1198,7 @@ class Order {
           else if (snap.val())
             element.innerHTML = 'impresso ' + moment(snap.val().printingTime).fromNow();
 
-        }
+        };
 
         setTimeout(() => updateText(), 10);
         element.updateInterval = setInterval(() => updateText(), 5000);
@@ -2120,7 +2120,7 @@ class OrderDeliveryTime {
   buildTimeFieldElement() {
 
     const element = document.createElement('div');
-    element.className = 'OrderDeliveryTime-time input-field col s3';
+    element.className = 'OrderDeliveryTime-time input-field col s4';
     this.element.appendChild(element);
 
     // input

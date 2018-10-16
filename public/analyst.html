@@ -49,6 +49,7 @@
 <body class="grey-200">
 
 <div id="analyst" class="Analyst"></div>
+<div id="app"></div>
 
 <script src="dist/js/moment-with-locales.js"></script>
 <script>
@@ -58,27 +59,7 @@
 
 </script>
 
-<script>
-
-  const onChange = (objToWatch, onChangeFunction) => {
-    const handler = {
-      get(target, property, receiver) {
-        onChangeFunction();
-        return Reflect.get(target, property, receiver);
-      },
-      set(target, property, value) {
-        onChangeFunction();
-        return Reflect.set(target, property, value);
-      },
-      deleteProperty(target, property) {
-        onChangeFunction();
-        return Reflect.deleteProperty(target, property);
-      }
-    };
-    return new Proxy(objToWatch, handler);
-  };
-
-</script>
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase-database.js"></script>
@@ -117,8 +98,7 @@
       this.ordersViewRef = this.databaseRef.ref('ordersViews');
       this.activeOrdersViewRef = this.ordersViewRef.child(moment().format('YYYY-MM-DD'));
 
-      this.realtime = new AnalystRealTime(document.createElement('div'), false);
-      this.dailyReports = [];
+      this.realtime = new AnalystRealTime(activeOrdersViewRef, undefined, false);
 
       this.init();
 
@@ -128,17 +108,14 @@
 
       this.build();
 
-      this.ordersViewRef.on('child_added', snap => {
-        // this.dailyReports.push(new DailyReport(this.activeOrdersViewRef.ref));
-        this.dailyReports.push(new DailyReport(snap.ref));
-        this.view.refresh();
-      });
+      this.realtime.init();
 
     }
 
     build() {
 
       this.element.className = 'Analyst';
+      this.element.appendChild(this.realtime.element);
 
     }
 
@@ -150,36 +127,47 @@
 
   class AnalystRealTime {
 
-    constructor(element = document.createElement('div'), autoInit = true) {
+    constructor(ordersViewRef, element = document.createElement('div'), autoInit = true) {
 
+      this.ordersViewRef = ordersViewRef;
       this.element = element;
 
-      if (autoInit)
-        this.build();
+      if (this.ordersViewRef && autoInit)
+        this.init();
+
+    }
+
+    init() {
+
+      this.dailyReport = new DailyReport(this.ordersViewRef, (report) => this.onDataUpdate(report));
+
+      this.build();
 
     }
 
     build() {
 
-      this.element.className = 'AnalystView';
+      this.element.className = 'AnalystRealTime';
+      this.element.inner = document.createElement('div');
+      this.element.appendChild(this.element.inner);
 
-      this.element.innerElement = document.createElement('div');
-      this.element.innerElement.className = 'AnalystView-inner';
-      this.element.appendChild(this.element.innerElement);
+      this.vm = new Vue({
+        el: this.element.inner,
+        data: {
+          report: {
+            items: {
+              amount: 0
+            }
+          }
+        },
+        template: '<span>{{ report.items.amount }}</span>'
+      });
 
     }
 
-    refresh() {
+    onDataUpdate(report) {
 
-      this.clear();
-      this.build();
-
-    }
-
-    clear() {
-
-      while (this.element.firstChild)
-        this.element.removeChild(this.element.firstChild);
+      this.vm.report = report;
 
     }
 
@@ -191,9 +179,10 @@
 
   class DailyReport {
 
-    constructor(ordersViewRef) {
+    constructor(ordersViewRef, onChange = false, autoInit = true) {
 
       this.ordersViewRef = ordersViewRef;
+      this.onChange = onChange;
 
       this.orders = {};
       this.refreshLocked = false;
@@ -201,11 +190,8 @@
 
       this.report = {};
 
-      this.proxy = onChange(this, () => {
-        console.log('haha');
-      });
-
-      this.init();
+      if (autoInit)
+        this.init();
 
     }
 
@@ -238,15 +224,20 @@
 
       this.refreshTimeout = setTimeout(() => {
 
-        this.proxy.report = DailyReport.getReport(Object.values(this.orders));
-
+        this.setReport(DailyReport.getReport(Object.values(this.orders)));
         this.refreshLocked = false;
-
-        console.log(this.proxy.report);
 
       }, 500);
 
       this.refreshLocked = true;
+
+    }
+
+    setReport(report) {
+
+      console.log(report);
+      this.report = report;
+      this.onChange(this.report);
 
     }
 

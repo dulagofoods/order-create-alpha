@@ -6,4 +6,9 @@
     display: -ms-flexbox;
     display: -webkit-flex;
     display: flex;
+    width: 100%;
+}
+
+.OrderDeliveryTime-time input {
+
 }
